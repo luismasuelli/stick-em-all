@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.19 <0.9.0;
+pragma solidity >=0.8.21 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
@@ -34,9 +34,10 @@ contract StickEmAllParams is Ownable {
    * by: "Add the dollar scale (100 for the cents) while also
    * removing the USD_PER_MATIC scale (100000000)".
    *
-   * The math results in: 10**18 / (10**2 / 10**8) or 10**24
+   * The math results in: 10**18 / (10**2 / 10**8) or 10**(16 + 8).
+   * The feed scale we'll be provided by the feed itself.
    */
-  uint256 constant MaticFromCentsScaleFactor = 10 ** 24;
+  uint256 constant MaticFromCentsScaleFactor = 10 ** 16;
 
   /**
    * The address that will receive the collected earnings.
@@ -125,6 +126,9 @@ contract StickEmAllParams is Ownable {
       /*uint80 answeredInRound*/
     ) = AggregatorV3Interface(priceFeed).latestRoundData();
 
+    // Getting the per-feed decimals.
+    uint8 decimals = AggregatorV3Interface(priceFeed).decimals();
+
     // Now, we take this value and use it properly as a factor.
     // We'll be using Polygon here. The rate is expressed in units
     // of 10**8 (e.g. 50000000 means $0.50/MATIC).
@@ -138,6 +142,6 @@ contract StickEmAllParams is Ownable {
     // 1e18 * ((fiatCost / 100) / (rate / 10**8))
     //
     // Which is the same as: 10 ** (18 - 2 + 8), or 10 ** 24
-    return MaticFromCentsScaleFactor * fiatCost / rate;
+    return MaticFromCentsScaleFactor * (18 ** decimals) * fiatCost / rate;
   }
 }
