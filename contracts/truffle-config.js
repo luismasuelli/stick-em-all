@@ -41,10 +41,8 @@
  * https://trufflesuite.com/docs/truffle/getting-started/using-the-truffle-dashboard/
  */
 
-// require('dotenv').config();
-// const { MNEMONIC, PROJECT_ID } = process.env;
-
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+require('dotenv').config();
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 module.exports = {
   /**
@@ -61,14 +59,38 @@ module.exports = {
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache, geth, or parity) in a separate terminal
-    // tab if you use this network and you must also set the `host`, `port` and `network_id`
+    // tab if you use this network, and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
-    // development: {
-    //  host: "127.0.0.1",     // Localhost (default: none)
-    //  port: 8545,            // Standard Ethereum port (default: none)
-    //  network_id: "*",       // Any network (default: none)
-    // },
+    development: {
+      network_id: "*",       // Any network (default: none)
+      provider: () => new HDWalletProvider(
+        "dentist whale pattern drastic time black cigar bike person destroy punch hungry",
+        "http://127.0.0.1:8545"
+      )
+    },
+    testnet: {
+      // TUNED FOR POLYGON MUMBAI.
+      provider: () => new HDWalletProvider(
+        process.env.MNEMONIC || "invalid-mnemonic-please-set-one", // Mnemonic of the wallet
+        "https://polygon-mumbai.gateway.tenderly.co" // RPC URL
+      ),
+      network_id: 80001, // Mumbai's network id
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    mainnet: {
+      // TUNED FOR POLYGON MAINNET.
+      provider: () => new HDWalletProvider(
+        process.env.MNEMONIC || "invalid-mnemonic-please-set-one", // Mnemonic of the wallet
+        "https://polygon-rpc.com" // Official Polygon Mainnet RPC URL
+      ),
+      network_id: 137, // Polygon Mainnet's network id
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    }
     //
     // An additional network, but with some advanced options…
     // advanced: {
