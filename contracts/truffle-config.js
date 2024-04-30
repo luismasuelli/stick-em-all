@@ -70,12 +70,12 @@ module.exports = {
       )
     },
     testnet: {
-      // TUNED FOR POLYGON MUMBAI.
+      // TUNED FOR POLYGON AMOY.
       provider: () => new HDWalletProvider(
         process.env.MNEMONIC || "invalid-mnemonic-please-set-one", // Mnemonic of the wallet
-        "https://polygon-mumbai.gateway.tenderly.co" // RPC URL
+        "https://rpc-amoy.polygon.technology/" // RPC URL
       ),
-      network_id: 80001, // Mumbai's network id
+      network_id: 80002, // Mumbai's network id
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true
