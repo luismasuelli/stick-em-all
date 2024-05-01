@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/contracts.iml" filepath="$PROJECT_DIR$/contracts.iml" />
+      <module fileurl="file://$PROJECT_DIR$/frontend-boilerplate.iml" filepath="$PROJECT_DIR$/frontend-boilerplate.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/stick-em-all.iml" filepath="$PROJECT_DIR$/.idea/stick-em-all.iml" />
     </modules>
   </component>
