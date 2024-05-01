@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
 /**
- * Manages all the underlying parameters of our Stick'em All
+ * Manages all the underlying parameters of our Stick 'em All
  * ecosystem. This includes ownership, costs, and withdrawal.
  */
 contract StickEmAllParams is Ownable {
@@ -37,7 +37,7 @@ contract StickEmAllParams is Ownable {
    * The math results in: 10**18 / (10**2 / 10**8) or 10**(16 + 8).
    * The feed scale we'll be provided by the feed itself.
    */
-  uint256 constant MaticFromCentsScaleFactor = 10 ** 16;
+  uint256 private constant MaticFromCentsScaleFactor = 10 ** 16;
 
   /**
    * The address that will receive the collected earnings.
