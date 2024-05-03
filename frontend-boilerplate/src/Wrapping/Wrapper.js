@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import Context from './Context.js';
 import Initializing from './Initializing.js';
 import NoActiveWallet from './NoActiveWallet.js';
 import BadNetwork from './BadNetwork.js';
-import Content from './Content.js';
 import Unexpected from "./Unexpected";
 import Web3 from 'web3';
 
@@ -11,7 +11,7 @@ const STATUS_NO_WALLET = 1;
 const STATUS_BAD_NETWORK = 2;
 const STATUS_OK = 3;
 
-const Wrapper = ({ expectedChainId, expectedChainName }) => {
+const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
     // The chain id to compare must be set to hexadecimal.
     const expectedHexChainId = '0x' + expectedChainId.toString(16);
 
@@ -103,7 +103,9 @@ const Wrapper = ({ expectedChainId, expectedChainName }) => {
         case STATUS_BAD_NETWORK:
             return <BadNetwork expectedChainName={expectedChainName} />;
         case STATUS_OK:
-            return <Content web3={web3} accounts={accounts} />;
+            return <Context.Provider value={{web3: web3, accounts: accounts}}>
+                {children}
+            </Context.Provider>;
         default:
             return <Unexpected uiStatus={uiStatus} />;
     }
