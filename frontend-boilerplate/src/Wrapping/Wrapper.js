@@ -100,12 +100,12 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
 
     switch(uiStatus) {
         case STATUS_INITIALIZING:
-            return <ShowStopper title={"Initializing"} content={"Loading contents..."} />;
+            return <ShowStopper title="Initializing" content="Loading contents..." />;
         case STATUS_NO_WALLET:
-            return <ShowStopper title={"No wallet"} content={"Please install and setup a wallet extension."} />;
+            return <ShowStopper title="No wallet" content="Please install and setup a wallet extension." />;
         case STATUS_BAD_CHAIN:
             let content = `The chain must be ${expectedChainName} (${expectedChainId}).`;
-            return <ShowStopper title={"Bad chain"} content={content} />;
+            return <ShowStopper title="Bad chain" content={content} />;
         case STATUS_OK:
             return <Web3Context.Provider value={{web3: web3, accounts: accounts}}>
                 <ChoosingAccount web3={web3} accounts={accounts}>
@@ -113,7 +113,7 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
                 </ChoosingAccount>
             </Web3Context.Provider>;
         default:
-            return <ShowStopper title={"Unexpected error"} content={"An unexpected error has occurred. Try again later."} />;
+            return <ShowStopper title="Unexpected error" content="An unexpected error has occurred. Try again later." />;
     }
 };
 
