@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import Context from './Context.js';
-import Initializing from './Initializing.js';
-import NoActiveWallet from './NoActiveWallet.js';
-import BadNetwork from './BadNetwork.js';
-import Unexpected from "./Unexpected";
 import Web3 from 'web3';
+import ShowStopper from "./ShowStopper";
 
 const STATUS_INITIALIZING = 0;
 const STATUS_NO_WALLET = 1;
-const STATUS_BAD_NETWORK = 2;
+const STATUS_BAD_CHAIN = 2;
 const STATUS_OK = 3;
 
 const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
+    // eslint-disable-next-line no-undef
+    expectedChainId = BigInt(expectedChainId);
+
     // The chain id to compare must be set to hexadecimal.
     const expectedHexChainId = '0x' + expectedChainId.toString(16);
 
@@ -56,8 +56,9 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
 
         // Define a callback for when the chain id changes.
         function onChainIdChanged(chainId) {
-            if (chainId !== expectedHexChainId) {
-                setUIStatus(STATUS_BAD_NETWORK);
+            if (chainId !== expectedChainId) {
+                console.log(`chainId: ${chainId} (${typeof chainId}) vs expectedChainId: ${expectedChainId} (${typeof expectedChainId})`);
+                setUIStatus(STATUS_BAD_CHAIN);
             } else {
                 setUIStatus(STATUS_OK);
             }
@@ -101,17 +102,18 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
 
     switch(uiStatus) {
         case STATUS_INITIALIZING:
-            return <Initializing />;
+            return <ShowStopper title={"Initializing"} content={"Loading contents..."} />;
         case STATUS_NO_WALLET:
-            return <NoActiveWallet />;
-        case STATUS_BAD_NETWORK:
-            return <BadNetwork expectedChainName={expectedChainName} />;
+            return <ShowStopper title={"No wallet"} content={"Please install and setup a wallet extension."} />;
+        case STATUS_BAD_CHAIN:
+            let content = `The chain must be ${expectedChainName} (${expectedChainId}).`;
+            return <ShowStopper title={"Bad chain"} content={content} />;
         case STATUS_OK:
             return <Context.Provider value={{web3: web3, accounts: accounts}}>
                 {children}
             </Context.Provider>;
         default:
-            return <Unexpected uiStatus={uiStatus} />;
+            return <ShowStopper title={"Unexpected error"} content={"An unexpected error has occurred. Try again later."} />;
     }
 };
 
