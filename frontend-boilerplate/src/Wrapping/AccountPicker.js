@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {Card, CardContent} from "@mui/material";
 
 export default function AccountPicker({ web3, accounts, accountIndex, setAccountIndex }) {
     const [balance, setBalance] = useState('0');
@@ -28,21 +29,22 @@ export default function AccountPicker({ web3, accounts, accountIndex, setAccount
             position: 'fixed',
             top: '10px',
             left: '10px',
-            padding: '10px',
-            backgroundColor: '#f0f0f0',
-            border: '1px solid #ccc',
-            borderRadius: '8px'
         }}>
-            <select onChange={handleAccountChange} value={accountIndex} style={{ padding: '5px', marginRight: '10px' }}>
-                {accounts.map((account, index) => (
-                    <option key={account} value={index}>
-                        {account}
-                    </option>
-                ))}
-            </select>
-            <label style={{ fontSize: '0.9rem' }}>
-                Balance: {balance} ETH
-            </label>
+            <Card style={{ width: 'auto' }}>
+                <CardContent>
+                    <select onChange={handleAccountChange} value={accountIndex}
+                            style={{padding: '5px', marginRight: '10px'}}>
+                        {accounts.map((account, index) => (
+                            <option key={account} value={index}>
+                                {account}
+                            </option>
+                        ))}
+                    </select>
+                    <label style={{fontSize: '0.9rem'}}>
+                        Balance: {balance} ETH
+                    </label>
+                </CardContent>
+            </Card>
         </div>
     );
 }
