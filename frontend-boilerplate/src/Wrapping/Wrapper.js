@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Context from './Context.js';
+import Web3Context from './Web3Context.js';
 import Web3 from 'web3';
 import ShowStopper from "./ShowStopper";
+import ChoosingAccount from "./ChoosingAccount";
 
 const STATUS_INITIALIZING = 0;
 const STATUS_NO_WALLET = 1;
@@ -11,9 +12,6 @@ const STATUS_OK = 3;
 const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
     // eslint-disable-next-line no-undef
     expectedChainId = BigInt(expectedChainId);
-
-    // The chain id to compare must be set to hexadecimal.
-    const expectedHexChainId = '0x' + expectedChainId.toString(16);
 
     // First, a state for the component. This tells what is
     // going on with the injected wallet.
@@ -98,7 +96,7 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
             ethereum.removeListener('accountsChanged', setAccounts);
             ethereum.removeListener('chainChanged', onChainIdChanged);
         };
-    }, [web3, expectedHexChainId, expectedChainName]);
+    }, [web3, expectedChainName, expectedChainId]);
 
     switch(uiStatus) {
         case STATUS_INITIALIZING:
@@ -109,9 +107,11 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
             let content = `The chain must be ${expectedChainName} (${expectedChainId}).`;
             return <ShowStopper title={"Bad chain"} content={content} />;
         case STATUS_OK:
-            return <Context.Provider value={{web3: web3, accounts: accounts}}>
-                {children}
-            </Context.Provider>;
+            return <Web3Context.Provider value={{web3: web3, accounts: accounts}}>
+                <ChoosingAccount web3={web3} accounts={accounts}>
+                    {children}
+                </ChoosingAccount>
+            </Web3Context.Provider>;
         default:
             return <ShowStopper title={"Unexpected error"} content={"An unexpected error has occurred. Try again later."} />;
     }
