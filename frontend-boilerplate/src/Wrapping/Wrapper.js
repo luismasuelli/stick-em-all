@@ -47,8 +47,12 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
         // Create the Web3 client. It will contain the connected
         // accounts, which are a subset of the available accounts
         // in the extension.
-        const web3_ = new Web3(ethereum);
-        setWeb3(web3_);
+        let web3_ = web3;
+        if (!web3_) {
+            web3_ = new Web3(ethereum);
+            setWeb3(web3_);
+            return;
+        }
 
         // Define a callback for when the chain id changes.
         function onChainIdChanged(chainId) {
@@ -93,7 +97,7 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
             ethereum.removeListener('accountsChanged', setAccounts);
             ethereum.removeListener('chainChanged', onChainIdChanged);
         };
-    }, [expectedHexChainId, expectedChainName]);
+    }, [web3, expectedHexChainId, expectedChainName]);
 
     switch(uiStatus) {
         case STATUS_INITIALIZING:
