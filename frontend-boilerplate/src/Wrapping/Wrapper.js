@@ -38,6 +38,8 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
         );
         if (!isWeb3Provider) {
             setUIStatus(STATUS_NO_WALLET);
+            setWeb3(null);
+            setAccounts([]);
             // Empty return - nothing to dispose.
             return;
         }
@@ -45,12 +47,8 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
         // Create the Web3 client. It will contain the connected
         // accounts, which are a subset of the available accounts
         // in the extension.
-        let web3_ = web3;
-        if (!web3_) {
-            web3_ = new Web3(ethereum);
-            setWeb3(web3_);
-            return;
-        }
+        let web3_ = new Web3(ethereum);
+        setWeb3(web3_);
 
         // Define a callback for when the chain id changes.
         function onChainIdChanged(chainId) {
@@ -69,9 +67,9 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
         // Finally, get the initial data for chainId and accounts.
         async function initConnectionData() {
             try {
-                const chainId = await web3.eth.getChainId();
+                const chainId = await web3_.eth.getChainId();
                 try {
-                    const accounts = await web3.eth.getAccounts();
+                    const accounts = await web3_.eth.getAccounts();
                     return [chainId, accounts];
                 } catch(error) {
                     console.error("Failed to retrieve accounts", error);
@@ -90,13 +88,13 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
             if (length > 1) {
                 setAccounts(result[1]);
             }
-        })
+        });
 
         return () => {
             ethereum.removeListener('accountsChanged', setAccounts);
             ethereum.removeListener('chainChanged', onChainIdChanged);
         };
-    }, [web3, expectedChainName, expectedChainId]);
+    }, [expectedChainName, expectedChainId]);
 
     switch(uiStatus) {
         case STATUS_INITIALIZING:
