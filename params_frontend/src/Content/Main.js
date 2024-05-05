@@ -10,22 +10,24 @@ import InfoIcon from '@mui/icons-material/Info';
  * @returns {JSX.Element}
  */
 export default function Main() {
+    // Extract the context's relevant data to make transactions.
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
+    const { web3, account, balanceRefresher } = context;
+    // Is the contract deployed? Which address?
+    const isDeployed = !!(process.env.REACT_APP_PARAMS_CONTRACT);
     const contractAddress = process.env.REACT_APP_PARAMS_CONTRACT || '0x0';
-
-    async function refresh() {
-
-    }
 
     return <Paper elevation={3} style={{ margin: '40px', marginTop: '120px', padding: '20px' }}>
         <AppBar position="static" color="primary">
             <Toolbar>
                 <Typography variant="h6" style={{ flexGrow: 1 }}>
-                    Stick 'em All - Management (Contract: {contractAddress})
+                    Stick 'em All - Management (Contract: {isDeployed ? contractAddress : "not deployed yet"})
                 </Typography>
-                <IconButton color="inherit">
-                    <RefreshIcon />
-                </IconButton>
+                {(isDeployed ? (
+                    <IconButton color="inherit" onClick={balanceRefresher}>
+                        <RefreshIcon />
+                    </IconButton>
+                ) : null)}
             </Toolbar>
         </AppBar>
 
