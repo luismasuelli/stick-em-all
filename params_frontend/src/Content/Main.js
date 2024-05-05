@@ -1,5 +1,5 @@
 import {useContext} from "react";
-import {Web3Context} from "web3";
+import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
 import {AppBar, IconButton, Paper, Toolbar, Typography} from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -12,6 +12,10 @@ import InfoIcon from '@mui/icons-material/Info';
 export default function Main() {
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
     const contractAddress = process.env.REACT_APP_PARAMS_CONTRACT || '0x0';
+
+    async function refresh() {
+
+    }
 
     return <Paper elevation={3} style={{ margin: '40px', marginTop: '120px', padding: '20px' }}>
         <AppBar position="static" color="primary">
