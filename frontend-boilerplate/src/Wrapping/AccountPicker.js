@@ -4,8 +4,8 @@ import ConnectToWallet from "./ConnectToWallet";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
 const AccountPicker = forwardRef(({
-                                      web3, accounts, accountIndex, onAccountIndexChange
-                                  }, ref) => {
+    web3, accounts, accountIndex, onAccountIndexChange
+}, ref) => {
     // eslint-disable-next-line no-undef
     const [balance, setBalance] = useState(BigInt('0'));
 
