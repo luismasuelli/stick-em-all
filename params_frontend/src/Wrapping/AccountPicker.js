@@ -4,8 +4,8 @@ import ConnectToWallet from "./ConnectToWallet";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
 export default function AccountPicker({
-                                          web3, accounts, accountIndex, setAccountIndex, balanceRefresher, setBalanceRefresher
-                                      }) {
+    web3, accounts, accountIndex, setAccountIndex, balanceRefresher, setBalanceRefresher
+}) {
     // eslint-disable-next-line no-undef
     const [balance, setBalance_] = useState(BigInt('0'));
     const setBalanceRef = useRef(null);
@@ -25,7 +25,7 @@ export default function AccountPicker({
                 const weiBalance = await web3.eth.getBalance(account);
                 const ethBalance = web3.utils.fromWei(weiBalance, 'ether');
                 console.log(`<<< Account balance is: ${ethBalance}`);
-                setBalance.callback(ethBalance);
+                setBalance(ethBalance);
             };
         } else {
             return () => {};
