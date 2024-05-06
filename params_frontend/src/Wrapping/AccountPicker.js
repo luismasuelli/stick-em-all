@@ -4,12 +4,15 @@ import ConnectToWallet from "./ConnectToWallet";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
 export default function AccountPicker({
-    web3, accounts, accountIndex, setAccountIndex, balanceRefresher, setBalanceRefresher
-}) {
+                                          web3, accounts, accountIndex, setAccountIndex, balanceRefresher, setBalanceRefresher
+                                      }) {
     // eslint-disable-next-line no-undef
-    const [balance, setBalance] = useState(BigInt('0'));
-    const ref = useRef(null);
-    ref.callback = setBalance;
+    const [balance, setBalance_] = useState(BigInt('0'));
+    const setBalanceRef = useRef(null);
+    setBalanceRef.callback = setBalance_;
+    const setBalance = useMemo(function() {
+        return (b) => setBalanceRef.callback(b);
+    }, [setBalanceRef])
 
     // We'll compute a function for when the accountIndex is set.
     // We'll set this function in the setBalanceRefresher state,
@@ -22,14 +25,14 @@ export default function AccountPicker({
                 const weiBalance = await web3.eth.getBalance(account);
                 const ethBalance = web3.utils.fromWei(weiBalance, 'ether');
                 console.log(`<<< Account balance is: ${ethBalance}`);
-                ref.callback(ethBalance);
+                setBalance.callback(ethBalance);
             };
         } else {
             return () => {};
         }
-    }, [web3, accounts, accountIndex, ref]);
+    }, [web3, accounts, accountIndex, setBalance]);
     useEffect(() => {
-        setBalanceRefresher.callback(newBalanceRefresher);
+        setBalanceRefresher(newBalanceRefresher);
     }, [setBalanceRefresher, newBalanceRefresher]);
 
     // Handler for dropdown change
