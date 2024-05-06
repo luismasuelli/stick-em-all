@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo, useRef, forwardRef, useImperativeHandle} from 'react';
+import React, {useState, useMemo, forwardRef, useImperativeHandle} from 'react';
 import {Card, CardContent, IconButton, MenuItem, Select, Typography} from "@mui/material";
 import ConnectToWallet from "./ConnectToWallet";
 import RefreshIcon from "@mui/icons-material/Refresh";
