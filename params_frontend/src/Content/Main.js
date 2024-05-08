@@ -1,12 +1,25 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
-import {Alert, AppBar, Box, Grid, IconButton, InputLabel, Paper, Toolbar, Typography} from "@mui/material";
+import {Alert, AppBar, Button, Grid, IconButton, Paper, Toolbar, Typography} from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import MakeContractClient from './MakeContractClient';
-import InfoIcon from '@mui/icons-material/Info';
 import ErrorLauncherContext from "../Errors/ErrorLauncherContext";
 import AddressInput from "./AddressInput";
+import Section from "./Section";
+import Label from "./Label";
+import Heading from "./Heading";
+import TokenInput from "./TokenInput";
+import Web3 from "web3";
+
+// Which are the defined params of the app?
+const params = [
+    // Define many costs like this:
+    {
+        caption: "Defining a World",
+        hash: Web3.utils.soliditySha3("Costs::DefineWorld")
+    }
+];
 
 /**
  * This is the main page. All the pages should look like this.
@@ -17,15 +30,6 @@ export default function Main() {
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
     const { web3, account, balanceRefresher } = context;
     const errorLauncher = useContext(ErrorLauncherContext);
-
-    // Which are the defined params of the app?
-    const params = [
-        // Define many costs like this:
-        {
-            caption: "Defining a World",
-            hash: web3.utils.soliditySha3("Costs::DefineWorld")
-        }
-    ];
 
     // Is the contract deployed? Which address?
     const contract = MakeContractClient(web3);
@@ -39,16 +43,26 @@ export default function Main() {
         earningsBalance: BigInt(0),
         fiatCosts: {}, // Each key is a hash. Each value is an object {native: '0.0', usd: '0.0'}
     });
+    const ref_ = useRef({setParamsData: null, contract: null});
+    ref_.current.setParamsData = setParamsData;
+    ref_.current.contract = contract;
     const isOwner = paramsData.owner === account;
 
     // These state managers stand for our fields:
-    const [ address, setAddress ] = useState('0x0');
+    const [ earningsReceiver, setEarningsReceiver ] = useState('0x0');
+    // eslint-disable-next-line no-undef
+    const [ amountToWithdraw, setAmountToWithdraw] = useState(BigInt(0));
+    const [ costParams, setCostParams ] = useState(new Array(params.length));
+    const setCostParam = (idx, value) => setCostParams([
+        ...(costParams.slice(0,idx)), value, ...(costParams.slice(idx+1))
+    ])
 
     // This refresh function returns EVERYTHING.
-    const refresh = errorLauncher.current.capturingError(async function() {
+    const refresh = useMemo(() => errorLauncher.current.capturingError(async function() {
         // First, update the balance.
         await balanceRefresher();
 
+        const contract = ref_.current.contract;
         // Then, get the following elements:
         // - owner
         let owner = await contract.methods.owner().call();
@@ -64,7 +78,31 @@ export default function Main() {
 
         // Update everything.
         console.log("Setting refresh data...");
-        setParamsData({owner, earningsReceiver, earningsBalance, fiatCosts});
+        ref_.current.setParamsData({owner, earningsReceiver, earningsBalance, fiatCosts});
+    }), [/* Intentionally empty, so the associated effect executes only once */]);
+
+    function wrappedCall(f) {
+        return async function(...args) {
+            let result = f(...args);
+            if (result instanceof Promise) result = await result;
+            await refresh();
+            return result;
+        }
+    }
+
+    // This function sets the new earnings receiver.
+    const updateEarningsReceiver = wrappedCall(async function() {
+        await contract.methods.setEarningsReceiver(earningsReceiver).send();
+    });
+
+    // This function withdraws an amount to the earnings receiver.
+    const withdraw = wrappedCall(async function() {
+        await contract.methods.earningsWithdraw(amountToWithdraw).send();
+    });
+
+    // This function updates a cost parameter.
+    const updateCostParameter = wrappedCall(async function(hash, value) {
+        await contract.methods.setFiatCost(hash, value).send();
     });
 
     // Force an initial refresh for our app.
@@ -105,6 +143,60 @@ export default function Main() {
                 </Alert>
             </>
         )}
-        {/* Placeholder for further content */}
+        <Section title="Earnings management" color="primary.light">
+            <Grid container>
+                <Grid item xs={12}>
+                    <Heading>Earnings Receiver</Heading>
+                </Grid>
+                <Grid item xs={2}>
+                    <Label>Earnings Receiver:</Label>
+                </Grid>
+                <Grid item xs={10}>
+                    <AddressInput value={earningsReceiver} onChange={setEarningsReceiver} />
+                </Grid>
+                <Grid item xs={12}>
+                    <Button onClick={updateEarningsReceiver} variant="contained" color="primary" size="large">Update</Button>
+                </Grid>
+
+                <Grid item xs={12}>
+                    <Heading>Withdraw (to address: {earningsReceiver})</Heading>
+                </Grid>
+                <Grid item xs={2}>
+                    <Label>Amount (in MATIC):</Label>
+                </Grid>
+                <Grid item xs={10}>
+                    <TokenInput value={amountToWithdraw} onChange={setAmountToWithdraw} />
+                </Grid>
+                <Grid item xs={12}>
+                    <Button onClick={withdraw} variant="contained" color="primary" size="large">Withdraw</Button>
+                </Grid>
+            </Grid>
+        </Section>
+        <Section title="Cost parameters" color="primary.light">
+            {params.map((p, idx) => (
+                <Grid container key={idx}>
+                    <Grid item xs={12}>
+                        <Heading>{p.caption}</Heading>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Label>Amount (in USD):</Label>
+                    </Grid>
+                    <Grid item xs={9}>
+                        <TokenInput value={costParams[idx]} onChange={(v) => setCostParam(idx, v)} />
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Label>Converted amount (in MATIC):</Label>
+                    </Grid>
+                    <Grid item xs={9}>
+                        {/* eslint-disable-next-line no-undef */}
+                        <Label sx={{textAlign: 'left'}}>{web3.utils.fromWei(costParams[idx] || BigInt(0), "ether")}</Label>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button onClick={() => updateCostParameter(idx, p.hash)}
+                                variant="contained" color="primary" size="large">Update</Button>
+                    </Grid>
+                </Grid>
+            ))}
+        </Section>
     </Paper>;
 }
