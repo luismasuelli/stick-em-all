@@ -41,13 +41,13 @@ const ErrorNotification = forwardRef(({ duration }, ref) => {
             autoHideDuration={duration}  // Snackbar will auto close after 6000ms
             onClose={handleClose}
             message={message}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
             <Alert
                 onClose={handleClose}
                 severity="error"
                 variant="filled"
                 sx={{ width: '100%' }}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 {message}
             </Alert>
