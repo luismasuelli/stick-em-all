@@ -47,18 +47,24 @@ export default function Main() {
     ref_.current.setParamsData = setParamsData;
     ref_.current.contract = contract;
     const isOwner = paramsData.owner === account;
+    const earningsReceiver = paramsData.earningsReceiver;
+    const costParams = paramsData.fiatCosts;
+    const setEarningsReceiver = (er) => {
+        setParamsData({
+            ...paramsData, earningsReceiver: er
+        });
+    }
+    const setCostParam = (hash, value) => setParamsData({...paramsData, fiatCosts: {
+        ...paramsData.fiatCosts, hash: value
+    }})
 
-    // These state managers stand for our fields:
-    const [ earningsReceiver, setEarningsReceiver ] = useState('0x0');
     // eslint-disable-next-line no-undef
     const [ amountToWithdraw, setAmountToWithdraw] = useState(BigInt(0));
-    const [ costParams, setCostParams ] = useState(new Array(params.length));
-    const setCostParam = (idx, value) => setCostParams([
-        ...(costParams.slice(0,idx)), value, ...(costParams.slice(idx+1))
-    ])
 
     // This refresh function returns EVERYTHING.
     const refresh = useMemo(() => errorLauncher.current.capturingError(async function() {
+        if (!isDeployed) return;
+
         // First, update the balance.
         await balanceRefresher();
 
@@ -101,8 +107,8 @@ export default function Main() {
     });
 
     // This function updates a cost parameter.
-    const updateCostParameter = wrappedCall(async function(hash, value) {
-        await contract.methods.setFiatCost(hash, value).send();
+    const updateCostParameter = wrappedCall(async function(hash) {
+        await contract.methods.setFiatCost(hash, paramsData.fiatCosts[hash]).send();
     });
 
     // Force an initial refresh for our app.
@@ -110,11 +116,18 @@ export default function Main() {
         refresh();
     }, [refresh]);
 
+    function abbr(address) {
+        if (address.length > 21) {
+            return address.slice(0, 10) + "..." + address.slice(address.length - 8)
+        }
+        return address;
+    }
+
     return <Paper elevation={3} style={{ margin: '40px', marginTop: '120px', padding: '20px' }}>
         <AppBar position="static" color="primary">
             <Toolbar>
                 <Typography variant="h6" style={{ flexGrow: 1 }}>
-                    Stick 'em All - Management (Contract: {isDeployed ? contract.options.address + "; Owner: " + paramsData.owner : "not deployed yet"})
+                    Stick 'em All - Management (Contract: {isDeployed ? abbr(contract.options.address) + "; Owner: " + abbr(paramsData.owner) : "not deployed yet"})
                 </Typography>
                 {(isDeployed ? (
                     <IconButton color="inherit" onClick={refresh}>
@@ -128,7 +141,11 @@ export default function Main() {
             This section allows the contract owner to modify the business parameters.
             This involves management of ownership, earnings, and costs (expressed in USD).
         </Alert>
-        {!isOwner ? (
+        {!isDeployed ? (
+            <Alert severity="error">
+                The contract is not deployed.
+            </Alert>
+        ) : (!isOwner ? (
             <Alert severity="error">
                 You're not the owner of this contract. Only the owner of this contract can edit these fields.<br />
                 Any attempt to make any change will fail. If you think this is an error / outdated, refresh the page.
@@ -142,7 +159,7 @@ export default function Main() {
                     These actions are dangerous, all of them. These can affect the entire business or make you lose the saved money.
                 </Alert>
             </>
-        )}
+        ))}
         <Section title="Earnings management" color="primary.light">
             <Grid container>
                 <Grid item xs={12}>
@@ -155,7 +172,7 @@ export default function Main() {
                     <AddressInput value={earningsReceiver} onChange={setEarningsReceiver} />
                 </Grid>
                 <Grid item xs={12}>
-                    <Button onClick={updateEarningsReceiver} variant="contained" color="primary" size="large">Update</Button>
+                    <Button disabled={!contract} onClick={updateEarningsReceiver} variant="contained" color="primary" size="large">Update</Button>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -168,7 +185,7 @@ export default function Main() {
                     <TokenInput value={amountToWithdraw} onChange={setAmountToWithdraw} />
                 </Grid>
                 <Grid item xs={12}>
-                    <Button onClick={withdraw} variant="contained" color="primary" size="large">Withdraw</Button>
+                    <Button disabled={!contract} onClick={withdraw} variant="contained" color="primary" size="large">Withdraw</Button>
                 </Grid>
             </Grid>
         </Section>
@@ -182,17 +199,17 @@ export default function Main() {
                         <Label>Amount (in USD):</Label>
                     </Grid>
                     <Grid item xs={9}>
-                        <TokenInput value={costParams[idx]} onChange={(v) => setCostParam(idx, v)} />
+                        <TokenInput value={costParams[p.hash]} onChange={(v) => setCostParam(p.hash, v)} />
                     </Grid>
                     <Grid item xs={3}>
                         <Label>Converted amount (in MATIC):</Label>
                     </Grid>
                     <Grid item xs={9}>
                         {/* eslint-disable-next-line no-undef */}
-                        <Label sx={{textAlign: 'left'}}>{web3.utils.fromWei(costParams[idx] || BigInt(0), "ether")}</Label>
+                        <Label sx={{textAlign: 'left'}}>{web3.utils.fromWei(paramsData.fiatCosts[p.hash] || BigInt(0), "ether")}</Label>
                     </Grid>
                     <Grid item xs={12}>
-                        <Button onClick={() => updateCostParameter(idx, p.hash)}
+                        <Button disabled={!contract} onClick={() => updateCostParameter(p.hash)}
                                 variant="contained" color="primary" size="large">Update</Button>
                     </Grid>
                 </Grid>
