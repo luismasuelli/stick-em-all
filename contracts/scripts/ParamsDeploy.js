@@ -5,6 +5,7 @@ async function main() {
     let addr;
     switch(hre.network.name) {
         case "hardhat":
+        case "localhost":
             const { mock } = await hre.ignition.deploy(MockV3AggregatorModule);
             addr = await mock.getAddress();
             break;
@@ -19,7 +20,9 @@ async function main() {
     }
     await hre.ignition.deploy(Params, {
         parameters: {
-            "priceFeed": addr
+            "Params": {
+                "priceFeed": addr
+            }
         }
     });
 }
