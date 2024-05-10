@@ -50,7 +50,7 @@ ngrok http --domain=your-awesome-domain.ngrok-free.app 8545
 Then, configure the local network in MetaMask with the following data:
 
 1. Any name for the network.
-2. Symbol: ETH.
+2. Symbol: GO (at least, MetaMask will not complain by choosing that symbol).
 3. RPC: https://your-awesome-domain.ngrok-free.app.
 4. Chain ID: 31337.
 5. No block explorer.
