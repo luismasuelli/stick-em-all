@@ -32,7 +32,7 @@ export default function Main() {
     const errorLauncher = useContext(ErrorLauncherContext);
 
     // Is the contract deployed? Which address?
-    const contract = MakeContractClient(web3);
+    const contract = MakeContractClient(web3, account);
     const isDeployed = contract !== null;
 
     // Which are the retrieved params of our app?
@@ -41,7 +41,8 @@ export default function Main() {
         earningsReceiver: "0x0",
         // eslint-disable-next-line no-undef
         earningsBalance: BigInt(0),
-        fiatCosts: {}, // Each key is a hash. Each value is an object {native: '0.0', usd: '0.0'}
+        fiatCosts: {}, // Each key is a hash. Each value is value in USD.
+        nativeCosts: {}, // Each key is a hash. Each value is value in ETH.
     });
     const ref_ = useRef({setParamsData: null, contract: null});
     ref_.current.setParamsData = setParamsData;
@@ -54,9 +55,11 @@ export default function Main() {
             ...paramsData, earningsReceiver: er
         });
     }
-    const setCostParam = (hash, value) => setParamsData({...paramsData, fiatCosts: {
-        ...paramsData.fiatCosts, hash: value
-    }})
+    const setCostParam = (hash, value) => {
+        let newFiatCosts = {...paramsData.fiatCosts};
+        newFiatCosts[hash] = value;
+        setParamsData({...paramsData, fiatCosts: newFiatCosts});
+    }
 
     // eslint-disable-next-line no-undef
     const [ amountToWithdraw, setAmountToWithdraw] = useState(BigInt(0));
@@ -79,12 +82,17 @@ export default function Main() {
         // - fiatCosts
         let fiatCosts = {};
         await Promise.all(params.map(async (e) => {
-            fiatCosts[e] = await contract.methods.fiatCosts(e.hash).call();
+            fiatCosts[e.hash] = await contract.methods.fiatCosts(e.hash).call();
+        }));
+        // - native costs:
+        let nativeCosts = {};
+        await Promise.all(params.map(async (e) => {
+            nativeCosts[e.hash] = await contract.methods.getNativeCost(e.hash).call();
         }));
 
         // Update everything.
         console.log("Setting refresh data...");
-        ref_.current.setParamsData({owner, earningsReceiver, earningsBalance, fiatCosts});
+        ref_.current.setParamsData({owner, earningsReceiver, earningsBalance, fiatCosts, nativeCosts});
     }), [/* Intentionally empty, so the associated effect executes only once */]);
 
     function wrappedCall(f) {
@@ -97,19 +105,21 @@ export default function Main() {
     }
 
     // This function sets the new earnings receiver.
-    const updateEarningsReceiver = wrappedCall(async function() {
+    const updateEarningsReceiver = errorLauncher.current.capturingError(wrappedCall(async function() {
         await contract.methods.setEarningsReceiver(earningsReceiver).send();
-    });
+    }));
 
     // This function withdraws an amount to the earnings receiver.
-    const withdraw = wrappedCall(async function() {
+    const withdraw = errorLauncher.current.capturingError(wrappedCall(async function() {
         await contract.methods.earningsWithdraw(amountToWithdraw).send();
-    });
+    }));
 
     // This function updates a cost parameter.
-    const updateCostParameter = wrappedCall(async function(hash) {
+    const updateCostParameter = errorLauncher.current.capturingError(wrappedCall(async function(hash) {
+        console.log("Hash:", hash);
+        console.log("Values:", paramsData.fiatCosts[hash]);
         await contract.methods.setFiatCost(hash, paramsData.fiatCosts[hash]).send();
-    });
+    }));
 
     // Force an initial refresh for our app.
     useEffect(() => {
@@ -206,7 +216,7 @@ export default function Main() {
                     </Grid>
                     <Grid item xs={9}>
                         {/* eslint-disable-next-line no-undef */}
-                        <Label sx={{textAlign: 'left'}}>{web3.utils.fromWei(paramsData.fiatCosts[p.hash] || BigInt(0), "ether")}</Label>
+                        <Label sx={{textAlign: 'left'}}>{web3.utils.fromWei(paramsData.nativeCosts[p.hash] || BigInt(0), "ether")}</Label>
                     </Grid>
                     <Grid item xs={12}>
                         <Button disabled={!contract} onClick={() => updateCostParameter(p.hash)}
