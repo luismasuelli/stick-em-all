@@ -25,6 +25,22 @@ In another shell, run these commands:
 npx hardhat run scripts/ParamsDeploy.js --network localhost
 ```
 
+## Take notes of the deployed contracts' addresses
+
+Either run this command:
+
+```shell
+npx hardhat ignition status chain-31337
+```
+
+and take notes of the addresses you care about (e.g. the address for the Params contract) or go to the
+`ignition/deployments/chain-31337/artifacts` directory. This one will be created due to the previous deployment script.
+
+Look for the `deployed_addresses.json` file and take notes of the addresses that are entry point contracts
+(e.g. the address for the Params contract). You'll need to use them in front-end apps.
+
+## Forward your network to https:// for MetaMask
+
 Your network will run in localhost:8545 (chain ID: 31337), but you'll need to expose it through https.
 
 My advice is like this:
@@ -54,3 +70,40 @@ Then, configure the local network in MetaMask with the following data:
 3. RPC: https://your-awesome-domain.ngrok-free.app.
 4. Chain ID: 31337.
 5. No block explorer.
+
+## Fund your MetaMask account
+
+For this project in particular, the seed is this:
+
+```
+dentist whale pattern drastic time black cigar bike person destroy punch hungry
+```
+
+And, as per the config, 100 accounts are instantiated with 10000 ETH each.
+My advice is to:
+
+1. Copy your address from your MetaMask (or whatever wallet you're using).
+2. Run the following command to access a console against the hardhat node:
+
+```shell
+npx hardhat console --network localhost
+```
+
+And there:
+
+```node
+const last = (await ethers.getSigners())[99];
+await last.sendTransaction({to: '0xyourMetaMaskAddress', value: ethers.parseEther('100.0')});
+```
+
+Now you'll see 100 full coins in your MetaMask account in that network.
+
+## Grant the ownership of the params to your MetaMask account
+
+The console commands are:
+
+```node
+const Params = await ethers.getContractFactory("StickEmAllParams");
+const contract = Params.attach("0xyourContractAddress"); // Considering that you took notes of the deployed address
+await contract.transferOwnership("0xyourMetaMaskAddress");
+```
