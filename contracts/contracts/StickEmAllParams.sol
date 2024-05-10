@@ -142,6 +142,6 @@ contract StickEmAllParams is Ownable {
     // 1e18 * ((fiatCost / 100) / (rate / 10**8))
     //
     // Which is the same as: 10 ** (18 - 2 + 8), or 10 ** 24
-    return MaticFromCentsScaleFactor * (18 ** decimals) * fiatCost / rate;
+    return MaticFromCentsScaleFactor * (10 ** decimals) * fiatCost / rate;
   }
 }
