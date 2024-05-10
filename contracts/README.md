@@ -92,8 +92,10 @@ npx hardhat console --network localhost
 And there:
 
 ```node
+const mmAddr = "0xyourMetaMaskAddress";
+const ctAddr = "0xyourContractAddress";
 const last = (await ethers.getSigners())[99];
-await last.sendTransaction({to: '0xyourMetaMaskAddress', value: ethers.parseEther('100.0')});
+await last.sendTransaction({to: mmAddr, value: ethers.parseEther('100.0')});
 ```
 
 Now you'll see 100 full coins in your MetaMask account in that network.
@@ -104,6 +106,6 @@ The console commands are:
 
 ```node
 const Params = await ethers.getContractFactory("StickEmAllParams");
-const contract = Params.attach("0xyourContractAddress"); // Considering that you took notes of the deployed address
-await contract.transferOwnership("0xyourMetaMaskAddress");
+const contract = Params.attach(ctAddr); // Considering that you took notes of the deployed address
+await contract.transferOwnership(mmAddr);
 ```
