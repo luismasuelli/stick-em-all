@@ -77,7 +77,7 @@ export default function Main() {
         let owner = await contract.methods.owner().call();
         // - earningsBalance
         let earningsReceiver = await contract.methods.earningsReceiver().call();
-        // - earningsReceiver
+        // - earningsReceiversent
         let earningsBalance = await contract.methods.earningsBalance().call();
         // - fiatCosts
         let fiatCosts = {};
@@ -209,7 +209,7 @@ export default function Main() {
                         <Label>Amount (in USD):</Label>
                     </Grid>
                     <Grid item xs={9}>
-                        <TokenInput value={costParams[p.hash]} onChange={(v) => setCostParam(p.hash, v)} />
+                        <TokenInput unit={2} value={costParams[p.hash]} onChange={(v) => setCostParam(p.hash, v)} />
                     </Grid>
                     <Grid item xs={3}>
                         <Label>Converted amount (in MATIC):</Label>
