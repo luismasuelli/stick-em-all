@@ -108,27 +108,29 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
     /**
      * Sets a field in the world.
      */
-    function setField(uint256 _tokenId, string memory _field, string memory _value) external {
+    function setField(uint256 _tokenId, uint256 _field, string memory _value) external {
         World storage world = worlds[_tokenId];
+        address owner = _ownerOf(_tokenId);
+        address sender = msg.sender;
         require(
-            msg.sender == ownerOf(_tokenId) || isWorldEditionAllowed(_tokenId, msg.sender),
+            sender == owner || _isWorldEditionAllowed[owner][_tokenId][sender],
             "StickEmAllWorlds: You're not allowed to do this operation"
         );
 
-        if (_field == "name") {
+        if (_field == 1) {
             world.name = _value;
-        } else if (_field == "description") {
+        } else if (_field == 2) {
             world.description = _value;
-        } else if (_field == "logo") {
+        } else if (_field == 3) {
             world.logo = _value;
-        } else if (_field == "background") {
+        } else if (_field == 4) {
             world.background = _value;
-        } else if (_field == "externalUri") {
+        } else if (_field == 5) {
             world.externalUri = _value;
-        } else if (_field == "validatorUri") {
+        } else if (_field == 6) {
             world.validatorUri = _value;
         } else {
-            revert(abi.encodePacked("StickEmAllWorlds: Unknown field ", _field));
+            revert(string(abi.encodePacked("StickEmAllWorlds: Unknown field ", _field)));
         }
     }
 }
