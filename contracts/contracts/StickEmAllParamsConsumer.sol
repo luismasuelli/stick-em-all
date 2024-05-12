@@ -15,7 +15,7 @@ abstract contract StickEmAllParamsConsumer {
 
     constructor(address _params) {
         require(_params != address(0), "StickEmAllParamsConsumer: Invalid params contract address");
-        params = StickEmAllParams(_params);
+        params = StickEmAllParams(payable(_params));
     }
 
     /**
