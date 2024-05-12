@@ -108,6 +108,10 @@ contract StickEmAllParams is Ownable {
     payable(earningsReceiver).transfer(_amount);
   }
 
+  receive() {
+    earningsBalance += msg.value;
+  }
+
   /**
    * Tells the native cost (this means: in tokens) of a given parameter.
    */
