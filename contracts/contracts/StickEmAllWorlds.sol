@@ -3,7 +3,12 @@ pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./StickEmAllParams.sol";
 import "./StickEmAllParamsConsumer.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
 
+/**
+ * This contract is a token contract that mints and manages a full
+ * world (which is meant to define albums and their stickers).
+ */
 contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
     /**
      * The parameter to define a world.
@@ -52,7 +57,7 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
          * failing a validation), since there is no URL
          * to compare against.
          */
-        string externalUri;
+        string externalUrl;
 
         /**
          * The validation file. If empty, no validation
@@ -61,7 +66,7 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
          * setting (however, these changes are only done
          * in front-end, never back-end).
          */
-        string validatorUri;
+        string validatorUrl;
     }
 
     /**
@@ -100,7 +105,7 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
         uint256 tokenId = _nextTokenId++;
         worlds[tokenId] = World({
             name: _name, description: _description, logo: _logo,
-            background: "", externalUri: "", validatorUri: ""
+            background: "", externalUrl: "", validatorUrl: ""
         });
         _mint(msg.sender, tokenId);
     }
@@ -126,11 +131,23 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
         } else if (_field == 4) {
             world.background = _value;
         } else if (_field == 5) {
-            world.externalUri = _value;
+            world.externalUrl = _value;
         } else if (_field == 6) {
-            world.validatorUri = _value;
+            world.validatorUrl = _value;
         } else {
             revert(string(abi.encodePacked("StickEmAllWorlds: Unknown field ", _field)));
         }
+    }
+
+    /**
+     * Returns the full data of a world for the NFT markets.
+     */
+    function tokenUri(uint256 _id) public view returns (string memory) {
+        _requireOwned(_id);
+        World storage world = worlds[_id];
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(abi.encodePacked(
+            '{"name:","', world.name, '", "description": "', world.description, '", "image": "', world.logo,
+            '", "external_url": "',world.externalUrl,'", "attributes": {"validator": "',world.validatorUrl,'"}}'
+        ))));
     }
 }
