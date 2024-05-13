@@ -142,9 +142,9 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
     /**
      * Returns the full data of a world for the NFT markets.
      */
-    function tokenUri(uint256 _id) public view returns (string memory) {
-        _requireOwned(_id);
-        World storage world = worlds[_id];
+    function tokenURI(uint256 tokenId) external view returns (string memory) {
+        _requireOwned(tokenId);
+        World storage world = worlds[tokenId];
         return string(abi.encodePacked("data:application/json;base64,", Base64.encode(abi.encodePacked(
             '{"name:","', world.name, '", "description": "', world.description, '", "image": "', world.logo,
             '", "external_url": "',world.externalUrl,'", "attributes": {"validator": "',world.validatorUrl,'"}}'
