@@ -62,7 +62,7 @@ contract StickEmAllWorldsManagement {
          * This pretty much matches what will be defined in the
          * stickers.
          *
-         * Recommended minimum size is: 400x400.
+         * Recommended size is: 400x400.
          */
         string image;
 
@@ -104,6 +104,8 @@ contract StickEmAllWorldsManagement {
          * Each sticker has exactly one image (squared one).
          * This pretty much matches what will be defined in the
          * matching achievement.
+         *
+         * Recommended size is: 400x400.
          */
         string image;
 
