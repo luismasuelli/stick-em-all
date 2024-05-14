@@ -36,6 +36,9 @@ contract StickEmAllWorldsManagement {
      * They will be known by their index in the album definition.
      *
      * Defining an achievement has costs.
+     *
+     * Each album can define up to 2**32 achievements, where the
+     * achievement 0 is for the album itself.
      */
     struct AchievementDefinition {
         /**
@@ -58,6 +61,8 @@ contract StickEmAllWorldsManagement {
          * Each achievement has exactly one image (squared one).
          * This pretty much matches what will be defined in the
          * stickers.
+         *
+         * Recommended minimum size is: 400x400.
          */
         string image;
 
@@ -70,11 +75,24 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
+     * The rarity type for a defined sticker.
+     */
+    enum StickerRarity {
+        Bronze, // "Common" stickers range
+        Silver, // "Uncommon" stickers range
+        Gold, // "Rare" stickers range
+        Platinum // Platinum is matched in the same range as Gold, but has a distinct probability.
+    }
+
+    /**
      * A sticker definition is NOT the same of an achievement.
      * Stickers can be exchanged before they're glued, and they
      * even become fungible tokens to be exchanged. However, a
      * sticker can also imply an achievement (and, like they,
      * it has a name and image).
+     *
+     * Each album can define up to 2**32 different stickers and
+     * it is NOT forced to use all the stickers' rarities.
      */
     struct StickerDefinition {
         /**
@@ -88,5 +106,17 @@ contract StickEmAllWorldsManagement {
          * matching achievement.
          */
         string image;
+
+        /**
+         * The rarity type of the sticker.
+         */
+        StickerRarity rarity;
+
+        /**
+         * The index of the related achievement.
+         */
+        uint32 achievementId;
     }
+
+
 }
