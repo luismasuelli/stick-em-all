@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Base64.sol";
 import "./StickEmAllParams.sol";
 import "./StickEmAllParamsConsumer.sol";
 import "./StickEmAllWorlds.sol";
