@@ -105,9 +105,10 @@ contract StickEmAllParams is Ownable {
     }
 
     /**
-     * Tells the native cost (this means: in tokens) of a given parameter.
+     * Tells the native cost (this means: in tokens) that corresponds
+     * to a given fiat value (which is expressed in cents).
      */
-    function getNativeCost(bytes32 _key) public view returns (uint256) {
+    function getNativeCost(uint256 _fiatValue) public view returns (uint256) {
         // Please note: DO NOT REMOVE PARENTHESES, COMMENTS, OR COMMAS.
         //              THE COMMAS ARE NEEDED SINCE THE latestRoundData
         //              METHOD RETURNS A TUPLE OF 5 ELEMENTS, WHICH ARE
@@ -115,11 +116,11 @@ contract StickEmAllParams is Ownable {
         //              the other fields, but the "place" for them must
         //              remain (and same for the parentheses).
         (
-            /* uint80 roundID */,
+        /* uint80 roundID */,
             int currentPrice,
-            /*uint startedAt*/,
-            /*uint timeStamp*/,
-            /*uint80 answeredInRound*/
+        /*uint startedAt*/,
+        /*uint timeStamp*/,
+        /*uint80 answeredInRound*/
         ) = AggregatorV3Interface(priceFeed).latestRoundData();
 
         // Getting the per-feed decimals.
@@ -130,14 +131,17 @@ contract StickEmAllParams is Ownable {
         // of 10**8 (e.g. 50000000 means $0.50/MATIC).
         uint256 rate = uint256(currentPrice);
 
-        // The fiat cost is expressed in units of 10**2 (e.g. 250 means
-        // a price of $2.50).
-        uint256 fiatCost = fiatCosts[_key];
-
         // This means that the final conversion will be:
         // 1e18 * ((fiatCost / 100) / (rate / 10**8))
         //
         // Which is the same as: 10 ** (18 - 2 + 8), or 10 ** 24
-        return MaticFromCentsScaleFactor * (10 ** decimals) * fiatCost / rate;
+        return MaticFromCentsScaleFactor * (10 ** decimals) * _fiatValue / rate;
+    }
+
+    /**
+     * Tells the native cost (this means: in tokens) of a given parameter.
+     */
+    function getNativeCost(bytes32 _key) public view returns (uint256) {
+        return getNativeCost(fiatCosts[_key]);
     }
 }
