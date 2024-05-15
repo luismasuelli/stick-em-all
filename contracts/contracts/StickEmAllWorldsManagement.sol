@@ -2,7 +2,6 @@
 pragma solidity ^0.8.21;
 
 import "./StickEmAllParams.sol";
-import "./StickEmAllParamsConsumer.sol";
 import "./StickEmAllWorlds.sol";
 
 /**
@@ -541,8 +540,7 @@ contract StickEmAllWorldsManagement {
     function getAlbumReleaseNativeCost(
         uint256 _worldId, uint256 _albumId
     ) public view returns (uint256) {
-        // TODO implement.
-        return 0;
+        return worlds.getNativeCost(getAlbumReleaseFiatCost(_worldId, _albumId));
     }
 
     /**
