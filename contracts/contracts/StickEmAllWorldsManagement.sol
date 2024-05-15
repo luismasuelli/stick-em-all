@@ -410,17 +410,6 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
-     * Checks for a page to be valid (and NOT completed) in an album.
-     */
-    modifier validPageId(uint256 _albumId, uint32 _pageId) {
-        require(
-            albumPageDefinitionsCount(_albumId) > _pageId && !albumPageDefinitions[_albumId][_pageId].complete,
-            "StickEmAllWorldsManagement: Invalid album page index, or already completed page"
-        );
-        _;
-    }
-
-    /**
      * Defines an album (and its achievement).
      */
     function defineAlbum(
@@ -498,6 +487,10 @@ contract StickEmAllWorldsManagement {
         string memory _name, string memory _image, StickerRarity _rarity,
         bytes32 _achievementType, bytes memory _achievementData
     ) external validWorldId(_worldId) validAlbumId(_worldId, _albumId) {
+        require(
+            albumPageDefinitionsCount(_albumId) > _pageIdx && !albumPageDefinitions[_albumId][_pageIdx].complete,
+            "StickEmAllWorldsManagement: Invalid album page index, or already completed page"
+        );
         StickerDefinition[] storage definitions = albumPageStickersDefinitions[_albumId][_pageIdx];
         definitions.push(StickerDefinition({
             displayName: _name, image: _image, rarity: _rarity, achievementId: _addAchievement(
@@ -506,4 +499,8 @@ contract StickEmAllWorldsManagement {
         }));
         _incrementPageCounter(_albumId, _pageIdx, definitions);
     }
+
+    // Release things start here.
+
+
 }
