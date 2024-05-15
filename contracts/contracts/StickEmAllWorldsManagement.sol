@@ -200,6 +200,11 @@ contract StickEmAllWorldsManagement {
          * are defined).
          */
         bool complete;
+
+        /**
+         * The current count of slots in the page.
+         */
+        uint8 slotsCount;
     }
 
     /**
@@ -272,12 +277,7 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album / per-page slots.
      */
-    mapping(uint256 => uint32[]) public slots;
-
-    /**
-     * The per-album stickers.
-     */
-    mapping(uint256 => StickerDefinition[]) public albumStickerDefinitions;
+    mapping(uint256 => mapping(uint32 => StickerDefinition[])) public albumPageStickersDefinitions;
 
     /**
      * The per-album bronze stickers' indices.
