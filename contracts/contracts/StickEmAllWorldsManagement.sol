@@ -33,6 +33,11 @@ contract StickEmAllWorldsManagement {
     bytes32 private constant DefineSticker = keccak256("Costs::Albums::DefineSticker");
 
     /**
+     * The maximum amount of defined albums overall.
+     */
+    uint256 private constant MaxNumberOfDefinedAlbums = 1 << 224;
+
+    /**
      * Achievement definitions stand for albums' achievements.
      * They will be known by their index in the album definition.
      *
@@ -250,6 +255,11 @@ contract StickEmAllWorldsManagement {
         AlbumPageDefinition[] pages;
 
         /**
+         * All the stickers definitions.
+         */
+        StickerDefinition[] stickers;
+
+        /**
          * Whether the album is released or not. Starts in false and
          * after it is released it cannot be edited anymore and also
          * it is ready to be:
@@ -257,11 +267,6 @@ contract StickEmAllWorldsManagement {
          * - Have its booster packs defined.
          */
         bool released;
-
-        /**
-         * All the stickers definitions.
-         */
-        StickerDefinition[] stickers;
 
         /**
          * Which stickers are bronze.
@@ -285,17 +290,19 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
-     * The cost of defining an album will be:
-     * 1. 1.00 for the album and its achievements.
-     * 2. 0.01 for each slot / sticker.
-     * 3. 0.05 for each additional achievement (sticker or page).
-     * 4. 0.10 for each page.
-     */
-
-    /**
      * The worlds contract.
      */
     StickEmAllWorlds public worlds;
+
+    /**
+     * All the defined albums. At most 1<<224 albums.
+     */
+    AlbumDefinition[] public albumDefinitions;
+
+    /**
+     * Event that allows enumerating the events of a world.
+     */
+    event AlbumDefined(uint256 indexed id, uint256 indexed worldId);
 
     constructor(address _worlds) {
         require(_worlds != address(0), "StickEmAllWorldsManagement: Invalid worlds contract address");
