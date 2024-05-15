@@ -238,6 +238,11 @@ contract StickEmAllWorldsManagement {
         string rarityIcons;
 
         /**
+         * The amount of pages that are completed (all their stickers defined).
+         */
+        uint256 completedPages;
+
+        /**
          * Whether the album is released or not. Starts in false and
          * after it is released it cannot be edited anymore and also
          * it is ready to be:
@@ -416,7 +421,7 @@ contract StickEmAllWorldsManagement {
         uint256 _index = albumDefinitions.length;
         albumDefinitions.push(AlbumDefinition({
             worldId: _worldId, name: _name, edition: _edition, frontImage: _frontImage,
-            backImage: _backImage, rarityIcons: _rarityIcons, released: false
+            backImage: _backImage, rarityIcons: _rarityIcons, completedPages: 0, released: false
         }));
         albumAchievementDefinitions[_index].push(AchievementDefinition({
             type_: _achievementType, displayName: _achievementName,
