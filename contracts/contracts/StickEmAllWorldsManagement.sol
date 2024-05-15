@@ -265,9 +265,23 @@ contract StickEmAllWorldsManagement {
     AlbumDefinition[] public albumDefinitions;
 
     /**
+     * The length of all the defined albums.
+     */
+    function albumDefinitionsCount() public view returns (uint256) {
+        return albumDefinitions.length;
+    }
+
+    /**
      * The per-album achievements.
      */
     mapping(uint256 => AchievementDefinition[]) public albumAchievementDefinitions;
+
+    /**
+     * The length of per-album achievements.
+     */
+    function albumAchievementDefinitionsCount(uint256 albumId) public view returns (uint256) {
+        return albumAchievementDefinitions[albumId].length;
+    }
 
     /**
      * The per-album pages.
@@ -275,9 +289,23 @@ contract StickEmAllWorldsManagement {
     mapping(uint256 => AlbumPageDefinition[]) public albumPageDefinitions;
 
     /**
+     * The length of per-album pages.
+     */
+    function albumPageDefinitionsCount(uint256 albumId) public view returns (uint256) {
+        return albumPageDefinitions[albumId].length;
+    }
+
+    /**
      * The per-album / per-page slots.
      */
     mapping(uint256 => mapping(uint32 => StickerDefinition[])) public albumPageStickersDefinitions;
+
+    /**
+     * The length of per-album / per-page slots.
+     */
+    function albumPageStickersDefinitionsCount(uint256 albumId, uint32 pageId) public view returns (uint256) {
+        return albumPageStickersDefinitions[albumId][pageId].length;
+    }
 
     /**
      * The per-album bronze stickers' indices.
@@ -285,9 +313,23 @@ contract StickEmAllWorldsManagement {
     mapping(uint256 => uint32[]) public albumBronzeStickerIndices;
 
     /**
+     * The per-album count of bronze stickers.
+     */
+    function albumBronzeStickerIndicesCount(uint256 albumId) public view returns (uint256) {
+        return albumBronzeStickerIndices[albumId].length;
+    }
+
+    /**
      * The per-album silver stickers' indices.
      */
     mapping(uint256 => uint32[]) public albumSilverStickerIndices;
+
+    /**
+     * The per-album count of silver stickers.
+     */
+    function albumSilverStickerIndicesCount(uint256 albumId) public view returns (uint256) {
+        return albumSilverStickerIndices[albumId].length;
+    }
 
     /**
      * The per-album gold stickers' indices.
@@ -295,9 +337,23 @@ contract StickEmAllWorldsManagement {
     mapping(uint256 => uint32[]) public albumGoldStickerIndices;
 
     /**
+     * The per-album count of gold stickers.
+     */
+    function albumGoldStickerIndicesCount(uint256 albumId) public view returns (uint256) {
+        return albumGoldStickerIndices[albumId].length;
+    }
+
+    /**
      * The per-album platinum stickers' indices.
      */
     mapping(uint256 => uint32[]) public albumPlatinumStickerIndices;
+
+    /**
+     * The per-album count of platinum stickers.
+     */
+    function albumPlatinumStickerIndicesCount(uint256 albumId) public view returns (uint256) {
+        return albumPlatinumStickerIndices[albumId].length;
+    }
 
     /**
      * Event that allows enumerating the events of a world.
