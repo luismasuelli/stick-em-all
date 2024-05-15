@@ -200,11 +200,6 @@ contract StickEmAllWorldsManagement {
          * are defined).
          */
         bool complete;
-
-        /**
-         * The allocated slots, telling their expected stickers.
-         */
-        uint32[] slots;
     }
 
     /**
@@ -245,21 +240,6 @@ contract StickEmAllWorldsManagement {
         string rarityIcons;
 
         /**
-         * The definitions in this album.
-         */
-        AchievementDefinition[] achievements;
-
-        /**
-         * The pages in this album.
-         */
-        AlbumPageDefinition[] pages;
-
-        /**
-         * All the stickers definitions.
-         */
-        StickerDefinition[] stickers;
-
-        /**
          * Whether the album is released or not. Starts in false and
          * after it is released it cannot be edited anymore and also
          * it is ready to be:
@@ -267,26 +247,6 @@ contract StickEmAllWorldsManagement {
          * - Have its booster packs defined.
          */
         bool released;
-
-        /**
-         * Which stickers are bronze.
-         */
-        uint32[] bronzeStickers;
-
-        /**
-         * Which stickers are silver.
-         */
-        uint32[] silverStickers;
-
-        /**
-         * Which stickers are gold.
-         */
-        uint32[] goldStickers;
-
-        /**
-         * Which stickers are platinum.
-         */
-        uint32[] platinumStickers;
     }
 
     /**
@@ -300,6 +260,46 @@ contract StickEmAllWorldsManagement {
     AlbumDefinition[] public albumDefinitions;
 
     /**
+     * The per-album achievements.
+     */
+    mapping(uint256 => AchievementDefinition[]) public albumAchievementDefinitions;
+
+    /**
+     * The per-album pages.
+     */
+    mapping(uint256 => AlbumPageDefinition[]) public albumPageDefinitions;
+
+    /**
+     * The per-album / per-page slots.
+     */
+    mapping(uint256 => uint32[]) public slots;
+
+    /**
+     * The per-album stickers.
+     */
+    mapping(uint256 => StickerDefinition[]) public albumStickerDefinitions;
+
+    /**
+     * The per-album bronze stickers' indices.
+     */
+    mapping(uint256 => uint32[]) public albumBronzeStickerIndices;
+
+    /**
+     * The per-album silver stickers' indices.
+     */
+    mapping(uint256 => uint32[]) public albumSilverStickerIndices;
+
+    /**
+     * The per-album gold stickers' indices.
+     */
+    mapping(uint256 => uint32[]) public albumGoldStickerIndices;
+
+    /**
+     * The per-album platinum stickers' indices.
+     */
+    mapping(uint256 => uint32[]) public albumPlatinumStickerIndices;
+
+    /**
      * Event that allows enumerating the events of a world.
      */
     event AlbumDefined(uint256 indexed id, uint256 indexed worldId);
@@ -307,5 +307,24 @@ contract StickEmAllWorldsManagement {
     constructor(address _worlds) {
         require(_worlds != address(0), "StickEmAllWorldsManagement: Invalid worlds contract address");
         worlds = StickEmAllWorlds(_worlds);
+    }
+
+    /**
+     * Defines an album.
+     */
+    function defineAlbum(
+        uint256 _worldId, string memory _name, string memory _edition,
+        string memory _frontImage, string memory _backImage, string memory _rarityIcons
+    ) external {
+        uint256 _index = albumDefinitions.length;
+        AlbumDefinition memory definition;
+        definition.worldId = _worldId;
+        definition.name = _name;
+        definition.edition = _edition;
+        definition.frontImage = _frontImage;
+        definition.backImage = _backImage;
+        definition.rarityIcons = _rarityIcons;
+        albumDefinitions.push(definition);
+        emit AlbumDefined(_index, _worldId);
     }
 }
