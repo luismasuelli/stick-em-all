@@ -366,21 +366,45 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
+     * Checks for a world id to be valid and allowed.
+     */
+    modifier validWorldId(uint256 _worldId) {
+        require(
+            worlds.ownerOf(_worldId) == msg.sender || worlds.isWorldEditionAllowed(_worldId, msg.sender),
+            "StickEmAllWorldsManagement: Invalid or unauthorized world"
+        );
+        _;
+    }
+
+    /**
+     * Checks for an album id to be valid and for the given world.
+     */
+    modifier validAlbumId(uint256 _worldId, uint256 _albumId) {
+        require(
+            albumDefinitions[_albumId].worldId == _worldId,
+            "StickEmAllWorldsManagement: Invalid album for world"
+        );
+        _;
+    }
+
+    /**
      * Defines an album.
      */
     function defineAlbum(
         uint256 _worldId, string memory _name, string memory _edition,
-        string memory _frontImage, string memory _backImage, string memory _rarityIcons
-    ) external {
+        string memory _frontImage, string memory _backImage, string memory _rarityIcons,
+        bytes32 _achievementType, string memory _achievementName, string memory _achievementImage,
+        bytes memory _achievementData
+    ) external validWorldId(_worldId) {
         uint256 _index = albumDefinitions.length;
-        AlbumDefinition memory definition;
-        definition.worldId = _worldId;
-        definition.name = _name;
-        definition.edition = _edition;
-        definition.frontImage = _frontImage;
-        definition.backImage = _backImage;
-        definition.rarityIcons = _rarityIcons;
-        albumDefinitions.push(definition);
+        albumDefinitions.push(AlbumDefinition({
+            worldId: _worldId, name: _name, edition: _edition, frontImage: _frontImage,
+            backImage: _backImage, rarityIcons: _rarityIcons, released: false
+        }));
+        albumAchievementDefinitions[_index].push(AchievementDefinition({
+            type_: _achievementType, displayName: _achievementName,
+            image: _achievementImage, data: _achievementData
+        }));
         emit AlbumDefined(_index, _worldId);
     }
 }
