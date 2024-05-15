@@ -237,6 +237,11 @@ contract StickEmAllWorldsManagement {
         string rarityIcons;
 
         /**
+         * The total amount of stickers in the album.
+         */
+        uint256 totalStickers;
+
+        /**
          * The amount of pages that are completed (all their stickers defined).
          */
         uint256 completedPages;
@@ -420,7 +425,8 @@ contract StickEmAllWorldsManagement {
         uint256 _index = albumDefinitions.length;
         albumDefinitions.push(AlbumDefinition({
             worldId: _worldId, name: _name, edition: _edition, frontImage: _frontImage,
-            backImage: _backImage, rarityIcons: _rarityIcons, completedPages: 0, released: false
+            backImage: _backImage, rarityIcons: _rarityIcons, completedPages: 0,
+            totalStickers: 0, released: false
         }));
         albumAchievementDefinitions[_index].push(AchievementDefinition({
             type_: _achievementType, displayName: _achievementName,
@@ -467,14 +473,21 @@ contract StickEmAllWorldsManagement {
      * Increments the counter of a page's defined slots and also, if the page
      * is completed,
      */
-    function _incrementPageCounter(
-        uint256 _albumId, uint32 _pageIdx, StickerDefinition[] storage _definitions
+    function _incrementStickerCounters(
+        uint256 _albumId, uint32 _pageIdx, uint32 _index, StickerRarity _rarity,
+        StickerDefinition[] storage _definitions
     ) private {
         AlbumPageDefinition storage page = albumPageDefinitions[_albumId][_pageIdx];
+        AlbumDefinition storage album = albumDefinitions[_albumId];
         if (_definitions.length == page.maxStickers) {
             page.complete = true;
-            albumDefinitions[_albumId].completedPages += 1;
+            album.completedPages += 1;
         }
+        album.totalStickers += 1;
+        if (_rarity == StickerRarity.Bronze) { albumBronzeStickerIndices[_albumId].push(_index); }
+        else if (_rarity == StickerRarity.Silver) { albumSilverStickerIndices[_albumId].push(_index); }
+        else if (_rarity == StickerRarity.Gold) { albumGoldStickerIndices[_albumId].push(_index); }
+        else { albumPlatinumStickerIndices[_albumId].push(_index); }
     }
 
     /**
@@ -496,7 +509,7 @@ contract StickEmAllWorldsManagement {
                 _albumId, _achievementType, _name, _image, _achievementData
             )
         }));
-        _incrementPageCounter(_albumId, _pageIdx, definitions);
+        _incrementStickerCounters(_albumId, _pageIdx, uint32(definitions.length) - 1, _rarity, definitions);
     }
 
     // Release things start here.
@@ -530,8 +543,14 @@ contract StickEmAllWorldsManagement {
     function getAlbumReleaseFiatCost(
         uint256 _worldId, uint256 _albumId
     ) public view returns (uint256) {
-        // TODO implement.
-        return 0;
+        StickEmAllParams params = worlds.params();
+        uint256 albumCost = params.fiatCosts(DefineAlbum);
+        uint256 pageCost = params.fiatCosts(DefinePage);
+        uint256 stickerCost = params.fiatCosts(DefineSticker);
+        uint256 achievementCost = params.fiatCosts(DefineAchievement);
+        return (albumCost) + (pageCost * albumPageDefinitionsCount(_albumId)) +
+               (stickerCost * albumDefinitions[_albumId].totalStickers) +
+               (achievementCost * (albumAchievementDefinitionsCount(_albumId) - 1));
     }
 
     /**
@@ -540,7 +559,7 @@ contract StickEmAllWorldsManagement {
     function getAlbumReleaseNativeCost(
         uint256 _worldId, uint256 _albumId
     ) public view returns (uint256) {
-        return worlds.getNativeCost(getAlbumReleaseFiatCost(_worldId, _albumId));
+        return worlds.params().getNativeCost(getAlbumReleaseFiatCost(_worldId, _albumId));
     }
 
     /**
