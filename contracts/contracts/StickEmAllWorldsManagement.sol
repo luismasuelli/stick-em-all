@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "./StickEmAllParams.sol";
 import "./StickEmAllParamsConsumer.sol";
+import "./StickEmAllWorlds.sol";
 
 /**
  * This contract allows world managers to define albums,
@@ -207,6 +208,11 @@ contract StickEmAllWorldsManagement {
      */
     struct AlbumDefinition {
         /**
+         * The world id for this album.
+         */
+        uint256 worldId;
+
+        /**
          * The album's name.
          */
         string name;
@@ -285,4 +291,14 @@ contract StickEmAllWorldsManagement {
      * 3. 0.05 for each additional achievement (sticker or page).
      * 4. 0.10 for each page.
      */
+
+    /**
+     * The worlds contract.
+     */
+    StickEmAllWorlds public worlds;
+
+    constructor(address _worlds) {
+        require(_worlds != address(0), "StickEmAllWorldsManagement: Invalid worlds contract address");
+        worlds = StickEmAllWorlds(_worlds);
+    }
 }
