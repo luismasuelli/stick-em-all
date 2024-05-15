@@ -380,9 +380,10 @@ contract StickEmAllWorldsManagement {
      * Checks for an album id to be valid and for the given world.
      */
     modifier validAlbumId(uint256 _worldId, uint256 _albumId) {
+        AlbumDefinition storage album = albumDefinitions[_albumId];
         require(
-            albumDefinitions[_albumId].worldId == _worldId,
-            "StickEmAllWorldsManagement: Invalid album for world"
+            album.worldId == _worldId && !album.released,
+            "StickEmAllWorldsManagement: Invalid (or already-released) album for world"
         );
         _;
     }
