@@ -502,5 +502,64 @@ contract StickEmAllWorldsManagement {
 
     // Release things start here.
 
+    /**
+     * An event telling the album has been released properly.
+     */
+    event AlbumReleased(uint256 indexed worldId, uint256 indexed albumId);
 
+    /**
+     * Tells whether an album can be released or not.
+     */
+    function canBeReleased(
+        uint256 _worldId, uint256 _albumId
+    ) public view returns (bool) {
+        AlbumDefinition storage album = albumDefinitions[_albumId];
+
+        // First check: Album exists in the world and it is NOT already released.
+        if (album.worldId != _worldId || album.released) return false;
+
+        // Second check: Album has at least 2 pages, and always an
+        // even number of pages.
+        if (album.completedPages != albumPageDefinitionsCount(_albumId) ||
+            (album.completedPages & 1) == 1) return false;
+        return true;
+    }
+
+    /**
+     * Returns the cost of releasing an album, in USD.
+     */
+    function getAlbumReleaseFiatCost(
+        uint256 _worldId, uint256 _albumId
+    ) public view returns (uint256) {
+        // TODO implement.
+        return 0;
+    }
+
+    /**
+     * Returns the cost of releasing an album, in MATIC.
+     */
+    function getAlbumReleaseNativeCost(
+        uint256 _worldId, uint256 _albumId
+    ) public view returns (uint256) {
+        // TODO implement.
+        return 0;
+    }
+
+    /**
+     * Releases an album. This is a PAID operation.
+     */
+    function releaseAlbum(
+        uint256 _worldId, uint256 _albumId
+    ) external validWorldId(_worldId) payable {
+        require(
+            canBeReleased(_worldId, _albumId),
+            "StickEmAllWorldsManagement: Invalid (or not ready for release) album for world"
+        );
+
+        // TODO Charge the amount of getAlbumReleaseNativeCost(_worldId, _albumId)
+        // TODO or properly fail/revert if the amount was not provided.
+
+        albumDefinitions[_albumId].released = true;
+        emit AlbumReleased(_worldId, _albumId);
+    }
 }
