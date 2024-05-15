@@ -22,9 +22,9 @@ contract StickEmAllWorldsManagement {
     bytes32 private constant DefineAlbum = keccak256("Costs::Albums::DefineAlbum");
 
     /**
-     * The cost parameter to define an album sheet (2 pages).
+     * The cost parameter to define an album page.
      */
-    bytes32 private constant DefineSheet = keccak256("Costs::Albums::DefineSheet");
+    bytes32 private constant DefinePage = keccak256("Costs::Albums::DefinePage");
 
     /**
      * The cost parameter to define a sticker.
@@ -150,12 +150,12 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
-     * Each sticker page will have one background image (better if 8:9),
-     * a layout, and an OPTIONAL achievement (if zero, then no achievement
-     * is assigned to that particular page). It will also have a name, and
-     * the chosen layout (and, derived, the amount of slots).
+     * Each album page will have one background image (better if 8:9), a
+     * layout, and an OPTIONAL achievement (if zero, then no achievement
+     * is assigned to that particular page). It will also have a name,
+     * and the chosen layout (and, derived, the amount of slots).
      */
-    struct StickerPageDefinition {
+    struct AlbumPageDefinition {
         /**
          * The name. It is only for presentational matters.
          */
@@ -182,16 +182,107 @@ contract StickEmAllWorldsManagement {
         uint8 currentlyDefinedStickers;
 
         /**
-         * The allocated slots, telling their expected stickers.
-         */
-        uint32[] slots;
-
-        /**
          * The index of the related achievement. If this value is
          * 0, this means there's no achievement set (the achievement
          * 0 is always reserved to the Album, which always has that
          * implicit achievement - so here is used to say "none").
          */
         uint32 achievementId;
+
+        /**
+         * Whether the page is completely defined (i.e. all the slots
+         * are defined).
+         */
+        bool complete;
+
+        /**
+         * The allocated slots, telling their expected stickers.
+         */
+        uint32[] slots;
     }
+
+    /**
+     * Each album definition has some data and also the pages.
+     * All the albums have their achievement defined automatically.
+     */
+    struct AlbumDefinition {
+        /**
+         * The album's name.
+         */
+        string name;
+
+        /**
+         * The album's edition (optional).
+         */
+        string edition;
+
+        /**
+         * The album's front image. Must be 8:9 and highly recommended.
+         */
+        string frontImage;
+
+        /**
+         * The album's front image. Must be 8:9 and highly recommended.
+         */
+        string backImage;
+
+        /**
+         * An image with the rarity icons. Icons should be squared and small,
+         * and (4h)x(h) in size. First, the bronze icon. Then, the silver.
+         * Then, the gold and finally the platinum one.
+         */
+        string rarityIcons;
+
+        /**
+         * The definitions in this album.
+         */
+        AchievementDefinition[] achievements;
+
+        /**
+         * The pages in this album.
+         */
+        AlbumPageDefinition[] pages;
+
+        /**
+         * Whether the album is released or not. Starts in false and
+         * after it is released it cannot be edited anymore and also
+         * it is ready to be:
+         * - Price-defined, and sold.
+         * - Have its booster packs defined.
+         */
+        bool released;
+
+        /**
+         * All the stickers definitions.
+         */
+        StickerDefinition[] stickers;
+
+        /**
+         * Which stickers are bronze.
+         */
+        uint32[] bronzeStickers;
+
+        /**
+         * Which stickers are silver.
+         */
+        uint32[] silverStickers;
+
+        /**
+         * Which stickers are gold.
+         */
+        uint32[] goldStickers;
+
+        /**
+         * Which stickers are platinum.
+         */
+        uint32[] platinumStickers;
+    }
+
+    /**
+     * The cost of defining an album will be:
+     * 1. 1.00 for the album and its achievements.
+     * 2. 0.01 for each slot / sticker.
+     * 3. 0.05 for each additional achievement (sticker or page).
+     * 4. 0.10 for each page.
+     */
 }
