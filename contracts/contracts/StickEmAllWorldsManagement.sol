@@ -410,6 +410,17 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
+     * Checks for a page to be valid (and NOT completed) in an album.
+     */
+    modifier validPageId(uint256 _albumId, uint32 _pageId) {
+        require(
+            albumPageDefinitionsCount(_albumId) > _pageId && !albumPageDefinitions[_albumId][_pageId].complete,
+            "StickEmAllWorldsManagement: Invalid album page index, or already completed page"
+        );
+        _;
+    }
+
+    /**
      * Defines an album (and its achievement).
      */
     function defineAlbum(
@@ -431,6 +442,23 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
+     * Adds an achievement to the album's achievements. Returns its index.
+     */
+    function _addAchievement(
+        uint256 _albumId, bytes32 type_, string memory _name, string memory _image, bytes memory _data
+    ) private returns (uint32) {
+        if (type_ != bytes32(0)) {
+            AchievementDefinition[] storage achievements = albumAchievementDefinitions[_albumId];
+            uint32 achievementId = uint32(achievements.length);
+            achievements.push(AchievementDefinition({
+                type_: type_, displayName: _name, image: _image, data: _data
+            }));
+            return achievementId;
+        }
+        return 0;
+    }
+
+    /**
      * Defines an album page (and its optional achievement).
      */
     function defineAlbumPage(
@@ -438,18 +466,44 @@ contract StickEmAllWorldsManagement {
         StickerPageLayout _layout, bytes32 _achievementType, string memory _achievementName,
         string memory _achievementImage, bytes memory _achievementData
     ) external validWorldId(_worldId) validAlbumId(_worldId, _albumId) {
-        uint32 achievementId = 0;
-        if (_achievementType != bytes32(0)) {
-            AchievementDefinition[] storage achievements = albumAchievementDefinitions[_albumId];
-            achievementId = uint32(achievements.length);
-            achievements.push(AchievementDefinition({
-                type_: _achievementType, displayName: _achievementName, image: _achievementImage,
-                data: _achievementData
-            }));
-        }
+        uint32 achievementId = _addAchievement(
+            _albumId, _achievementType, _achievementName, _achievementImage, _achievementData
+        );
         albumPageDefinitions[_albumId].push(AlbumPageDefinition({
             name: _name, backgroundImage: _backgroundImage, layout: _layout, maxStickers: slotsPerLayout[_layout],
             currentlyDefinedStickers: 0, achievementId: achievementId, complete: false
         }));
+    }
+
+    /**
+     * Increments the counter of a page's defined slots and also, if the page
+     * is completed,
+     */
+    function _incrementPageCounter(
+        uint256 _albumId, uint32 _pageIdx, StickerDefinition[] storage _definitions
+    ) private {
+        AlbumPageDefinition storage page = albumPageDefinitions[_albumId][_pageIdx];
+        if (_definitions.length == page.maxStickers) {
+            page.complete = true;
+            albumDefinitions[_albumId].completedPages += 1;
+        }
+    }
+
+    /**
+     * Adds a sticker to the album's page. If this sticker has an achievement,
+     * then it will have the same name and image of the sticker.
+     */
+    function defineAlbumPageSticker(
+        uint256 _worldId, uint256 _albumId, uint32 _pageIdx,
+        string memory _name, string memory _image, StickerRarity _rarity,
+        bytes32 _achievementType, bytes memory _achievementData
+    ) external validWorldId(_worldId) validAlbumId(_worldId, _albumId) {
+        StickerDefinition[] storage definitions = albumPageStickersDefinitions[_albumId][_pageIdx];
+        definitions.push(StickerDefinition({
+            displayName: _name, image: _image, rarity: _rarity, achievementId: _addAchievement(
+                _albumId, _achievementType, _name, _image, _achievementData
+            )
+        }));
+        _incrementPageCounter(_albumId, _pageIdx, definitions);
     }
 }
