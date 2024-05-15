@@ -200,11 +200,6 @@ contract StickEmAllWorldsManagement {
          * are defined).
          */
         bool complete;
-
-        /**
-         * The current count of slots in the page.
-         */
-        uint8 slotsCount;
     }
 
     /**
@@ -253,6 +248,11 @@ contract StickEmAllWorldsManagement {
          */
         bool released;
     }
+
+    /**
+     * The slots per layout entry.
+     */
+    mapping(StickerPageLayout => uint8) public slotsPerLayout;
 
     /**
      * The worlds contract.
@@ -363,6 +363,24 @@ contract StickEmAllWorldsManagement {
     constructor(address _worlds) {
         require(_worlds != address(0), "StickEmAllWorldsManagement: Invalid worlds contract address");
         worlds = StickEmAllWorlds(_worlds);
+        slotsPerLayout[StickerPageLayout.OneItem] = 1;
+        slotsPerLayout[StickerPageLayout.TwoItemsVertical] = 2;
+        slotsPerLayout[StickerPageLayout.TwoItemsHorizontal] = 2;
+        slotsPerLayout[StickerPageLayout.TwoItemsDiagonalUp] = 2;
+        slotsPerLayout[StickerPageLayout.TwoItemsDiagonalDown] = 2;
+        slotsPerLayout[StickerPageLayout.ThreeItemsTriangleUp] = 3;
+        slotsPerLayout[StickerPageLayout.ThreeItemsTriangleDown] = 3;
+        slotsPerLayout[StickerPageLayout.ThreeItemsVertical] = 3;
+        slotsPerLayout[StickerPageLayout.ThreeItemsHorizontal] = 3;
+        slotsPerLayout[StickerPageLayout.ThreeItemsDiagonalUp] = 3;
+        slotsPerLayout[StickerPageLayout.ThreeItemsDiagonalDown] = 3;
+        slotsPerLayout[StickerPageLayout.FourItems1Up] = 4;
+        slotsPerLayout[StickerPageLayout.FourItems1Down] = 4;
+        slotsPerLayout[StickerPageLayout.FourItemsSquare] = 4;
+        slotsPerLayout[StickerPageLayout.FiveItems3Up] = 5;
+        slotsPerLayout[StickerPageLayout.FiveItems3Down] = 5;
+        slotsPerLayout[StickerPageLayout.FiveItemsSquare] = 5;
+        slotsPerLayout[StickerPageLayout.SixItems] = 6;
     }
 
     /**
@@ -389,7 +407,7 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
-     * Defines an album.
+     * Defines an album (and its achievement).
      */
     function defineAlbum(
         uint256 _worldId, string memory _name, string memory _edition,
@@ -407,5 +425,28 @@ contract StickEmAllWorldsManagement {
             image: _achievementImage, data: _achievementData
         }));
         emit AlbumDefined(_index, _worldId);
+    }
+
+    /**
+     * Defines an album page (and its optional achievement).
+     */
+    function defineAlbumPage(
+        uint256 _worldId, uint256 _albumId, string memory _name, string memory _backgroundImage,
+        StickerPageLayout _layout, bytes32 _achievementType, string memory _achievementName,
+        string memory _achievementImage, bytes memory _achievementData
+    ) external validWorldId(_worldId) validAlbumId(_worldId, _albumId) {
+        uint32 achievementId = 0;
+        if (_achievementType != bytes32(0)) {
+            AchievementDefinition[] storage achievements = albumAchievementDefinitions[_albumId];
+            achievementId = uint32(achievements.length);
+            achievements.push(AchievementDefinition({
+                type_: _achievementType, displayName: _achievementName, image: _achievementImage,
+                data: _achievementData
+            }));
+        }
+        albumPageDefinitions[_albumId].push(AlbumPageDefinition({
+            name: _name, backgroundImage: _backgroundImage, layout: _layout, maxStickers: slotsPerLayout[_layout],
+            currentlyDefinedStickers: 0, achievementId: achievementId, complete: false
+        }));
     }
 }
