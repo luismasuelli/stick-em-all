@@ -32,7 +32,7 @@ contract StickEmAllWorldsManagement {
     /**
      * The maximum amount of defined albums overall.
      */
-    uint256 private constant MaxNumberOfDefinedAlbums = 1 << 240;
+    uint256 private constant MaxNumberOfDefinedAlbums = 1 << 224;
 
     /**
      * Achievement definitions stand for albums' achievements.
