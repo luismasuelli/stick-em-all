@@ -540,9 +540,7 @@ contract StickEmAllWorldsManagement {
     /**
      * Returns the cost of releasing an album, in USD.
      */
-    function getAlbumReleaseFiatCost(
-        uint256 _worldId, uint256 _albumId
-    ) public view returns (uint256) {
+    function getAlbumReleaseFiatCost(uint256 _albumId) public view returns (uint256) {
         StickEmAllParams params = worlds.params();
         uint256 albumCost = params.fiatCosts(DefineAlbum);
         uint256 pageCost = params.fiatCosts(DefinePage);
@@ -556,10 +554,8 @@ contract StickEmAllWorldsManagement {
     /**
      * Returns the cost of releasing an album, in MATIC.
      */
-    function getAlbumReleaseNativeCost(
-        uint256 _worldId, uint256 _albumId
-    ) public view returns (uint256) {
-        return worlds.params().getNativeCost(getAlbumReleaseFiatCost(_worldId, _albumId));
+    function getAlbumReleaseNativeCost(uint256 _albumId) public view returns (uint256) {
+        return worlds.params().getNativeCost(getAlbumReleaseFiatCost(_albumId));
     }
 
     /**
