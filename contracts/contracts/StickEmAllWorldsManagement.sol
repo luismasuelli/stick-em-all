@@ -559,6 +559,16 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
+     * Charges an amount (returns the remainder back to the sender).
+     */
+    function _chargeAmount(uint256 _cost) private {
+        uint256 paid = msg.value;
+        require(paid >= _cost, "StickEmAllWorldsManagement: Insufficient payment");
+        payable(address(worlds.params())).call{value: paid}("");
+        payable(msg.sender).call{value: paid - _cost}("");
+    }
+
+    /**
      * Releases an album. This is a PAID operation.
      */
     function releaseAlbum(
@@ -568,10 +578,7 @@ contract StickEmAllWorldsManagement {
             canBeReleased(_worldId, _albumId),
             "StickEmAllWorldsManagement: Invalid (or not ready for release) album for world"
         );
-
-        // TODO Charge the amount of getAlbumReleaseNativeCost(_worldId, _albumId)
-        // TODO or properly fail/revert if the amount was not provided.
-
+        _chargeAmount(getAlbumReleaseNativeCost(_albumId));
         albumDefinitions[_albumId].released = true;
         emit AlbumReleased(_worldId, _albumId);
     }
