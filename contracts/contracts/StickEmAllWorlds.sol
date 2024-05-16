@@ -83,6 +83,15 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
     constructor(address _params) ERC721("World", "STWD") StickEmAllParamsConsumer(_params) {}
 
     /**
+     * The transfer from is enhanced to set the earningsReceiver
+     * to the new destination.
+     */
+    function transferFrom(address from, address to, uint256 tokenId) public virtual override {
+        super.transferFrom(from, to, tokenId);
+        worlds[tokenId].earningsReceiver = to;
+    }
+
+    /**
      * Sets the world edition allowance for a user.
      */
     function setWorldEditionAllowed(uint256 _worldId, address _who, bool _allowed) external {
