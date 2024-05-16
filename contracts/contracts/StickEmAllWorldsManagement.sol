@@ -732,6 +732,7 @@ contract StickEmAllWorldsManagement {
         uint256 _worldId, uint256 _albumId, uint256 _ruleId,
         bool _active, uint32 _fiatPrice, uint16 _platinumStickerProbability
     ) external validWorldId(_worldId) validReleasedAlbumId(_worldId, _albumId) {
+        // Validating the probability and the booster pack id for the album.
         require(
             _platinumStickerProbability <= 10000,
             "StickEmAllWorldsManagement: The platinum probability must be between 0 and 10000"
@@ -741,6 +742,7 @@ contract StickEmAllWorldsManagement {
             _ruleId < rules.length,
             "StickEmAllWorldsManagement: Invalid rule id"
         );
+        // Updating the current rule.
         BoosterPackRule storage rule = rules[_ruleId];
         rule.active = _active;
         if (_fiatPrice != 0) rule.fiatPrice = _fiatPrice;
