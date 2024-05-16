@@ -32,7 +32,7 @@ contract StickEmAllWorldsManagement {
     /**
      * The maximum amount of defined albums overall.
      */
-    uint256 private constant MaxNumberOfDefinedAlbums = 1 << 224;
+    uint256 private constant MaxNumberOfDefinedAlbums = 1 << 240;
 
     /**
      * Achievement definitions stand for albums' achievements.
@@ -125,7 +125,7 @@ contract StickEmAllWorldsManagement {
          * 0 is always reserved to the Album, which always has that
          * implicit achievement - so here is used to say "none").
          */
-        uint32 achievementId;
+        uint16 achievementId;
     }
 
     /**
@@ -190,7 +190,7 @@ contract StickEmAllWorldsManagement {
          * 0 is always reserved to the Album, which always has that
          * implicit achievement - so here is used to say "none").
          */
-        uint32 achievementId;
+        uint16 achievementId;
 
         /**
          * Whether the page is completely defined (i.e. all the slots
@@ -231,7 +231,7 @@ contract StickEmAllWorldsManagement {
 
         /**
          * An image with the rarity icons. Icons should be squared and small,
-         * and (4h)x(h) in size. First, the bronze icon. Then, the silver.
+         * and 4:1 in size ratio. First, the bronze icon. Then, the silver.
          * Then, the gold and finally the platinum one.
          */
         string rarityIcons;
@@ -254,6 +254,73 @@ contract StickEmAllWorldsManagement {
          * - Have its booster packs defined.
          */
         bool released;
+    }
+
+    /**
+     * Each RELEASED album can define SEVERAL booster pack rules. Once
+     * a booster pack rule is defined, it can be disabled for sale but
+     * cannot be deleted.
+     *
+     * Booster pack rules always tell how many stickers can be defined
+     * for each type (up to 15 in total - suggested: 11/3/1). Also, it
+     * will define a probability (expressed in units per 10000) to get
+     * a platinum card instead of a gold card (this is ignored when no
+     * gold or no platinum -or both- stickers are defined. A last/16th
+     * number will be considering for the probability of getting gold
+     * vs. platinum stickers. AT MOST 1 GOLD/PLATINUM STICKER IS SERVED.
+     *
+     * Booster packs will have a different design. They will have their
+     * name and an image (in proportion 2:3).
+     */
+    struct BoosterPackRule {
+        /**
+         * Tells whether it is valid / exists.
+         */
+        bool created;
+
+        /**
+         * Tells whether this rule is active for sale or not.
+         */
+        bool active;
+
+        /**
+         * The name of the rule.
+         */
+        string name;
+
+        /**
+         * An image for the rule. Ideally a transparent-allowing
+         * image of 2:3.
+         */
+        string image;
+
+        /**
+         * How many bronze stickers come. 0 to 15. Recommended: 11.
+         * The total number of stickers cannot be 0 and cannot be
+         * greater than 15.
+         */
+        uint8 bronzeStickersCount;
+
+        /**
+         * How many silver stickers come. 0 to 15. Recommended: 3.
+         * The total number of stickers cannot be 0 and cannot be
+         * greater than 15.
+         */
+        uint8 silverStickersCount;
+
+        /**
+         * Whether it contains a gold or platinum sticker. This
+         * adds 1 to the count of stickers. After this, the total
+         * number of stickers cannot be 0 and cannot be greater
+         * than 15.
+         */
+        bool hasGoldOrPlatinumSticker;
+
+        /**
+         * Expressed in units per 10000, the probability of a
+         * platinum card to appear instead of a gold card.
+         */
+        uint16 platinumProbability;
     }
 
     /**
@@ -305,19 +372,19 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album / per-page slots.
      */
-    mapping(uint256 => mapping(uint32 => StickerDefinition[])) public albumPageStickersDefinitions;
+    mapping(uint256 => mapping(uint16 => StickerDefinition[])) public albumPageStickersDefinitions;
 
     /**
      * The length of per-album / per-page slots.
      */
-    function albumPageStickersDefinitionsCount(uint256 albumId, uint32 pageId) public view returns (uint256) {
+    function albumPageStickersDefinitionsCount(uint256 albumId, uint16 pageId) public view returns (uint256) {
         return albumPageStickersDefinitions[albumId][pageId].length;
     }
 
     /**
      * The per-album bronze stickers' indices.
      */
-    mapping(uint256 => uint32[]) public albumBronzeStickerIndices;
+    mapping(uint256 => uint16[]) public albumBronzeStickerIndices;
 
     /**
      * The per-album count of bronze stickers.
@@ -329,7 +396,7 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album silver stickers' indices.
      */
-    mapping(uint256 => uint32[]) public albumSilverStickerIndices;
+    mapping(uint256 => uint16[]) public albumSilverStickerIndices;
 
     /**
      * The per-album count of silver stickers.
@@ -341,7 +408,7 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album gold stickers' indices.
      */
-    mapping(uint256 => uint32[]) public albumGoldStickerIndices;
+    mapping(uint256 => uint16[]) public albumGoldStickerIndices;
 
     /**
      * The per-album count of gold stickers.
@@ -353,7 +420,7 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album platinum stickers' indices.
      */
-    mapping(uint256 => uint32[]) public albumPlatinumStickerIndices;
+    mapping(uint256 => uint16[]) public albumPlatinumStickerIndices;
 
     /**
      * The per-album count of platinum stickers.
@@ -440,10 +507,10 @@ contract StickEmAllWorldsManagement {
      */
     function _addAchievement(
         uint256 _albumId, bytes32 type_, string memory _name, string memory _image, bytes memory _data
-    ) private returns (uint32) {
+    ) private returns (uint16) {
         if (type_ != bytes32(0)) {
             AchievementDefinition[] storage achievements = albumAchievementDefinitions[_albumId];
-            uint32 achievementId = uint32(achievements.length);
+            uint16 achievementId = uint16(achievements.length);
             achievements.push(AchievementDefinition({
                 type_: type_, displayName: _name, image: _image, data: _data
             }));
@@ -460,7 +527,7 @@ contract StickEmAllWorldsManagement {
         StickerPageLayout _layout, bytes32 _achievementType, string memory _achievementName,
         string memory _achievementImage, bytes memory _achievementData
     ) external validWorldId(_worldId) validAlbumId(_worldId, _albumId) {
-        uint32 achievementId = _addAchievement(
+        uint16 achievementId = _addAchievement(
             _albumId, _achievementType, _achievementName, _achievementImage, _achievementData
         );
         albumPageDefinitions[_albumId].push(AlbumPageDefinition({
@@ -474,7 +541,7 @@ contract StickEmAllWorldsManagement {
      * is completed,
      */
     function _incrementStickerCounters(
-        uint256 _albumId, uint32 _pageIdx, uint32 _index, StickerRarity _rarity,
+        uint256 _albumId, uint16 _pageIdx, uint16 _index, StickerRarity _rarity,
         StickerDefinition[] storage _definitions
     ) private {
         AlbumPageDefinition storage page = albumPageDefinitions[_albumId][_pageIdx];
@@ -495,7 +562,7 @@ contract StickEmAllWorldsManagement {
      * then it will have the same name and image of the sticker.
      */
     function defineAlbumPageSticker(
-        uint256 _worldId, uint256 _albumId, uint32 _pageIdx,
+        uint256 _worldId, uint256 _albumId, uint16 _pageIdx,
         string memory _name, string memory _image, StickerRarity _rarity,
         bytes32 _achievementType, bytes memory _achievementData
     ) external validWorldId(_worldId) validAlbumId(_worldId, _albumId) {
@@ -509,7 +576,7 @@ contract StickEmAllWorldsManagement {
                 _albumId, _achievementType, _name, _image, _achievementData
             )
         }));
-        _incrementStickerCounters(_albumId, _pageIdx, uint32(definitions.length) - 1, _rarity, definitions);
+        _incrementStickerCounters(_albumId, _pageIdx, uint16(definitions.length) - 1, _rarity, definitions);
     }
 
     // Release things start here.
