@@ -576,7 +576,7 @@ contract StickEmAllWorldsManagement {
     ) external validWorldId(_worldId) payable {
         require(
             canBeReleased(_worldId, _albumId),
-            "StickEmAllWorldsManagement: Invalid (or not ready for release) album for world"
+            "StickEmAllWorldsManagement: Invalid, already released, or not ready for release, album for world"
         );
         _chargeAmount(getAlbumReleaseNativeCost(_albumId));
         albumDefinitions[_albumId].released = true;
