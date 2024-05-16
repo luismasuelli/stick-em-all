@@ -271,6 +271,10 @@ contract StickEmAllWorldsManagement {
      *
      * Booster packs will have a different design. They will have their
      * name and an image (in proportion 2:3).
+     *
+     * Defining a booster pack rule is free: Earnings will be taken from
+     * the user's selling a booster pack (i.e. a percentage of the fiat
+     * price of a booster pack).
      */
     struct BoosterPackRule {
         /**
@@ -282,6 +286,12 @@ contract StickEmAllWorldsManagement {
          * Tells whether this rule is active for sale or not.
          */
         bool active;
+
+        /**
+         * The sale price of a booster pack, expressed in USD cents.
+         * It cannot be 0.
+         */
+        uint32 fiatPrice;
 
         /**
          * The name of the rule.
@@ -353,8 +363,8 @@ contract StickEmAllWorldsManagement {
     /**
      * The length of per-album achievements.
      */
-    function albumAchievementDefinitionsCount(uint256 albumId) public view returns (uint256) {
-        return albumAchievementDefinitions[albumId].length;
+    function albumAchievementDefinitionsCount(uint256 _albumId) public view returns (uint256) {
+        return albumAchievementDefinitions[_albumId].length;
     }
 
     /**
@@ -365,8 +375,8 @@ contract StickEmAllWorldsManagement {
     /**
      * The length of per-album pages.
      */
-    function albumPageDefinitionsCount(uint256 albumId) public view returns (uint256) {
-        return albumPageDefinitions[albumId].length;
+    function albumPageDefinitionsCount(uint256 _albumId) public view returns (uint256) {
+        return albumPageDefinitions[_albumId].length;
     }
 
     /**
@@ -377,8 +387,8 @@ contract StickEmAllWorldsManagement {
     /**
      * The length of per-album / per-page slots.
      */
-    function albumPageStickersDefinitionsCount(uint256 albumId, uint16 pageId) public view returns (uint256) {
-        return albumPageStickersDefinitions[albumId][pageId].length;
+    function albumPageStickersDefinitionsCount(uint256 _albumId, uint16 _pageId) public view returns (uint256) {
+        return albumPageStickersDefinitions[_albumId][_pageId].length;
     }
 
     /**
@@ -389,8 +399,8 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album count of bronze stickers.
      */
-    function albumBronzeStickerIndicesCount(uint256 albumId) public view returns (uint256) {
-        return albumBronzeStickerIndices[albumId].length;
+    function albumBronzeStickerIndicesCount(uint256 _albumId) public view returns (uint256) {
+        return albumBronzeStickerIndices[_albumId].length;
     }
 
     /**
@@ -401,8 +411,8 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album count of silver stickers.
      */
-    function albumSilverStickerIndicesCount(uint256 albumId) public view returns (uint256) {
-        return albumSilverStickerIndices[albumId].length;
+    function albumSilverStickerIndicesCount(uint256 _albumId) public view returns (uint256) {
+        return albumSilverStickerIndices[_albumId].length;
     }
 
     /**
@@ -413,8 +423,8 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album count of gold stickers.
      */
-    function albumGoldStickerIndicesCount(uint256 albumId) public view returns (uint256) {
-        return albumGoldStickerIndices[albumId].length;
+    function albumGoldStickerIndicesCount(uint256 _albumId) public view returns (uint256) {
+        return albumGoldStickerIndices[_albumId].length;
     }
 
     /**
@@ -425,8 +435,21 @@ contract StickEmAllWorldsManagement {
     /**
      * The per-album count of platinum stickers.
      */
-    function albumPlatinumStickerIndicesCount(uint256 albumId) public view returns (uint256) {
-        return albumPlatinumStickerIndices[albumId].length;
+    function albumPlatinumStickerIndicesCount(uint256 _albumId) public view returns (uint256) {
+        return albumPlatinumStickerIndices[_albumId].length;
+    }
+
+    /**
+     * The per-album booster pack rule definitions.
+     */
+    mapping(uint256 => BoosterPackRule[]) public albumBoosterPackRules;
+
+    /**
+     * The per-album booster pack rule definitions count
+     * (also includes the inactive rules).
+     */
+    function albumBoosterPackRulesCount(uint256 _albumId) public view returns (uint256) {
+        return albumBoosterPackRules[_albumId].length;
     }
 
     /**
@@ -469,13 +492,27 @@ contract StickEmAllWorldsManagement {
     }
 
     /**
-     * Checks for an album id to be valid and for the given world.
+     * Checks for an album id to be valid and for the given world,
+     * and to not be released.
      */
-    modifier validAlbumId(uint256 _worldId, uint256 _albumId) {
+    modifier validNonReleasedAlbumId(uint256 _worldId, uint256 _albumId) {
         AlbumDefinition storage album = albumDefinitions[_albumId];
         require(
             album.worldId == _worldId && !album.released,
-            "StickEmAllWorldsManagement: Invalid (or already-released) album for world"
+            "StickEmAllWorldsManagement: Invalid (or already released) album for world"
+        );
+        _;
+    }
+
+    /**
+     * Checks for an album id to be valid and for the given world,
+     * and to be released.
+     */
+    modifier validReleasedAlbumId(uint256 _worldId, uint256 _albumId) {
+        AlbumDefinition storage album = albumDefinitions[_albumId];
+        require(
+            album.worldId == _worldId && album.released,
+            "StickEmAllWorldsManagement: Invalid (or not released) album for world"
         );
         _;
     }
@@ -526,7 +563,7 @@ contract StickEmAllWorldsManagement {
         uint256 _worldId, uint256 _albumId, string memory _name, string memory _backgroundImage,
         StickerPageLayout _layout, bytes32 _achievementType, string memory _achievementName,
         string memory _achievementImage, bytes memory _achievementData
-    ) external validWorldId(_worldId) validAlbumId(_worldId, _albumId) {
+    ) external validWorldId(_worldId) validNonReleasedAlbumId(_worldId, _albumId) {
         uint16 achievementId = _addAchievement(
             _albumId, _achievementType, _achievementName, _achievementImage, _achievementData
         );
@@ -565,7 +602,7 @@ contract StickEmAllWorldsManagement {
         uint256 _worldId, uint256 _albumId, uint16 _pageIdx,
         string memory _name, string memory _image, StickerRarity _rarity,
         bytes32 _achievementType, bytes memory _achievementData
-    ) external validWorldId(_worldId) validAlbumId(_worldId, _albumId) {
+    ) external validWorldId(_worldId) validNonReleasedAlbumId(_worldId, _albumId) {
         require(
             albumPageDefinitionsCount(_albumId) > _pageIdx && !albumPageDefinitions[_albumId][_pageIdx].complete,
             "StickEmAllWorldsManagement: Invalid album page index, or already completed page"
@@ -648,5 +685,65 @@ contract StickEmAllWorldsManagement {
         _chargeAmount(getAlbumReleaseNativeCost(_albumId));
         albumDefinitions[_albumId].released = true;
         emit AlbumReleased(_worldId, _albumId);
+    }
+
+    /**
+     * Defines a booster pack on a released album.
+     */
+    function defineBoosterPackRule(
+        uint256 _worldId, uint256 _albumId,
+        string memory _name, string memory _image, uint32 _fiatPrice,
+        uint8 _bronzeStickersCount, uint8 _silverStickersCount,
+        bool _hasGoldOrPlatinumSticker, uint16 _platinumStickerProbability
+    ) external validWorldId(_worldId) validReleasedAlbumId(_worldId, _albumId) {
+        // Check price and prob values.
+        require(_fiatPrice != 0, "StickEmAllWorldsManagement: The fiat price cannot be 0");
+        require(
+            _platinumStickerProbability <= 10000,
+            "StickEmAllWorldsManagement: The platinum probability must be between 0 and 10000"
+        );
+        // Check the amount of available stickers.
+        require(
+            albumBronzeStickerIndicesCount(_albumId) >= _bronzeStickersCount &&
+            albumSilverStickerIndicesCount(_albumId) >= _silverStickersCount &&
+            (!_hasGoldOrPlatinumSticker ||
+             (albumGoldStickerIndicesCount(_albumId) + albumPlatinumStickerIndicesCount(_albumId)) >= 1),
+            "StickEmAllWorldsManagement: Not enough stickers of the chosen rarities in the album"
+        );
+        // Check the per-booster total stickers.
+        uint8 totalStickers = _bronzeStickersCount + _silverStickersCount;
+        if (_hasGoldOrPlatinumSticker) totalStickers += 1;
+        require(
+            totalStickers > 0 && totalStickers <= 15,
+            "StickEmAllWorldsManagement: The total amount of stickers must be between 1 and 15"
+        );
+        albumBoosterPackRules[_albumId].push(BoosterPackRule({
+            created: true, active: true, name: _name, image: _image, fiatPrice: _fiatPrice,
+            bronzeStickersCount: _bronzeStickersCount, silverStickersCount: _silverStickersCount,
+            hasGoldOrPlatinumSticker: _hasGoldOrPlatinumSticker, platinumProbability: _platinumStickerProbability
+        }));
+    }
+
+    /**
+     * Changes the price, availability and platinum probability
+     * of a booster pack rule.
+     */
+    function updateBoosterPackRule(
+        uint256 _worldId, uint256 _albumId, uint256 _ruleId,
+        bool _active, uint32 _fiatPrice, uint16 _platinumStickerProbability
+    ) external validWorldId(_worldId) validReleasedAlbumId(_worldId, _albumId) {
+        require(
+            _platinumStickerProbability <= 10000,
+            "StickEmAllWorldsManagement: The platinum probability must be between 0 and 10000"
+        );
+        BoosterPackRule[] storage rules = albumBoosterPackRules[_albumId];
+        require(
+            _ruleId < rules.length,
+            "StickEmAllWorldsManagement: Invalid rule id"
+        );
+        BoosterPackRule storage rule = rules[_ruleId];
+        rule.active = _active;
+        if (_fiatPrice != 0) rule.fiatPrice = _fiatPrice;
+        rule.platinumProbability = _platinumStickerProbability;
     }
 }
