@@ -67,6 +67,12 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
          * in front-end, never back-end).
          */
         string validatorUrl;
+
+        /**
+         * The earnings receiver (worlds will earn money
+         * when booster packs are sold).
+         */
+        address earningsReceiver;
     }
 
     /**
@@ -105,7 +111,8 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
         uint256 tokenId = _nextTokenId++;
         worlds[tokenId] = World({
             name: _name, description: _description, logo: _logo,
-            background: "", externalUrl: "", validatorUrl: ""
+            background: "", externalUrl: "", validatorUrl: "",
+            earningsReceiver: msg.sender
         });
         _mint(msg.sender, tokenId);
     }
@@ -164,6 +171,18 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
      */
     function setValidatorUrl(uint256 _tokenId, string memory _value) external {
         _validateWorld(_tokenId).validatorUrl = _value;
+    }
+
+    /**
+     * Sets the earnings receiver of a world.
+     */
+    function setEarningsReceiver(uint256 _tokenId, address _earningsReceiver) external {
+        require(_earningsReceiver != address(0), "StickEmAllWorlds: Invalid earnings receiver");
+        World storage world = worlds[_tokenId];
+        address owner = _ownerOf(_tokenId);
+        address sender = msg.sender;
+        require(sender == owner, "StickEmAllWorlds: You're not allowed to do this operation");
+        world.earningsReceiver = _earningsReceiver;
     }
 
     /**
