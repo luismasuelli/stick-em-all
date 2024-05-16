@@ -111,9 +111,9 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
     }
 
     /**
-     * Sets a field in the world.
+     * Validates a world being editable by the user.
      */
-    function setField(uint256 _tokenId, uint256 _field, string memory _value) external {
+    function _validateWorld(uint256 _tokenId) private view returns (World storage) {
         World storage world = worlds[_tokenId];
         address owner = _ownerOf(_tokenId);
         address sender = msg.sender;
@@ -121,22 +121,49 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
             sender == owner || _isWorldEditionAllowed[owner][_tokenId][sender],
             "StickEmAllWorlds: You're not allowed to do this operation"
         );
+        return world;
+    }
 
-        if (_field == 1) {
-            world.name = _value;
-        } else if (_field == 2) {
-            world.description = _value;
-        } else if (_field == 3) {
-            world.logo = _value;
-        } else if (_field == 4) {
-            world.background = _value;
-        } else if (_field == 5) {
-            world.externalUrl = _value;
-        } else if (_field == 6) {
-            world.validatorUrl = _value;
-        } else {
-            revert(string(abi.encodePacked("StickEmAllWorlds: Unknown field ", _field)));
-        }
+    /**
+     * Sets the name of a world.
+     */
+    function setName(uint256 _tokenId, string memory _value) external {
+        _validateWorld(_tokenId).name = _value;
+    }
+
+    /**
+     * Sets the description of a world.
+     */
+    function setDescription(uint256 _tokenId, string memory _value) external {
+        _validateWorld(_tokenId).description = _value;
+    }
+
+    /**
+     * Sets the logo of a world.
+     */
+    function setLogo(uint256 _tokenId, string memory _value) external {
+        _validateWorld(_tokenId).logo = _value;
+    }
+
+    /**
+     * Sets the background of a world.
+     */
+    function setBackground(uint256 _tokenId, string memory _value) external {
+        _validateWorld(_tokenId).background = _value;
+    }
+
+    /**
+     * Sets the external url of a world.
+     */
+    function setExternalUrl(uint256 _tokenId, string memory _value) external {
+        _validateWorld(_tokenId).externalUrl = _value;
+    }
+
+    /**
+     * Sets the validator url of a world.
+     */
+    function setValidatorUrl(uint256 _tokenId, string memory _value) external {
+        _validateWorld(_tokenId).validatorUrl = _value;
     }
 
     /**
