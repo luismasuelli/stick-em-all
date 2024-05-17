@@ -697,6 +697,8 @@ contract StickEmAllWorldsManagement {
         bool _hasGoldOrPlatinumSticker, uint16 _platinumStickerProbability
     ) external validWorldId(_worldId) validReleasedAlbumId(_worldId, _albumId) {
         // Check price and prob values.
+        BoosterPackRule[] storage rules = albumBoosterPackRules[_albumId];
+        require(rules.length <= 65535, "StickEmAllWorldsManagement: No more available rules");
         require(_fiatPrice != 0, "StickEmAllWorldsManagement: The fiat price cannot be 0");
         require(
             _platinumStickerProbability <= 10000,
@@ -717,7 +719,7 @@ contract StickEmAllWorldsManagement {
             totalStickers > 0 && totalStickers <= 15,
             "StickEmAllWorldsManagement: The total amount of stickers must be between 1 and 15"
         );
-        albumBoosterPackRules[_albumId].push(BoosterPackRule({
+        rules.push(BoosterPackRule({
             created: true, active: true, name: _name, image: _image, fiatPrice: _fiatPrice,
             bronzeStickersCount: _bronzeStickersCount, silverStickersCount: _silverStickersCount,
             hasGoldOrPlatinumSticker: _hasGoldOrPlatinumSticker, platinumProbability: _platinumStickerProbability
