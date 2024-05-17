@@ -35,6 +35,11 @@ contract StickEmAllWorldsManagement {
     uint256 private constant MaxNumberOfDefinedAlbums = 1 << 224;
 
     /**
+     * The maximum amount of pages per album.
+     */
+    uint256 private constant MaxNumberOfAlbumPages = 1 << 13;
+
+    /**
      * Achievement definitions stand for albums' achievements.
      * They will be known by their index in the album definition.
      *
@@ -564,10 +569,15 @@ contract StickEmAllWorldsManagement {
         StickerPageLayout _layout, bytes32 _achievementType, string memory _achievementName,
         string memory _achievementImage, bytes memory _achievementData
     ) external validWorldId(_worldId) validNonReleasedAlbumId(_worldId, _albumId) {
+        AlbumPageDefinition[] storage definitions = albumPageDefinitions[_albumId];
+        require(
+            definitions.length < MaxNumberOfAlbumPages,
+            "StickEmAllWorldsManagement: No more pages can be created in this album"
+        );
         uint16 achievementId = _addAchievement(
             _albumId, _achievementType, _achievementName, _achievementImage, _achievementData
         );
-        albumPageDefinitions[_albumId].push(AlbumPageDefinition({
+        definitions.push(AlbumPageDefinition({
             name: _name, backgroundImage: _backgroundImage, layout: _layout, maxStickers: slotsPerLayout[_layout],
             currentlyDefinedStickers: 0, achievementId: achievementId, complete: false
         }));
@@ -613,7 +623,7 @@ contract StickEmAllWorldsManagement {
                 _albumId, _achievementType, _name, _image, _achievementData
             )
         }));
-        _incrementStickerCounters(_albumId, _pageIdx, uint16(definitions.length) - 1, _rarity, definitions);
+        _incrementStickerCounters(_albumId, _pageIdx, (_pageIdx << 3) | uint16(definitions.length) - 1, _rarity, definitions);
     }
 
     // Release things start here.
