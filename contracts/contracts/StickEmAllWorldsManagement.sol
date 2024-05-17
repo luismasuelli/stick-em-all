@@ -40,6 +40,11 @@ contract StickEmAllWorldsManagement {
     uint256 private constant MaxNumberOfAlbumPages = 1 << 13;
 
     /**
+     * The maximum amount of booster pack rules per album.
+     */
+    uint256 private constant MAxNumberOfAlbumBoosterPackRules = 1 << 16;
+
+    /**
      * Achievement definitions stand for albums' achievements.
      * They will be known by their index in the album definition.
      *
@@ -708,7 +713,10 @@ contract StickEmAllWorldsManagement {
     ) external validWorldId(_worldId) validReleasedAlbumId(_worldId, _albumId) {
         // Check price and prob values.
         BoosterPackRule[] storage rules = albumBoosterPackRules[_albumId];
-        require(rules.length <= 65535, "StickEmAllWorldsManagement: No more available rules");
+        require(
+            rules.length < MAxNumberOfAlbumBoosterPackRules,
+            "StickEmAllWorldsManagement: There are no more available booster pack rules for this album"
+        );
         require(_fiatPrice != 0, "StickEmAllWorldsManagement: The fiat price cannot be 0");
         require(
             _platinumStickerProbability <= 10000,
