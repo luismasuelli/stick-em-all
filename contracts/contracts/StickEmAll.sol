@@ -20,9 +20,9 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
      * Album instances are NFTs and its data will be tracked like this:
      * - Struct field: The id of the underlying album type.
      * - Struct field: How many stickers pasted (contrasts against: type's totalStickers).
-     * - mapping[pageIdx, slotIdx]: Whether sticker in that slot is pasted or not
+     * - mapping[pageIdx<<3|slotIdx]: Whether sticker in that slot is pasted or not
      *   (contrasts against: type's albumPageStickersDefinitions to check which are valid).
-     * - mapping[pageIdx]: How many stickers in that slot are pasted
+     * - mapping[pageIdx]: How many stickers in that page are pasted
      *   (contrasts against: albumPageStickersDefinitionsCount for that page).
      * - Struct field: Completed pages (contrasts against: type's completedPages).
      * - Struct field: Completed (boolean).
@@ -94,6 +94,67 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
      *       corresponding events or, at least, some sort of _mintBatch operation.
      *     - THIS OPERATION WILL BE LINK-EXPENSIVE.
      */
+
+    /**
+     * This is the data for the album instance. The NFT
+     * data will be extracted from the type and, as extra
+     * fields, whether it is completed or not (and also
+     * how many pages are completed).
+     */
+    struct AlbumInstance {
+        /**
+         * Whether this album instance is valid/created.
+         */
+        bool created;
+
+        /**
+         * The owner of this album.
+         */
+        address owner;
+
+        /**
+         * The type of the album.
+         */
+        uint256 albumTypeId;
+
+        /**
+         * The amount of pasted stickers.
+         */
+        uint256 pastedStickers;
+
+        /**
+         * The amount of completed pages.
+         */
+        uint256 completedPages;
+
+        /**
+         * Whether it is completed or not.
+         */
+        bool completed;
+    }
+
+    /**
+     * The album instances.
+     */
+    mapping(uint256 => AlbumInstance) public albumInstances;
+
+    /**
+     * Tells whether a sticker is pasted or not.
+     * It does NOT test whether the sticker is valid, but only
+     * whether they're pasted. The key is pageIdx<<3|slotIdx.
+     */
+    mapping(uint256 => mapping(uint16 => bool)) public pastedStickers;
+
+    /**
+     * Tells the amount of stickers in a page.
+     * The key is pageIdx.
+     */
+    mapping(uint256 => mapping(uint16 => uint16)) public pastedStickersCount;
+
+    /**
+     * Tells which achievements were reached by this album.
+     */
+    mapping(uint256 => mapping(uint256 => bool)) public achieved;
 
     /**
      * The Worlds Management contract.
