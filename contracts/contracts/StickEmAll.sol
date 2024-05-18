@@ -176,7 +176,7 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
      */
     function _decomposeSticker(
         uint256 _stickerId
-    ) private view returns (uint256 albumId, uint16 pageId, uint16 slotId){
+    ) private pure returns (uint256 albumId, uint16 pageId, uint16 slotId) {
         require(_stickerId & (1<<0xFF) == 0 && _stickerId & 0x3FFFFFFF == 0, "StickEmAll: Not a sticker id");
         albumId = _stickerId >> 31;
         pageId = uint16((_stickerId >> 3) & 0x1FFF);
@@ -237,6 +237,55 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
                 emit Achievement(_albumId, 0);
             }
         }
+    }
+
+    /**
+     * Gets the fiat price of a purchase of a booster pack.
+     */
+    function getBoosterPackFiatPrice(
+        uint256 _albumTypeId, uint16 _ruleId, uint256 _amount
+    ) public view returns (uint256) {
+        (,bool active,uint32 fiatPrice,,,,,,,) = worldsManagement.albumBoosterPackRules(_albumTypeId, _ruleId);
+        if (!active) return 0;
+        return _amount * worldsManagement.worlds().params().getNativeCost(fiatPrice);
+    }
+
+    /**
+     * Gets the native price of a purchase of a booster pack.
+     */
+    function getBoosterPackNativePrice(
+        uint256 _albumTypeId, uint16 _ruleId, uint256 _amount
+    ) public view returns (uint256) {
+        return worldsManagement.worlds().params().getNativeCost(getBoosterPackFiatPrice(
+            _albumTypeId, _ruleId, _amount
+        ));
+    }
+
+    /**
+     * Purchases N booster packs.
+     */
+    function purchaseBoosterPacks(uint256 _albumTypeId, uint16 _ruleId, uint256 _amount) external payable {
+        // 1. Check the amount to be > 0.
+        require(_amount > 0, "StickEmAll: The amount cannot be zero");
+        // 2. Check the rule to be valid and active.
+        require(
+            _ruleId < worldsManagement.albumBoosterPackRulesCount(_albumTypeId),
+            "StickEmAll: Invalid album / rule id"
+        );
+        (,bool active,uint32 fiatPrice,uint32 fiatFee,,,,,,) = worldsManagement.albumBoosterPackRules(_albumTypeId, _ruleId);
+        require(active, "StickEmAll: The sale of that booster pack is not available");
+        // 3. Check the price to be paid.
+        uint256 nativePrice = _amount * worldsManagement.worlds().params().getNativeCost(fiatPrice);
+        uint256 nativeFee = _amount * worldsManagement.worlds().params().getNativeCost(fiatFee);
+        uint256 nativeRemainder = nativePrice - nativeFee;
+        require(msg.value >= nativePrice, "StickEmAll: Insufficient payment");
+        // 4. Get the world that minted the type.
+        (uint256 worldId,,,,,,,,) = worldsManagement.albumDefinitions(_albumTypeId);
+        (,,,,,,address earningsReceiver) = worldsManagement.worlds().worlds(worldId);
+        // 5. Properly forward the amounts, and mint.
+        payable(earningsReceiver).call{value:nativeRemainder}("");
+        payable(worldsManagement.worlds().params().earningsReceiver()).call{value:nativeFee}("");
+        _mint(msg.sender, (_albumTypeId << 31)|0x40000000|_ruleId, _amount, "");
     }
 
     /**
