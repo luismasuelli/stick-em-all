@@ -161,9 +161,82 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
      */
     StickEmAllWorldsManagement public worldsManagement;
 
+    /**
+     * Event telling about an achievement.
+     */
+    event Achievement(uint256 indexed albumId, uint16 indexed achievementId);
+
     constructor(address _worldsManagement, address _coordinator) ERC1155("") VRFConsumerBaseV2Plus(_coordinator) {
         require(_worldsManagement != address(0), "StickEmAll: Invalid management contract");
         worldsManagement = StickEmAllWorldsManagement(worldsManagement);
+    }
+
+    /**
+     * Decomposes a sticker's ID. It also validates it being a sticker ID.
+     */
+    function _decomposeSticker(
+        uint256 _stickerId
+    ) private view returns (uint256 albumId, uint16 pageId, uint16 slotId){
+        require(_stickerId & (1<<0xFF) == 0 && _stickerId & 0x3FFFFFFF == 0, "StickEmAll: Not a sticker id");
+        albumId = _stickerId >> 31;
+        pageId = uint16((_stickerId >> 3) & 0x1FFF);
+        slotId = uint16(_stickerId & 7);
+    }
+
+    /**
+     * Pastes a sticker into the album.
+     */
+    function stick(uint256 _albumId, uint256 _stickerId) external {
+        AlbumInstance storage instance = albumInstances[_albumId];
+        // 1. The album must exist.
+        require(instance.created, "StickEmAll: Invalid album");
+        // 2. The album's owner must be the sender, or must have
+        //    allowed the sender on their assets.
+        address albumOwner = instance.owner;
+        require(
+            msg.sender == albumOwner || isApprovedForAll(albumOwner, msg.sender),
+            "StickEmAll: Not authorized to paste on this album"
+        );
+        // 3. The sticker must be properly decomposed to the album's type.
+        (uint256 albumTypeId, uint16 pageId, uint16 slotId) = _decomposeSticker(_stickerId);
+        // 4. Check the sticker is valid or this album.
+        require(instance.albumTypeId == albumTypeId, "StickEmAll: The sticker is not for this album");
+        // 5. Burn exactly one token.
+        _burn(albumOwner, _stickerId, 1);
+        // 6. Require the token to be NOT set in the album.
+        uint16 relativeId = uint16(_stickerId & 0xFFFF);
+        require(
+            !pastedStickers[_albumId][relativeId],
+            "StickEmAll: Sticker already pasted in this album"
+        );
+        // ... Now:
+        // 3. Same for the album. If completed, set its achievement (it will have).
+
+        // 1. Set the sticker in the page. Set the achievement, if any.
+        pastedStickers[_albumId][relativeId] = true;
+        uint16 count_ = pastedStickersCount[_albumId][pageId] + 1;
+        pastedStickersCount[_albumId][pageId] = count_;
+        (,,,uint16 stickerAchievementId) = worldsManagement.albumPageStickersDefinitions(albumTypeId, pageId, slotId);
+        if (stickerAchievementId > 0) {
+            achieved[_albumId][stickerAchievementId] = true;
+            emit Achievement(_albumId, stickerAchievementId);
+        }
+        // 2. Set the pages count in the album, if page completed. Set the achievement, if any.
+        (,,,uint8 maxStickers,,,) = worldsManagement.albumPageDefinitions(albumTypeId, pageId);
+        if (count_ == maxStickers) {
+            instance.completedPages += 1;
+            (,,,uint16 pageAchievementId) = worldsManagement.albumPageStickersDefinitions(albumTypeId, pageId, slotId);
+            if (pageAchievementId > 0) {
+                achieved[_albumId][pageAchievementId] = true;
+                emit Achievement(_albumId, pageAchievementId);
+            }
+
+            if (instance.completedPages == worldsManagement.albumPageDefinitionsCount(albumTypeId)) {
+                instance.completed = true;
+                achieved[_albumId][0] = true;
+                emit Achievement(_albumId, 0);
+            }
+        }
     }
 
     /**
