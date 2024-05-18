@@ -304,6 +304,12 @@ contract StickEmAllWorldsManagement {
         uint32 fiatPrice;
 
         /**
+         * The fee, in USD, that is forwarded, expressed in USD cents.
+         * This amount is forwarded to the owner.
+         */
+        uint32 fiatFee;
+
+        /**
          * The name of the rule.
          */
         string name;
@@ -714,6 +720,9 @@ contract StickEmAllWorldsManagement {
         // Check price and prob values.
         BoosterPackRule[] storage rules = albumBoosterPackRules[_albumId];
         require(
+            _fiatPrice > 200, "StickEmAllWorldsManagement: The minimum fiat price must be 200 ($2.00)"
+        );
+        require(
             rules.length < MAxNumberOfAlbumBoosterPackRules,
             "StickEmAllWorldsManagement: There are no more available booster pack rules for this album"
         );
@@ -731,16 +740,21 @@ contract StickEmAllWorldsManagement {
             "StickEmAllWorldsManagement: Not enough stickers of the chosen rarities in the album"
         );
         // Check the per-booster total stickers.
-        uint8 totalStickers = _bronzeStickersCount + _silverStickersCount;
-        if (_hasGoldOrPlatinumSticker) totalStickers += 1;
-        require(
-            totalStickers > 0 && totalStickers <= 15,
-            "StickEmAllWorldsManagement: The total amount of stickers must be between 1 and 15"
-        );
+        {
+            uint8 totalStickers = _bronzeStickersCount + _silverStickersCount;
+            if (_hasGoldOrPlatinumSticker) totalStickers += 1;
+            require(
+                totalStickers > 0 && totalStickers <= 15,
+                "StickEmAllWorldsManagement: The total amount of stickers must be between 1 and 15"
+            );
+        }
+        uint32 fiatFee = _fiatPrice / 5;
+        if (fiatFee < 100) fiatFee = 100;
         rules.push(BoosterPackRule({
             created: true, active: true, name: _name, image: _image, fiatPrice: _fiatPrice,
             bronzeStickersCount: _bronzeStickersCount, silverStickersCount: _silverStickersCount,
-            hasGoldOrPlatinumSticker: _hasGoldOrPlatinumSticker, platinumProbability: _platinumStickerProbability
+            hasGoldOrPlatinumSticker: _hasGoldOrPlatinumSticker, platinumProbability: _platinumStickerProbability,
+            fiatFee: fiatFee
         }));
     }
 
@@ -752,6 +766,9 @@ contract StickEmAllWorldsManagement {
         uint256 _worldId, uint256 _albumId, uint256 _ruleId,
         bool _active, uint32 _fiatPrice, uint16 _platinumStickerProbability
     ) external validWorldId(_worldId) validReleasedAlbumId(_worldId, _albumId) {
+        require(
+            _fiatPrice > 200, "StickEmAllWorldsManagement: The minimum fiat price must be 200 ($2.00)"
+        );
         // Validating the probability and the booster pack id for the album.
         require(
             _platinumStickerProbability <= 10000,
@@ -765,7 +782,12 @@ contract StickEmAllWorldsManagement {
         // Updating the current rule.
         BoosterPackRule storage rule = rules[_ruleId];
         rule.active = _active;
-        if (_fiatPrice != 0) rule.fiatPrice = _fiatPrice;
+        if (_fiatPrice != 0) {
+            rule.fiatPrice = _fiatPrice;
+            uint32 fiatFee = _fiatPrice / 5;
+            if (fiatFee < 100) fiatFee = 100;
+            rule.fiatFee = fiatFee;
+        }
         rule.platinumProbability = _platinumStickerProbability;
     }
 }
