@@ -82,22 +82,25 @@ contract StickEmAllEconomy is ERC1155 {
 
     /**
      * Burns a sticker. Only the owner can call this method.
+     * Here, the sticker id comes composed with the album type id and page id as well.
      */
-    function burnSticker(address _owner, uint256 _albumTypeId, uint16 _pageId, uint16 _slotId) external onlyMain {
-        _burn(_owner, _albumTypeId << 31 | _pageId << 3 | _slotId, 1);
+    function burnSticker(address _owner, uint256 _stickerId) external onlyMain {
+        _burn(_owner, _stickerId, 1);
     }
 
     /**
      * Mints N booster packs. Only the owner can call this method.
+     * Here, the booster pack id comes composed with the album type id as well.
      */
-    function mintBoosterPacks(address _owner, uint256 _albumTypeId, uint16 _ruleId, uint256 _amount) external onlyMain {
-        _mint(_owner, _albumTypeId << 31 | 0x40000000 | _ruleId, _amount, "");
+    function mintBoosterPacks(address _owner, uint256 _boosterPackId, uint256 _amount) external onlyMain {
+        _mint(_owner, _boosterPackId, _amount, "");
     }
 
     /**
      * Burns a booster pack.
+     * Here, the booster pack id comes composed with the album type id as well.
      */
-    function burnBoosterPack(address _owner, uint256 _albumTypeId, uint16 _ruleId) external onlyMain {
-        _burn(_owner, _albumTypeId << 31 | _ruleId, 1);
+    function burnBoosterPack(address _owner, uint256 _boosterPackId) external onlyMain {
+        _burn(_owner, _boosterPackId, 1);
     }
 }
