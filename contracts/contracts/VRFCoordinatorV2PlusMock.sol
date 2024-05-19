@@ -1,11 +1,33 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 import "@chainlink/contracts/src/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
+import "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 
 /**
  * This is a mock resembling the V2Plus contract coordinator.
  */
 contract VRFCoordinatorV2PlusMock is IVRFCoordinatorV2Plus {
+    /**
+     * The mocked request. Stuff like confirmations,
+     * subscriptions or gas limits are not accounted.
+     */
+    struct MockedRequest {
+        address requester;
+        uint256 numWords;
+        bytes extraArgs;
+        bool fulfilled;
+    }
+
+    /**
+     * The mocked requests.
+     */
+    mapping(uint256 => MockedRequest) private requests;
+
+    /**
+     * The id of the next request.
+     */
+    uint256 private nextRequestId = 1;
+
     function acceptSubscriptionOwnerTransfer(uint256 subId) external {
         // Mock.
     }
@@ -46,11 +68,23 @@ contract VRFCoordinatorV2PlusMock is IVRFCoordinatorV2Plus {
     }
 
     function requestRandomWords(VRFV2PlusClient.RandomWordsRequest calldata req) external returns (uint256 requestId) {
-        // Mock.
-        return 0;
+        requestId = nextRequestId++;
+        requests[requestId] = MockedRequest({
+            requester: msg.sender,
+            numWords: req.numWords,
+            extraArgs: req.extraArgs,
+            fulfilled: false
+        });
     }
 
     function requestSubscriptionOwnerTransfer(uint256 subId, address newOwner) external {
         // Mock.
+    }
+
+    function fulfillRandomWordsRequest(uint256 requestId, uint256[] memory randomWords) external {
+        require(requests[requestId].requester != address(0), "VRFCoordinatorV2PlusMock: Invalid request");
+        require(!requests[requestId].fulfilled, "VRFCoordinatorV2PlusMock: Request already fulfilled");
+        requests[requestId].fulfilled = true;
+        VRFConsumerBaseV2Plus(requests[requestId].requester).rawFulfillRandomWords(requestId, randomWords);
     }
 }
