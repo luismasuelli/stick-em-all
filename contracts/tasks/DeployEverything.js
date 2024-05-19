@@ -1,6 +1,6 @@
 const { task } = require("hardhat/config");
 const MockV3AggregatorModule = require("../ignition/modules/MockV3Aggregator");
-const Params = require("../ignition/modules/Params");
+const StickEmAllParams = require("../ignition/modules/StickEmAllParams");
 const fs = require('fs');
 const path = require('path');
 
@@ -48,9 +48,9 @@ async function deployPriceFeed(hre) {
  * @returns {Promise<string>} The address of the deployed contract.
  */
 async function deployParams(hre, priceFeedAddr) {
-    const { params } = await hre.ignition.deploy(Params, {
+    const { params } = await hre.ignition.deploy(StickEmAllParams, {
         parameters: {
-            "Params": {
+            "StickEmAllParams": {
                 "priceFeed": priceFeedAddr
             }
         }
