@@ -2,6 +2,9 @@
 pragma solidity ^0.8.7;
 import "@chainlink/contracts/src/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
 
+/**
+ * This is a mock resembling the V2Plus contract coordinator.
+ */
 contract VRFCoordinatorV2PlusMock is IVRFCoordinatorV2Plus {
     function acceptSubscriptionOwnerTransfer(uint256 subId) external {
         // Mock.
