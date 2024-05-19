@@ -63,7 +63,7 @@ contract StickEmAllEconomy is ERC1155, Ownable {
      * Mints N booster packs. Only the owner can call this method.
      */
     function mintBoosterPacks(address _owner, uint256 _albumTypeId, uint16 _ruleId, uint256 _amount) external onlyOwner {
-        _mint(_owner, _albumTypeId << 31 | _ruleId, _amount, "");
+        _mint(_owner, _albumTypeId << 31 | 0x40000000 | _ruleId, _amount, "");
     }
 
     /**
