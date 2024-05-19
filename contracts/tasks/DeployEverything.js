@@ -47,7 +47,7 @@ async function deployPriceFeed(hre) {
  * Deploys the params contract, if any.
  * @param hre The hardhat runtime environment.
  * @param priceFeedAddr The address of the price feed.
- * @returns {Promise<string>} The address of the deployed contract.
+ * @returns {Promise<*>} The deployed contract.
  */
 async function deployParams(hre, priceFeedAddr) {
     const { params } = await hre.ignition.deploy(StickEmAllParams, {
@@ -57,7 +57,7 @@ async function deployParams(hre, priceFeedAddr) {
             }
         }
     });
-    return await params.getAddress();
+    return params;
 }
 
 
@@ -65,7 +65,7 @@ async function deployParams(hre, priceFeedAddr) {
  * Deploys the worlds and worldsManagement contracts.
  * @param hre The hardhat runtime environment.
  * @param paramsAddr The address of the params argument.
- * @returns {Promise<{worldsAddress, worldsManagementAddress}>} The address of worlds and worldsManagement contracts.
+ * @returns {Promise<{worlds, worldsManagement}>} The worlds and worldsManagement contracts.
  */
 async function deployWorld(hre, paramsAddr) {
     // Deploy the worlds contract.
@@ -86,7 +86,18 @@ async function deployWorld(hre, paramsAddr) {
             }
         }
     });
-    return {worldsAddress, worldsManagementAddress: await worldsManagement.getAddress()};
+    return {worlds, worldsManagement};
+}
+
+
+/**
+ * Computes a keccak256.
+ * @param ethers The ethers module.
+ * @param key The key
+ * @returns {string} The keccak256 of the value.
+ */
+function keccak256(ethers, key) {
+    return ethers.keccak256(ethers.toUtf8Bytes(key));
 }
 
 
@@ -106,11 +117,21 @@ task("deploy-everything", "Deploys all our ecosystem")
         console.log("Price feed address: " + priceFeedAddr);
 
         // Deploying or identifying the params addr.
-        let paramsAddr = await deployParams(hre, priceFeedAddr);
+        let params = await deployParams(hre, priceFeedAddr);
+        let paramsAddr = await params.getAddress();
         console.log("Params address: " + paramsAddr);
 
         // Deploying the worlds (mint & management) contracts.
-        let {worldsAddress, worldsManagementAddress} = await deployWorld(hre, paramsAddr);
+        let {worlds, worldsManagement} = await deployWorld(hre, paramsAddr);
+        let worldsAddress = await worlds.getAddress();
+        let worldsManagementAddress = await worldsManagement.getAddress();
         console.log("Worlds address: " + worldsAddress);
         console.log("Worlds Management address: " + worldsManagementAddress);
+
+        // Define world parameters.
+        await worldsAddress.setFiatCost(keccak256("Costs::DefineWorld", 10));
+        await worldsAddress.setFiatCost(keccak256("Costs::Albums::DefineAlbum", 5));
+        await worldsAddress.setFiatCost(keccak256("Costs::Albums::DefinePage", 3));
+        await worldsAddress.setFiatCost(keccak256("Costs::Albums::DefineAchievement", 2));
+        await worldsAddress.setFiatCost(keccak256("Costs::Albums::DefineSticker", 1));
     });
