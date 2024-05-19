@@ -368,8 +368,8 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
         uint8 totalCount = bronzeCount + silverCount;
         if (hasGoldOrPlatinum) totalCount += 1;
         // Prepare the array of elements.
-        uint32[] keys = new uint32[totalCount];
-        uint32[] values = new uint32[totalCount];
+        uint256[] memory keys = new uint256[](totalCount);
+        uint256[] memory values = new uint256[](totalCount);
         // TODO continue here, all the logic.
         _mintBatch(request.owner, keys, values, "");
     }
