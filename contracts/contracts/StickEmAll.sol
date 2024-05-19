@@ -359,8 +359,18 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
         // Get the request.
         BoosterOpenRequest storage request = boosterOpenRequests[requestId];
         // Get the rule's elements.
-        uint256 albumId = request.ruleId >> 31;
+        uint256 albumTypeId = request.ruleId >> 31;
         uint16 ruleIdx = uint16(request.ruleId & 0xFFFF);
-        // TODO continue here.
+        (
+            ,,,,,,
+            uint8 bronzeCount, uint8 silverCount, bool hasGoldOrPlatinum, uint16 platinumProbs
+        ) = worldsManagement.albumBoosterPackRules(albumTypeId, ruleIdx);
+        uint8 totalCount = bronzeCount + silverCount;
+        if (hasGoldOrPlatinum) totalCount += 1;
+        // Prepare the array of elements.
+        uint32[] keys = new uint32[totalCount];
+        uint32[] values = new uint32[totalCount];
+        // TODO continue here, all the logic.
+        _mintBatch(request.owner, keys, values, "");
     }
 }
