@@ -339,6 +339,10 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
             msg.sender == owner || isApprovedForAll(owner, msg.sender),
             "StickEmAll: Not authorized to open booster packs for this address"
         );
+        require(
+            ((_boosterPackAssetId & 0x40000000) != 0) && ((_boosterPackAssetId & ((1<<255) - 1)) != 0),
+            "StickEmAll: Invalid asset id"
+        );
         _burn(msg.sender, _boosterPackAssetId, 1);
         // Create the request.
         uint256 requestID = s_vrfCoordinator.requestRandomWords(VRFV2PlusClient.RandomWordsRequest({
@@ -352,6 +356,10 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
      * Attends opened booster packs (up to 15 words).
      */
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
-        // TODO implement.
+        // Get the request.
+        BoosterOpenRequest storage request = boosterOpenRequests[requestId];
+        // Get the rule's elements.
+        uint256 albumId = request.ruleId >> 31;
+        uint16 ruleIdx = uint16(request.ruleId & 0xFFFF);
     }
 }
