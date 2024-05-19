@@ -353,6 +353,65 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
     }
 
     /**
+     * Adds the bronze and silver cards (at most pairs 0..13) and perhaps the
+     * gold/platinum card (at most pair 14).
+     */
+    function getStickers(
+        uint8 bronzeStickers, uint8 silverStickers, bool hasGoldOrPlatinum,
+        uint256 platinumProbability, uint256 albumTypeId, uint256 word
+    ) private view returns (uint256[] memory, uint256[] memory) {
+        uint256 index = 0;
+        uint256 length = bronzeStickers + silverStickers;
+        if (hasGoldOrPlatinum) length += 1;
+        uint256[] memory keys = new uint256[](length);
+        uint256[] memory values = new uint256[](length);
+        {
+            uint16 bronzeStickersCount = uint16(worldsManagement.albumBronzeStickerIndicesCount(albumTypeId));
+            for(uint8 idx = 0; idx < bronzeStickers; idx++)
+            {
+                values[index] = 1;
+                keys[index] = albumTypeId << 31 | worldsManagement.albumBronzeStickerIndices(
+                    albumTypeId, ((word & 0xFFFF) % bronzeStickersCount)
+                );
+                index += 1;
+                word = word >> 16;
+            }
+        }
+        {
+            uint16 silverStickersCount = uint16(worldsManagement.albumSilverStickerIndicesCount(albumTypeId));
+            for(uint8 idx = 0; idx < silverStickersCount; idx++)
+            {
+                values[index] = 1;
+                keys[index] = albumTypeId << 31 | worldsManagement.albumSilverStickerIndices(
+                    albumTypeId, ((word & 0xFFFF) % silverStickersCount)
+                );
+                index += 1;
+                word = word >> 16;
+            }
+        }
+        if (hasGoldOrPlatinum)
+        {
+            uint16 goldStickersCount = uint16(worldsManagement.albumBronzeStickerIndicesCount(albumTypeId));
+            uint16 platinumStickersCount = uint16(worldsManagement.albumSilverStickerIndicesCount(albumTypeId));
+
+            values[index] = 1;
+            if (goldStickersCount == 0 || ((word & 0xFFFF) % 10000) > (10000 - platinumProbability)) {
+                // No gold stickers or the probs chose platinum: pick platinum.
+                keys[index] = albumTypeId << 31 | worldsManagement.albumPlatinumStickerIndices(
+                    albumTypeId, ((word & 0xFFFF) % platinumStickersCount)
+                );
+            } else {
+                // Pick gold.
+                keys[index] = albumTypeId << 31 | worldsManagement.albumGoldStickerIndices(
+                    albumTypeId, ((word & 0xFFFF) % goldStickersCount)
+                );
+            }
+        }
+
+        return (keys, values);
+    }
+
+    /**
      * Attends opened booster packs (up to 15 words).
      */
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
@@ -365,12 +424,9 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
             ,,,,,,
             uint8 bronzeCount, uint8 silverCount, bool hasGoldOrPlatinum, uint16 platinumProbs
         ) = worldsManagement.albumBoosterPackRules(albumTypeId, ruleIdx);
-        uint8 totalCount = bronzeCount + silverCount;
-        if (hasGoldOrPlatinum) totalCount += 1;
-        // Prepare the array of elements.
-        uint256[] memory keys = new uint256[](totalCount);
-        uint256[] memory values = new uint256[](totalCount);
-        // TODO continue here, all the logic.
+        (uint256[] memory keys, uint256[] memory values) = getStickers(
+            bronzeCount, silverCount, hasGoldOrPlatinum, platinumProbs, albumTypeId, randomWords[0]
+        );
         _mintBatch(request.owner, keys, values, "");
     }
 }
