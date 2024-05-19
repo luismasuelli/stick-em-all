@@ -5,19 +5,15 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import "./StickEmAllWorldsManagement.sol";
+import "./StickEmAllEconomy.sol";
 
 /**
  * StickEmAllMain is the main point where users purchase
  * and manage their albums and stickers, stick them, and
  * get their achievements.
  */
-contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
+contract StickEmAllMain is VRFConsumerBaseV2Plus {
     /**
-     * Some notes about the IDs of the tokens:
-     * - Albums are NFTs:       [1:1bit][albumInstId:225bit].
-     * - Booster packs are FTs: [0:1bit][albumTypeId:224bit][1(=BP):1bit][0:14bit][ruleId:16bit].
-     * - Stickers are FTs:      [0:1bit][albumTypeId:224bit][0(=ST):1bit][0:14bit][pageIdx:13bit][slotIdx:3bit].
-     *
      * Album instances are NFTs and its data will be tracked like this:
      * - Struct field: The id of the underlying album type.
      * - Struct field: How many stickers pasted (contrasts against: type's totalStickers).
@@ -91,7 +87,7 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
      *       the probability in consideration.
      *     - If there's a gold/platinum type taken or randomly chosen, take word (28/29)
      *       and compute num%N where N is the amount of stickers of that rarity.
-     *     - Mint all the tokens. This implies at most 15 _mint operations with their
+     *     - Mint all the tokens. This implies at most 15 mint operations with their
      *       corresponding events or, at least, some sort of _mintBatch operation.
      *     - THIS OPERATION WILL BE LINK-EXPENSIVE.
      */
@@ -178,7 +174,12 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
     mapping(uint256 => mapping(uint256 => bool)) public achieved;
 
     /**
-     * The Worlds Management contract.
+     * The Economy contract.
+     */
+    StickEmAllEconomy public economy;
+
+    /**
+     * The Worlds Management contract (cached from economy).
      */
     StickEmAllWorldsManagement public worldsManagement;
 
@@ -204,11 +205,12 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
     uint256 private subscriptionId;
 
     constructor(
-        address _worldsManagement, address _coordinator,
+        address _economy, address _coordinator,
         bytes32 _keyHash, uint256 _subscriptionId
-    ) ERC1155("") VRFConsumerBaseV2Plus(_coordinator) {
-        require(_worldsManagement != address(0), "StickEmAll: Invalid management contract");
-        worldsManagement = StickEmAllWorldsManagement(worldsManagement);
+    ) VRFConsumerBaseV2Plus(_coordinator) {
+        require(_economy != address(0), "StickEmAll: Invalid economy contract");
+        economy = StickEmAllEconomy(_economy);
+        worldsManagement = economy.worldsManagement();
         keyHash = _keyHash;
         _subscriptionId = subscriptionId;
     }
@@ -236,7 +238,7 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
         //    allowed the sender on their assets.
         address albumOwner = instance.owner;
         require(
-            msg.sender == albumOwner || isApprovedForAll(albumOwner, msg.sender),
+            msg.sender == albumOwner || economy.isApprovedForAll(albumOwner, msg.sender),
             "StickEmAll: Not authorized to paste on this album"
         );
         // 3. The sticker must be properly decomposed to the album's type.
@@ -244,7 +246,7 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
         // 4. Check the sticker is valid or this album.
         require(instance.albumTypeId == albumTypeId, "StickEmAll: The sticker is not for this album");
         // 5. Burn exactly one token.
-        _burn(albumOwner, _stickerId, 1);
+        economy.burnSticker(albumOwner, _stickerId);
         // 6. Require the token to be NOT set in the album.
         uint16 relativeId = uint16(_stickerId & 0xFFFF);
         require(
@@ -314,20 +316,24 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
             _ruleId < worldsManagement.albumBoosterPackRulesCount(_albumTypeId),
             "StickEmAll: Invalid album / rule id"
         );
-        (,bool active,uint32 fiatPrice,uint32 fiatFee,,,,,,) = worldsManagement.albumBoosterPackRules(_albumTypeId, _ruleId);
-        require(active, "StickEmAll: The sale of that booster pack is not available");
-        // 3. Check the price to be paid.
-        uint256 nativePrice = _amount * worldsManagement.worlds().params().getNativeCost(fiatPrice);
-        uint256 nativeFee = _amount * worldsManagement.worlds().params().getNativeCost(fiatFee);
+        uint256 nativePrice;
+        uint256 nativeFee;
+        {
+            (,bool active,uint32 fiatPrice,uint32 fiatFee,,,,,,) = worldsManagement.albumBoosterPackRules(_albumTypeId, _ruleId);
+            require(active, "StickEmAll: The sale of that booster pack is not available");
+            // 3. Check the price to be paid.
+            nativePrice = _amount * worldsManagement.worlds().params().getNativeCost(fiatPrice);
+            nativeFee = _amount * worldsManagement.worlds().params().getNativeCost(fiatFee);
+            require(msg.value >= nativePrice, "StickEmAll: Insufficient payment");
+        }
         uint256 nativeRemainder = nativePrice - nativeFee;
-        require(msg.value >= nativePrice, "StickEmAll: Insufficient payment");
         // 4. Get the world that minted the type.
         (uint256 worldId,,,,,,,,) = worldsManagement.albumDefinitions(_albumTypeId);
         (,,,,,,address earningsReceiver) = worldsManagement.worlds().worlds(worldId);
         // 5. Properly forward the amounts, and mint.
         payable(earningsReceiver).call{value:nativeRemainder}("");
         payable(worldsManagement.worlds().params().earningsReceiver()).call{value:nativeFee}("");
-        _mint(msg.sender, (_albumTypeId << 31)|0x40000000|_ruleId, _amount, "");
+        economy.mintBoosterPacks(msg.sender, (_albumTypeId << 31)|0x40000000|_ruleId, _amount);
     }
 
     /**
@@ -336,14 +342,14 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
     function openBoosterPack(address owner, uint256 _boosterPackAssetId) external {
         // Check to be authorized, and burn the token.
         require(
-            msg.sender == owner || isApprovedForAll(owner, msg.sender),
+            msg.sender == owner || economy.isApprovedForAll(owner, msg.sender),
             "StickEmAll: Not authorized to open booster packs for this address"
         );
         require(
             ((_boosterPackAssetId & 0x40000000) != 0) && ((_boosterPackAssetId & ((1<<255) - 1)) != 0),
             "StickEmAll: Invalid asset id"
         );
-        _burn(msg.sender, _boosterPackAssetId, 1);
+        economy.burnBoosterPack(msg.sender, _boosterPackAssetId);
         // Create the request.
         uint256 requestID = s_vrfCoordinator.requestRandomWords(VRFV2PlusClient.RandomWordsRequest({
             keyHash: keyHash, subId: subscriptionId, requestConfirmations: 3, callbackGasLimit: 250000,
@@ -359,17 +365,15 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
     function getStickers(
         uint8 bronzeStickers, uint8 silverStickers, bool hasGoldOrPlatinum,
         uint256 platinumProbability, uint256 albumTypeId, uint256 word
-    ) private view returns (uint256[] memory, uint256[] memory) {
+    ) private view returns (uint256[] memory) {
         uint256 index = 0;
         uint256 length = bronzeStickers + silverStickers;
         if (hasGoldOrPlatinum) length += 1;
         uint256[] memory keys = new uint256[](length);
-        uint256[] memory values = new uint256[](length);
         {
             uint16 bronzeStickersCount = uint16(worldsManagement.albumBronzeStickerIndicesCount(albumTypeId));
             for(uint8 idx = 0; idx < bronzeStickers; idx++)
             {
-                values[index] = 1;
                 keys[index] = albumTypeId << 31 | worldsManagement.albumBronzeStickerIndices(
                     albumTypeId, ((word & 0xFFFF) % bronzeStickersCount)
                 );
@@ -381,7 +385,6 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
             uint16 silverStickersCount = uint16(worldsManagement.albumSilverStickerIndicesCount(albumTypeId));
             for(uint8 idx = 0; idx < silverStickersCount; idx++)
             {
-                values[index] = 1;
                 keys[index] = albumTypeId << 31 | worldsManagement.albumSilverStickerIndices(
                     albumTypeId, ((word & 0xFFFF) % silverStickersCount)
                 );
@@ -394,7 +397,6 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
             uint16 goldStickersCount = uint16(worldsManagement.albumBronzeStickerIndicesCount(albumTypeId));
             uint16 platinumStickersCount = uint16(worldsManagement.albumSilverStickerIndicesCount(albumTypeId));
 
-            values[index] = 1;
             if (goldStickersCount == 0 || ((word & 0xFFFF) % 10000) > (10000 - platinumProbability)) {
                 // No gold stickers or the probs chose platinum: pick platinum.
                 keys[index] = albumTypeId << 31 | worldsManagement.albumPlatinumStickerIndices(
@@ -408,7 +410,7 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
             }
         }
 
-        return (keys, values);
+        return keys;
     }
 
     /**
@@ -424,9 +426,9 @@ contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
             ,,,,,,
             uint8 bronzeCount, uint8 silverCount, bool hasGoldOrPlatinum, uint16 platinumProbs
         ) = worldsManagement.albumBoosterPackRules(albumTypeId, ruleIdx);
-        (uint256[] memory keys, uint256[] memory values) = getStickers(
+        uint256[] memory keys = getStickers(
             bronzeCount, silverCount, hasGoldOrPlatinum, platinumProbs, albumTypeId, randomWords[0]
         );
-        _mintBatch(request.owner, keys, values, "");
+        economy.mintStickers(request.owner, keys);
     }
 }
