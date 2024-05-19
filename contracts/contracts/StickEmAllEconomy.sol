@@ -144,4 +144,14 @@ contract StickEmAllEconomy is ERC1155 {
     function burnBoosterPack(address _owner, uint256 _boosterPackId) external onlyMain {
         _burn(_owner, _boosterPackId, 1);
     }
+
+    /**
+     * The URI for the token (depends on it being album, sticker, or booster pack).
+     */
+    function uri(uint256 _tokenId) public view virtual override returns (string memory) {
+        // TODO implement properly.
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(abi.encodePacked(
+            '{}'
+        ))));
+    }
 }
