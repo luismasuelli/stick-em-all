@@ -3,6 +3,7 @@ pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+import "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import "./StickEmAllWorldsManagement.sol";
 
 /**
@@ -134,6 +135,26 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
     }
 
     /**
+     * Depicts a request to mint objects out of a booster.
+     */
+    struct BoosterOpenRequest {
+        /**
+         * The booster pack rule being opened.
+         */
+        uint256 ruleId;
+
+        /**
+         * The address that will receive the new assets.
+         */
+        address owner;
+    }
+
+    /**
+     * The booster open requests.
+     */
+    mapping(uint256 => BoosterOpenRequest) private boosterOpenRequests;
+
+    /**
      * The album instances.
      */
     mapping(uint256 => AlbumInstance) public albumInstances;
@@ -166,9 +187,30 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
      */
     event Achievement(uint256 indexed albumId, uint16 indexed achievementId);
 
-    constructor(address _worldsManagement, address _coordinator) ERC1155("") VRFConsumerBaseV2Plus(_coordinator) {
+    /**
+     * The keyhash to use. Values:
+     * Local mock keyhash: 0 / ignored.
+     * Polygon Amoy keyhash (500 gwei): 0x816bedba8a50b294e5cbd47842baf240c2385f2eaf719edbd4f250a137a8c899
+     * Polygon mainnet keyhashes:
+     * - 200 gwei: 0x0ffbbd0c1c18c0263dd778dadd1d64240d7bc338d95fec1cf0473928ca7eaf9e
+     * - 500 gwei: 0x719ed7d7664abc3001c18aac8130a2265e1e70b7e036ae20f3ca8b92b3154d86
+     * - 1000 gwei: 0x192234a5cda4cc07c0b66dfbcfbb785341cc790edc50032e842667dbb506cada
+     */
+    bytes32 private keyHash;
+
+    /**
+     * The subscription id to use.
+     */
+    uint256 private subscriptionId;
+
+    constructor(
+        address _worldsManagement, address _coordinator,
+        bytes32 _keyHash, uint256 _subscriptionId
+    ) ERC1155("") VRFConsumerBaseV2Plus(_coordinator) {
         require(_worldsManagement != address(0), "StickEmAll: Invalid management contract");
         worldsManagement = StickEmAllWorldsManagement(worldsManagement);
+        keyHash = _keyHash;
+        _subscriptionId = subscriptionId;
     }
 
     /**
@@ -286,6 +328,24 @@ contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
         payable(earningsReceiver).call{value:nativeRemainder}("");
         payable(worldsManagement.worlds().params().earningsReceiver()).call{value:nativeFee}("");
         _mint(msg.sender, (_albumTypeId << 31)|0x40000000|_ruleId, _amount, "");
+    }
+
+    /**
+     * Opens a booster pack.
+     */
+    function openBoosterPack(address owner, uint256 _boosterPackAssetId) external {
+        // Check to be authorized, and burn the token.
+        require(
+            msg.sender == owner || isApprovedForAll(owner, msg.sender),
+            "StickEmAll: Not authorized to open booster packs for this address"
+        );
+        _burn(msg.sender, _boosterPackAssetId, 1);
+        // Create the request.
+        uint256 requestID = s_vrfCoordinator.requestRandomWords(VRFV2PlusClient.RandomWordsRequest({
+            keyHash: keyHash, subId: subscriptionId, requestConfirmations: 3, callbackGasLimit: 250000,
+            numWords: 1, extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: false}))
+        }));
+        boosterOpenRequests[requestID] = BoosterOpenRequest({ruleId: _boosterPackAssetId, owner: owner });
     }
 
     /**
