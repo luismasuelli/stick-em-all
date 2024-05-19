@@ -18,7 +18,23 @@ const params = [
     {
         caption: "Defining a World",
         hash: Web3.utils.soliditySha3("Costs::DefineWorld")
-    }
+    },
+    {
+        caption: "Defining an Album",
+        hash: Web3.utils.soliditySha3("Costs::Albums::DefineAlbum")
+    },
+    {
+        caption: "Defining an Album's Page",
+        hash: Web3.utils.soliditySha3("Costs::Albums::DefinePage")
+    },
+    {
+        caption: "Defining an Achievement",
+        hash: Web3.utils.soliditySha3("Costs::Albums::DefineAchievement")
+    },
+    {
+        caption: "Defining a Sticker",
+        hash: Web3.utils.soliditySha3("Costs::Albums::DefineSticker")
+    },
 ];
 
 /**
