@@ -7,11 +7,11 @@ import "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import "./StickEmAllWorldsManagement.sol";
 
 /**
- * StickEmAll is the main point where users purchase and
- * manage their albums and stickers, stick them, and get
- * their achievements.
+ * StickEmAllMain is the main point where users purchase
+ * and manage their albums and stickers, stick them, and
+ * get their achievements.
  */
-contract StickEmAll is ERC1155, VRFConsumerBaseV2Plus {
+contract StickEmAllMain is ERC1155, VRFConsumerBaseV2Plus {
     /**
      * Some notes about the IDs of the tokens:
      * - Albums are NFTs:       [1:1bit][albumInstId:225bit].
