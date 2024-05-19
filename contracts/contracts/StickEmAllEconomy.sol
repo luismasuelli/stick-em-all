@@ -17,10 +17,40 @@ contract StickEmAllEconomy is ERC1155 {
      * - Stickers are FTs:      [0:1bit][albumTypeId:224bit][0(=ST):1bit][0:14bit][pageIdx:13bit][slotIdx:3bit].
      */
 
-    // The worlds management contract.
+    /**
+     * Tracking ownership of each NFT.
+     */
+    struct AlbumInstance {
+        /**
+         * The owner of this album (!= 0 means it exists).
+         */
+        address owner;
+
+        /**
+         * The type of the album.
+         */
+        uint256 albumTypeId;
+    }
+
+    /**
+     * The id of the last spawned album (starts with 1<<255 because it
+     * is not a valid album id).
+     */
+    uint256 private lastAlbumId = 1 << 255;
+
+    /**
+     * Albums are NFTs. They're properly tracked.
+     */
+    mapping(uint256 => AlbumInstance) public albums;
+
+    /**
+     * The worlds management contract.
+     */
     StickEmAllWorldsManagement public worldsManagement;
 
-    // The main contract (only its address).
+    /**
+     * The main contract.
+     */
     address public main;
 
     /**
@@ -50,6 +80,32 @@ contract StickEmAllEconomy is ERC1155 {
     modifier onlyMain {
         require(msg.sender == main, "StickEmAllEconomy: Only the main StickEmAll contract can invoke this method");
         _;
+    }
+
+    /**
+     * Mints an album for the sender. The albums are free.
+     */
+    function mintAlbum(uint256 _albumTypeId) external {
+        (,,,,,,,,bool released) = worldsManagement.albumDefinitions(_albumTypeId);
+        require(released, "StickEmAllEconomy: Invalid album id");
+        require(lastAlbumId != ~uint256(0), "StickEmAllEconomy: No more albums");
+        lastAlbumId += 1;
+        albums[lastAlbumId] = AlbumInstance({owner: msg.sender, albumTypeId: _albumTypeId});
+        _mint(msg.sender, _albumTypeId, 1, "");
+    }
+
+    /**
+     * Updates the ownership of NFTs.
+     */
+    function _update(
+        address from, address to, uint256[] memory ids, uint256[] memory values
+    ) internal virtual override {
+        super._update(from, to, ids, values);
+        uint256 length = ids.length;
+        for(uint256 idx = 0; idx < length; idx++) {
+            uint256 id = ids[idx];
+            if (id & (1 << 255) != 0) albums[id].owner = to;
+        }
     }
 
     /**
