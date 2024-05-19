@@ -100,21 +100,6 @@ contract StickEmAllMain is VRFConsumerBaseV2Plus {
      */
     struct AlbumInstance {
         /**
-         * Whether this album instance is valid/created.
-         */
-        bool created;
-
-        /**
-         * The owner of this album.
-         */
-        address owner;
-
-        /**
-         * The type of the album.
-         */
-        uint256 albumTypeId;
-
-        /**
          * The amount of pasted stickers.
          */
         uint256 pastedStickers;
@@ -231,22 +216,21 @@ contract StickEmAllMain is VRFConsumerBaseV2Plus {
      * Pastes a sticker into the album.
      */
     function stick(uint256 _albumId, uint256 _stickerId) external {
+        // 1. Get the local instance data and also the ownership tracking.
+        (address albumInstanceOwner, uint256 albumInstanceTypeId) = economy.albums(_albumId);
         AlbumInstance storage instance = albumInstances[_albumId];
-        // 1. The album must exist.
-        require(instance.created, "StickEmAll: Invalid album");
         // 2. The album's owner must be the sender, or must have
         //    allowed the sender on their assets.
-        address albumOwner = instance.owner;
         require(
-            msg.sender == albumOwner || economy.isApprovedForAll(albumOwner, msg.sender),
+            msg.sender == albumInstanceOwner || economy.isApprovedForAll(albumInstanceOwner, msg.sender),
             "StickEmAll: Not authorized to paste on this album"
         );
         // 3. The sticker must be properly decomposed to the album's type.
         (uint256 albumTypeId, uint16 pageId, uint16 slotId) = _decomposeSticker(_stickerId);
         // 4. Check the sticker is valid or this album.
-        require(instance.albumTypeId == albumTypeId, "StickEmAll: The sticker is not for this album");
+        require(albumInstanceTypeId == albumTypeId, "StickEmAll: The sticker is not for this album");
         // 5. Burn exactly one token.
-        economy.burnSticker(albumOwner, _stickerId);
+        economy.burnSticker(albumInstanceOwner, _stickerId);
         // 6. Require the token to be NOT set in the album.
         uint16 relativeId = uint16(_stickerId & 0xFFFF);
         require(
