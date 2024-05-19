@@ -1,6 +1,8 @@
 const { task } = require("hardhat/config");
 const MockV3AggregatorModule = require("../ignition/modules/MockV3Aggregator");
 const StickEmAllParams = require("../ignition/modules/StickEmAllParams");
+const StickEmAllWorlds = require("../ignition/modules/StickEmAllWorlds");
+const StickEmAllWorldsManagement = require("../ignition/modules/StickEmAllWorldsManagement");
 const fs = require('fs');
 const path = require('path');
 
@@ -55,14 +57,43 @@ async function deployParams(hre, priceFeedAddr) {
             }
         }
     });
-    return params.getAddress();
+    return await params.getAddress();
+}
+
+
+/**
+ * Deploys the worlds and worldsManagement contracts.
+ * @param hre The hardhat runtime environment.
+ * @param paramsAddr The address of the params argument.
+ * @returns {Promise<{worldsAddress, worldsManagementAddress}>} The address of worlds and worldsManagement contracts.
+ */
+async function deployWorld(hre, paramsAddr) {
+    // Deploy the worlds contract.
+    const { worlds } = await hre.ignition.deploy(StickEmAllWorlds, {
+        parameters: {
+            "StickEmAllWorlds": {
+                "params": worlds
+            }
+        }
+    });
+    let worldsAddress = await worlds.getAddress();
+
+    // Deploy the worldsManagement contract.
+    const { worldsManagement } = await hre.ignition.deploy(StickEmAllWorldsManagement, {
+        parameters: {
+            "StickEmAllWorldsManagement": {
+                "worlds": worlds
+            }
+        }
+    });
+    return {worldsAddress, worldsManagementAddress: await worldsManagement.getAddress()};
 }
 
 
 task("deploy-everything", "Deploys all our ecosystem")
     .addParam("owner", "The address that will own the ecosystem in the end")
     .setAction(async ({ owner }, hre, runSuper) => {
-        if (!hre.ethers.utils.isAddress(owner)) {
+        if (!hre.ethers.isAddress(owner)) {
             console.error("The owner is not a valid checksum address");
             return;
         }
@@ -71,10 +102,15 @@ task("deploy-everything", "Deploys all our ecosystem")
         await resetDeployments(hre);
 
         // Deploying or identifying the price feed contract.
-        let priceFeedAddr = deployPriceFeed(hre);
+        let priceFeedAddr = await deployPriceFeed(hre);
         console.log("Price feed address: " + priceFeedAddr);
 
         // Deploying or identifying the params addr.
-        let paramsAddr = deployParams(hre, priceFeedAddr);
+        let paramsAddr = await deployParams(hre, priceFeedAddr);
         console.log("Params address: " + paramsAddr);
+
+        // Deploying the worlds (mint & management) contracts.
+        let {worldsAddress, worldsManagementAddress} = await deployWorld(hre, paramsAddr);
+        console.log("Worlds address: " + worldsAddress);
+        console.log("Worlds Management address: " + worldsManagementAddress);
     });
