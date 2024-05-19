@@ -17,21 +17,6 @@ contract StickEmAllEconomy is ERC1155 {
      * - Stickers are FTs:      [0:1bit][albumTypeId:224bit][0(=ST):1bit][0:14bit][pageIdx:13bit][slotIdx:3bit].
      */
 
-    // The mask for an album type id.
-    uint256 private constant AlbumTypeIdMask = (1 << 224) - 1;
-
-    // The mask for an album instance id.
-    uint256 private constant AlbumIdMask = (1 << 255) - 1;
-
-    // The mask for a booster rule id.
-    uint256 private constant RuleIdMask = 0xffff;
-
-    // The mask for a page id.
-    uint256 private constant PageIdxMask = 0x1fff;
-
-    // The mask for a slot id.
-    uint256 private constant SlotIdxMask = 0x7;
-
     // The worlds management contract.
     StickEmAllWorldsManagement public worldsManagement;
 
