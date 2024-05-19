@@ -1,5 +1,5 @@
 const MockV3AggregatorModule = require("../ignition/modules/MockV3Aggregator");
-const Params = require("../ignition/modules/Params");
+const StickEmAllParams = require("../ignition/modules/StickEmAllParams");
 
 async function main() {
     let addr;
@@ -18,9 +18,9 @@ async function main() {
         default:
             throw new Error("Unknown network: " + hre.network.name);
     }
-    await hre.ignition.deploy(Params, {
+    await hre.ignition.deploy(StickEmAllParams, {
         parameters: {
-            "Params": {
+            "StickEmAllParams": {
                 "priceFeed": addr
             }
         }
