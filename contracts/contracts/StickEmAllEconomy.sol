@@ -69,15 +69,12 @@ contract StickEmAllEconomy is ERC1155 {
 
     /**
      * Mints many stickers. Only the owner can call this method.
-     * Here, the sticker ids comes composed with the page id.
+     * Here, the sticker ids comes composed with the album type id and page id as well.
      */
-    function mintStickers(address _owner, uint256 _albumTypeId, uint256[] memory _stickerIds) external onlyMain {
-        uint256 length = _stickerIds.length;
-        uint256[] memory ids = new uint256[](length);
+    function mintStickers(address _owner, uint256[] memory ids) external onlyMain {
+        uint256 length = ids.length;
         uint256[] memory values = new uint256[](length);
-        _albumTypeId = _albumTypeId << 31;
         for(uint256 index = 0; index < length; index++) {
-            ids[index] = _stickerIds[index] | _albumTypeId;
             values[index] = 1;
         }
         _mintBatch(_owner, ids, values, "");
