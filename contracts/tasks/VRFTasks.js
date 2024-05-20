@@ -76,6 +76,7 @@ async function fulfillVRFRequest(hre, id) {
     console.log(`Request #${id} was fulfilled`);
 }
 
+
 task("vrf-list-requests", "Lists the pending VRF requests")
     .setAction(async (args, hre, runSuper) => {
         try {
@@ -92,8 +93,28 @@ task("vrf-list-requests", "Lists the pending VRF requests")
 task("vrf-fulfill", "Fulfills one request")
     .setAction(async({ id }, hre, runSuper) => {
         try {
-            await fulfillVRFRequest(id);
+            await fulfillVRFRequest(hre, id);
         } catch(e) {
             console.log(e);
+        }
+    });
+
+
+task("vrf-fulfill-worker", "Worker that fulfills VRF requests")
+    .setAction(async(args, hre, runSuper) => {
+        const contract = await getVRFContract(hre);
+
+        async function listener(requestId, _, event) {
+            await fulfillVRFRequest(hre, requestId);
+        }
+
+        contract.on("RandomNumbersRequested", listener);
+
+        try {
+            while(true) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        } finally {
+            contract.off("RandomNumbersRequested", listener);
         }
     });
