@@ -103,7 +103,7 @@ async function deployVRF(hre) {
         case "hardhat":
         case "localhost":
             const { mock } = await hre.ignition.deploy(VRFCoordinatorV2PlusMock);
-            return { vrfAddress: await mock.getAddress(), keyHash: "0x" };
+            return { vrfAddress: await mock.getAddress(), keyHash: "0x0000000000000000000000000000000000000000000000000000000000000000" };
         case "testnet":
             return {
                 vrfAddress: "0x343300b5d84D444B2ADc9116FEF1bED02BE49Cf2",
