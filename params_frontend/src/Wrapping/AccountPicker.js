@@ -44,7 +44,7 @@ const AccountPicker = forwardRef(({
     };
 
     return (
-        <Card style={{ width: 'auto', position: 'fixed', top: '10px', left: '10px' }}>
+        <Card style={{ width: 'auto', position: 'fixed', top: '10px', left: '10px', zIndex: 1000 }}>
             <CardContent>
                 {(accounts && accounts.length && (
                     <>
