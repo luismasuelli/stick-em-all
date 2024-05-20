@@ -87,4 +87,27 @@ contract VRFCoordinatorV2PlusMock is IVRFCoordinatorV2Plus {
         requests[requestId].fulfilled = true;
         VRFConsumerBaseV2Plus(requests[requestId].requester).rawFulfillRandomWords(requestId, randomWords);
     }
+
+    /**
+     * List the pending requests.
+     */
+    function listPendingRequests() external view returns (uint256[] memory, uint256[] memory) {
+        uint256 filteredLength = 0;
+        uint256 length = nextRequestId - 1;
+        // 1. From 1 to the nextRequestId (without including it): How many elements are not fulfilled?
+        for(uint256 index = 1; index < nextRequestId; index++) {
+            if (!requests[index].fulfilled) filteredLength++;
+        }
+        // 2. From 1 to the nextRequestId (without including it): Enumerate the elements that are not fulfilled.
+        uint256[] memory indices = new uint256[](filteredLength);
+        uint256[] memory amountsRequested = new uint256[](filteredLength);
+        uint256 filteredIndex = 0;
+        for(uint256 index = 1; index < nextRequestId; index++) {
+            if (!requests[index].fulfilled) {
+                indices[filteredIndex++] = index;
+                amountsRequested[filteredIndex++] = index;
+            }
+        }
+        return (indices, amountsRequested);
+    }
 }
