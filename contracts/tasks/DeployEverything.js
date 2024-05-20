@@ -15,7 +15,7 @@ const path = require('path');
  * @returns {Promise<void>} Nothing (async function).
  */
 async function resetDeployments(hre) {
-    const chainId = await hre.getChainId();
+    const chainId = await hre.network.config.chainId;
     const deploymentDir = path.join(__dirname, 'deployments', `chain-${chainId}`);
 
     if (fs.existsSync(deploymentDir)) {
@@ -74,7 +74,7 @@ async function deployWorld(hre, paramsAddr) {
     const { worlds } = await hre.ignition.deploy(StickEmAllWorlds, {
         parameters: {
             "StickEmAllWorlds": {
-                "params": worlds
+                "params": paramsAddr
             }
         }
     });
@@ -84,7 +84,7 @@ async function deployWorld(hre, paramsAddr) {
     const { worldsManagement } = await hre.ignition.deploy(StickEmAllWorldsManagement, {
         parameters: {
             "StickEmAllWorldsManagement": {
-                "worlds": worlds
+                "worlds": worldsAddress
             }
         }
     });
