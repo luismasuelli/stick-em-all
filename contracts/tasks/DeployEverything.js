@@ -16,11 +16,27 @@ const path = require('path');
  * @returns {Promise<void>} Nothing (async function).
  */
 async function resetDeployments(hre) {
-    const chainId = await hre.network.config.chainId;
-    const deploymentDir = path.join(__dirname, 'deployments', `chain-${chainId}`);
+    const chainId = (await hre.ethers.provider.getNetwork()).chainId;
+    const deploymentDir = path.join(__dirname, '..', 'ignition', 'deployments', `chain-${chainId}`);
 
+    console.log("Checking/cleaning deployment directory " + deploymentDir + "...");
     if (fs.existsSync(deploymentDir)) {
-        fs.rmdirSync(deploymentDir, { recursive: true });
+        switch(hre.network.name) {
+            case "hardhat":
+            case "localhost":
+                console.log("Removing directory " + deploymentDir + "...");
+                fs.rmdirSync(deploymentDir, { recursive: true });
+                break;
+            case "mainnet":
+            case "testnet":
+                console.warn(
+                    "A deployment is already set for network: " + hre.network.name + ", " +
+                    "which is located at directory: " + deploymentDir + ". If you want to re-deploy " +
+                    "these contracts, delete those directories manually. I'll not do that for you " +
+                    "for those networks (I'll only do that locally)."
+                );
+                break;
+        }
     }
 }
 
