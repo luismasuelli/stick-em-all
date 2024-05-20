@@ -2,6 +2,28 @@ const { task } = require("hardhat/config");
 const VRFCoordinatorV2PlusMock = require("../ignition/modules/VRFCoordinatorV2PlusMock");
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+
+
+/**
+ * Generates random numbers.
+ * @param n How many numbers.
+ * @returns {*[]} The numbers.
+ */
+function generateRandomBigInts(n) {
+    const bitLength = 256;
+    const byteLength = bitLength / 8;  // 256 bits = 32 bytes
+    const bigInts = [];
+
+    for (let i = 0; i < n; i++) {
+        const buffer = crypto.randomBytes(byteLength);
+        const hex = '0x' + buffer.toString('hex');
+        const bigInt = BigInt(hex);
+        bigInts.push(bigInt);
+    }
+
+    return bigInts;
+}
 
 
 /**
@@ -50,12 +72,7 @@ async function fulfillVRFRequest(hre, id) {
     if (result[4]) {
         console.error("This request is already fulfilled");
     }
-    const amount = result[1];
-    let elements = [];
-    for(let index = 0; index < amount; index++) {
-
-    }
-    await mock.fulfillRandomWordsRequest(id, []);
+    await mock.fulfillRandomWordsRequest(id, generateRandomBigInts(result[1]));
     console.log(`Request #${id} was fulfilled`);
 }
 
