@@ -28,6 +28,11 @@ contract VRFCoordinatorV2PlusMock is IVRFCoordinatorV2Plus {
      */
     uint256 private nextRequestId = 1;
 
+    /**
+     * An event, for a local worker.
+     */
+    event RandomNumbersRequested(uint256 indexed requestId, uint256 randomNunbers);
+
     function acceptSubscriptionOwnerTransfer(uint256 subId) external {
         // Mock.
     }
@@ -75,6 +80,7 @@ contract VRFCoordinatorV2PlusMock is IVRFCoordinatorV2Plus {
             extraArgs: req.extraArgs,
             fulfilled: false
         });
+        emit RandomNumbersRequested(requestId, req.numWords);
     }
 
     function requestSubscriptionOwnerTransfer(uint256 subId, address newOwner) external {
