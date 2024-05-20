@@ -187,10 +187,10 @@ function keccak256(ethers, key) {
 
 
 task("deploy-everything", "Deploys all our ecosystem")
-    .addParam("owner", "The address that will own the ecosystem in the end")
+    .addOptionalParam("owner", "The address that will own the ecosystem in the end (specially useful in local)")
     .addOptionalParam("vrfsub", "The VRF subscription id (mandatory in testnet/mainnet)")
     .setAction(async ({ owner, vrfsub }, hre, runSuper) => {
-        if (!hre.ethers.isAddress(owner)) {
+        if (owner && !hre.ethers.isAddress(owner)) {
             console.error("The owner is not a valid checksum address");
             return;
         }
@@ -211,7 +211,7 @@ task("deploy-everything", "Deploys all our ecosystem")
 
         // Deploying the worlds (mint & management) contracts.
         console.log("Deploying world contracts...");
-        let {worlds, worldsManagement} = await deployWorld(hre, paramsAddr);
+        let { worlds, worldsManagement } = await deployWorld(hre, paramsAddr);
         let worldsAddress = await worlds.getAddress();
         let worldsManagementAddress = await worldsManagement.getAddress();
         console.log("Worlds address: " + worldsAddress);
@@ -238,4 +238,12 @@ task("deploy-everything", "Deploys all our ecosystem")
         await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefinePage"), 3);
         await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefineAchievement"), 2);
         await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefineSticker"), 1);
+
+        if (owner) {
+            console.log("Transferring ownership to " + owner + "...");
+            await params.transferOwnership(owner);
+            console.log("Transferring 100.0 ETH to " + owner + "...");
+            const last = (await hre.ethers.getSigners())[99];
+            await last.sendTransaction({to: owner, value: hre.ethers.parseEther('100.0')});
+        }
     });
