@@ -261,5 +261,29 @@ task("deploy-everything", "Deploys all our ecosystem")
             console.log("Transferring 100.0 ETH to " + owner + "...");
             const last = (await hre.ethers.getSigners())[99];
             await last.sendTransaction({to: owner, value: hre.ethers.parseEther('100.0')});
+        } else {
+            switch(hre.network.name) {
+                case "hardhat":
+                case "localhost":
+                    console.warn(
+                        "This is a local network and no owner was set. Unless you set the same " +
+                        "mnemonic in your wallet software (which, btw, is NOT recommended at all), you'll " +
+                        "not be able to make some significant changes while operating with the contracts. " +
+                        "Don't worry: you can re-run this hardhat task with the --owner 0xYourWalletAddress " +
+                        "(in the worst case: even restarting the hardhat node before running this task again) " +
+                        "and have this totally operational while testing everything locally from your browser's " +
+                        "wallet (or whichever one you use)."
+                    );
+                    break;
+                case "testnet":
+                case "mainnet":
+                    console.log(
+                        "You did not specify an explicit owner. The current owner corresponds to the " +
+                        "first account related to the specified MNEMONIC: " + (await params.owner())
+                    );
+                    break;
+                default:
+                    throw new Error("Unknown network: " + hre.network.name);
+            }
         }
     });
