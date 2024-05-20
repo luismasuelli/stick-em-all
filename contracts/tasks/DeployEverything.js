@@ -103,7 +103,10 @@ async function deployVRF(hre) {
         case "hardhat":
         case "localhost":
             const { mock } = await hre.ignition.deploy(VRFCoordinatorV2PlusMock);
-            return { vrfAddress: await mock.getAddress(), keyHash: "0x0000000000000000000000000000000000000000000000000000000000000000" };
+            return {
+                vrfAddress: await mock.getAddress(),
+                keyHash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            };
         case "testnet":
             return {
                 vrfAddress: "0x343300b5d84D444B2ADc9116FEF1bED02BE49Cf2",
@@ -230,9 +233,9 @@ task("deploy-everything", "Deploys all our ecosystem")
         console.log("Main address: " + mainAddress);
 
         // Define world parameters.
-        await worldsAddress.setFiatCost(keccak256("Costs::DefineWorld", 10));
-        await worldsAddress.setFiatCost(keccak256("Costs::Albums::DefineAlbum", 5));
-        await worldsAddress.setFiatCost(keccak256("Costs::Albums::DefinePage", 3));
-        await worldsAddress.setFiatCost(keccak256("Costs::Albums::DefineAchievement", 2));
-        await worldsAddress.setFiatCost(keccak256("Costs::Albums::DefineSticker", 1));
+        await params.setFiatCost(keccak256(hre.ethers, "Costs::DefineWorld"), 10);
+        await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefineAlbum"), 5);
+        await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefinePage"), 3);
+        await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefineAchievement"), 2);
+        await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefineSticker"), 1);
     });
