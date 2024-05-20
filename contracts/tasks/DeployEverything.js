@@ -5,6 +5,7 @@ const StickEmAllWorlds = require("../ignition/modules/StickEmAllWorlds");
 const StickEmAllWorldsManagement = require("../ignition/modules/StickEmAllWorldsManagement");
 const VRFCoordinatorV2PlusMock = require("../ignition/modules/VRFCoordinatorV2PlusMock");
 const StickEmAllEconomy = require("../ignition/modules/StickEmAllEconomy");
+const StickEmAllMain = require("../ignition/modules/StickEmAllMain");
 const fs = require('fs');
 const path = require('path');
 
@@ -88,7 +89,7 @@ async function deployWorld(hre, paramsAddr) {
             }
         }
     });
-    return {worlds, worldsManagement};
+    return { worlds, worldsManagement };
 }
 
 
@@ -102,7 +103,7 @@ async function deployVRF(hre) {
         case "hardhat":
         case "localhost":
             const { mock } = await hre.ignition.deploy(VRFCoordinatorV2PlusMock);
-            return { vrfAddress: await mock.getAddress(), keyHash: "0x0" };
+            return { vrfAddress: await mock.getAddress(), keyHash: "0x" };
         case "testnet":
             return {
                 vrfAddress: "0x343300b5d84D444B2ADc9116FEF1bED02BE49Cf2",
@@ -154,13 +155,13 @@ async function deployMainContracts(hre, vrfAddress, worldsManagementAddress, key
             throw new Error("Unknown network: " + hre.network.name);
     }
 
-    const { main } = await hre.ignition.deploy(StickEmAllEconomy, {
+    const { main } = await hre.ignition.deploy(StickEmAllMain, {
         parameters: {
             "StickEmAllMain": {
                 "economy": economyAddress,
                 "vrf": vrfAddress,
                 "keyHash": keyHash,
-                "subscription": subscription
+                "subscription": subscription || 0
             }
         }
     });
