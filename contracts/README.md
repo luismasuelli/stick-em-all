@@ -135,3 +135,10 @@ If by some reason you didn't pay attention and cleared/closed your terminal, you
    ```
    
 And then take the proper notes to be used in front-ends.
+
+### Authorize the consumer
+
+If you're the responsible for deploying the contract on testnet or mainnet, ensure you copy the address of the
+main contract and add it as a valid consumer to your VRF subscription. Otherwise, the VRF calls will fail.
+
+This is not needed (and cannot be done) for your local network.
