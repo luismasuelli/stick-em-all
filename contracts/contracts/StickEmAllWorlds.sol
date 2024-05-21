@@ -80,6 +80,11 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
      */
     mapping(uint256 => World) public worlds;
 
+    /**
+     * Tells that a world edition allowance has changed.
+     */
+    event WorldEditionAllowanceChanged(uint256 indexed worldId, address indexed who, bool allowed);
+
     constructor(address _params) ERC721("World", "STWD") StickEmAllParamsConsumer(_params) {}
 
     /**
@@ -100,6 +105,7 @@ contract StickEmAllWorlds is ERC721, StickEmAllParamsConsumer {
             require(_ownerOf(_worldId) == msg.sender, "StickEmAllWorlds: You're not the owner of this world");
         }
         _isWorldEditionAllowed[msg.sender][_worldId][_who] = _allowed;
+        emit WorldEditionAllowanceChanged(_worldId, _who, _allowed);
     }
 
     /**
