@@ -1,4 +1,4 @@
-# Stick 'em All contracts
+# Stick 'em All - Contracts
 
 This contains the contracts that are related to the Stick 'em All project.
 

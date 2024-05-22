@@ -1,4 +1,4 @@
-# stick-em-all
+# stick-em-all - Full Project
 
 A new experience for sticker album enthusiasts, with evolving experiences for collecting and gaming.
 
