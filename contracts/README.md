@@ -1,6 +1,6 @@
 # Stick 'em All - Contracts
 
-This contains the contracts that are related to the Stick 'em All project.
+This directory contains the contracts that are related to the Stick 'em All project.
 
 ## Install everything
 
