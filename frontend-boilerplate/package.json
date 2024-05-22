@@ -15,7 +15,8 @@
     "react-router-dom": "^6.23.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4",
-    "web3": "^4.8.0"
+    "web3": "^4.8.0",
+    "web3-utils": "^4.2.3"
   },
   "scripts": {
     "start": "NODE_ENV=development touch .env.development.custom.local && env-cmd -f .env.development env-cmd -f .env.development.custom.local react-scripts start",
