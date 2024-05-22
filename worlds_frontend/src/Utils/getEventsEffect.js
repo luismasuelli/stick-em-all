@@ -118,17 +118,21 @@ function processFutureEvents(contract, eventNames, updateState, pushState, {last
  * while all the other references should be non-reactive.
  * @param contract The contract.
  * @param eventNames The names of the events.
- * @param updateInitialState The update state function (it can be mutable).
- * @param finishInitialState A finish function to deliver the new state.
- * @param updateNextState The update state function (IT MUST BE IMMUTABLE).
+ * @param prepareInitialState An object {updateInitialState, finishInitialState} where updateInitialState is a function
+ * that takes (state, element) and returns a new state (or the same state, after mutating it) and finishInitialState is
+ * another function taking (state) usually returning a clone of the state.
+ * @param updateNextState The update state function (IT MUST BE IMMUTABLE). It must take (state, element) and return
+ * a new state object (NOT relying on mutations).
  * @param pushState A function to push the {lastBlock, lastState} to be managed or rendered later.
- * @param lastBlock The last processed block.
- * @param lastState The last processed state.
+ * @param checkpoint A {lastBlock, lastState} object where the lastBlock stands for the last synchronized block and
+ * the lastState stands for the corresponding state of digested data in a way that it can be further synchronized from.
  * @returns {function(): function(): void} The effect function (async function).
  */
 function getEventsEffect(
-    contract, eventNames, {updateInitialState, finishInitialState}, updateNextState, pushState, {lastBlock, lastState}
+    contract, eventNames, prepareInitialState, updateNextState, pushState, checkpoint
 ) {
+    const {lastBlock, lastState} = checkpoint;
+    const {updateInitialState, finishInitialState} = prepareInitialState;
     updateNextState = updateNextState || defaultImmutableUpdateState;
 
     // This function is suitable for an effect.
