@@ -23,3 +23,13 @@ This is a Hardhat project that contains all the contracts that are used in this 
 
 See [the instructions](contracts/README.md) to mount a local network or deploy the contracts to the
 mainnet (Polygon Mainnet) or testnet (Polygon Amoy).
+
+### Params
+
+This is a React project holding an application that allows you to set up the cost params of
+this ecosystem.
+
+See [the instructions](params_frontend/README.md) to mount or build the application.
+
+When building the application for distribution, the ideal scenario involves serving it as a whole
+directory through a static HTTP server or using an IPFS pinning service.
