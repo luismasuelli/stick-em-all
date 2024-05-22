@@ -126,7 +126,7 @@ function processFutureEvents(contract, eventNames, updateState, pushState, {last
  * @param lastState The last processed state.
  * @returns {function(): function(): void} The effect function (async function).
  */
-function eventsEffect(
+function getEventsEffect(
     contract, eventNames, {updateInitialState, finishInitialState}, updateNextState, pushState, {lastBlock, lastState}
 ) {
     updateNextState = updateNextState || defaultImmutableUpdateState;
@@ -161,3 +161,6 @@ function eventsEffect(
         }
     }
 }
+
+
+export default getEventsEffect;
