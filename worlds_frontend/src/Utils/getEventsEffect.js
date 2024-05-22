@@ -6,7 +6,7 @@ function defaultMutableUpdateState(s, e) {
 
 
 function defaultFinishState(s) {
-    return [...s];
+    return [...(s || [])];
 }
 
 
