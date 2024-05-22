@@ -6,6 +6,7 @@ import getEventsEffect from "../Utils/getEventsEffect";
 
 
 function updateNextState(state, event) {
+    // TODO we'll change this later.
     return [...state, event];
 }
 
@@ -18,17 +19,19 @@ export default function Main() {
     // 1. Get the context and everything needed to have the references to the contracts.
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
     const {account, web3} = context;
-    const {contracts, setContracts} = useState(null);
-    const {events, setEvents} = useState([]);
+    const [contracts, setContracts] = useState(null);
+    const [events, setEvents] = useState([]);
     const ref = useRef(null);
     ref.setEvents = function(events) {
-        console.log("Setting new events:", events);
+        setEvents(events);
     }
-    console.log("Current events:", events);
+    ref.setContracts = function(contracts) {
+        setContracts(contracts);
+    }
 
     useEffect(() => {
-        MakeWorldsContractClients(web3, account).then(setContracts);
-    }, [account, web3]);
+        MakeWorldsContractClients(web3, account).then(ref.setContracts);
+    }, [account, web3, ref]);
 
     // 2. Once the contracts are set, we can use them to set up the effects properly.
     useEffect(() => {
@@ -36,10 +39,11 @@ export default function Main() {
             return getEventsEffect(
                 contracts.worldsContract,
                 ["Transfer", "WorldEditionAllowanceChanged"],
-                null, updateNextState, setEvents
+                {}, updateNextState, ref.setEvents,
+                {lastState: []}
             );
         }
-    }, [contracts]);
+    }, [contracts, ref]);
 
     return <></>;
 }
