@@ -38,7 +38,7 @@ export default function ContractWindow({
         }
     ))), [errorLauncher, refresh]);
 
-    // 3. Force a first refrseh.
+    // 3. Force a first refresh.
     useEffect(() => {
         refresh();
     }, [refresh]);
