@@ -1,4 +1,4 @@
-import {useContext, useMemo} from "react";
+import {useContext, useEffect, useMemo} from "react";
 import {Alert, AppBar, IconButton, Paper, Toolbar, Typography} from "@mui/material";
 import ErrorLauncherContext from "../../Errors/ErrorLauncherContext";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -37,6 +37,10 @@ export default function ContractWindow({
             return result;
         }
     ))), [errorLauncher, refresh]);
+
+    useEffect(() => {
+        refresh();
+    }, [refresh]);
 
     return <Paper elevation={3} style={{ margin: '40px', marginTop: '120px', padding: '20px' }}>
         <AppBar position="static" color="primary">
