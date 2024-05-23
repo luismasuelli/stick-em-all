@@ -1,10 +1,11 @@
 import {useContext, useMemo, useState} from "react";
 import {Alert, AppBar, IconButton, Paper, Toolbar, Typography} from "@mui/material";
-import Web3Context from "../Wrapping/Web3Context";
-import Web3AccountContext from "../Wrapping/Web3AccountContext";
-import ErrorLauncherContext from "../Errors/ErrorLauncherContext";
+import Web3Context from "../../Wrapping/Web3Context";
+import Web3AccountContext from "../../Wrapping/Web3AccountContext";
+import ErrorLauncherContext from "../../Errors/ErrorLauncherContext";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import ParamsContext from "./ParamsContext";
+import ParamsContext from "../Contexts/ParamsContext";
+import ContractWindow from "./ContractWindow";
 
 
 /**
@@ -72,39 +73,8 @@ export default function ParamsAwareContractWindow({
         setParamsData({owner, earningsReceiver, earningsBalance, fiatCosts, nativeCosts});
     }), [paramsContract, params, web3, balanceRefresher, errorLauncher, setParamsData]);
 
-    // 4. This wrapped call component wraps an action inside an error capture
-    //    and a forced refresh. This utility is provided as a context for later.
-    const wrappedCall = useMemo(() => ((f) => (
-        errorLauncher.current.capturingError(async function(...args) {
-            let result = f(...args);
-            if (result instanceof Promise) result = await result;
-            await refresh();
-            return result;
-        }
-    ))), [errorLauncher, refresh]);
-
-    return <Paper elevation={3} style={{ margin: '40px', marginTop: '120px', padding: '20px' }}>
-        <AppBar position="static" color="primary">
-            <Toolbar>
-                <Typography variant="h6" style={{ flexGrow: 1 }}>
-                    {caption} (Contract: {(mainContract !== null) ? abbr(mainContract.options.address) + (showOwner ? "; Owner: " + abbr(paramsData.owner) : "") : "not deployed yet"})
-                </Typography>
-                {((mainContract !== null) ? (
-                    <IconButton color="inherit" onClick={refresh}>
-                        <RefreshIcon />
-                    </IconButton>
-                ) : null)}
-            </Toolbar>
-        </AppBar>
-
-        <Alert severity="info" sx={{marginTop: 4}}>
-            {description}
-        </Alert>
-        {mainContract === null ? (
-            <Alert severity="error">
-                The contract is not deployed.
-            </Alert>
-        ) : !showOwner ? null : !isOwner ? (
+    const contractInfo = (
+        !showOwner ? null : !isOwner ? (
             <Alert severity="error">
                 You're not the owner of this contract. Only the owner of this contract can edit these fields.<br />
                 Any attempt to make any change will fail. If you think this is an error / outdated, refresh the page.
@@ -119,9 +89,19 @@ export default function ParamsAwareContractWindow({
                     lose the saved money.
                 </Alert>
             </>
-        )}
-        <ParamsContext.Provider value={{wrappedCall, paramsData}}>
+        )
+    );
+
+    let extraCaption = (
+        !showOwner ? "" :
+        mainContract === null ? "not deployed yet" :
+        `(Owner: ${abbr(paramsData.owner)})`
+    );
+
+    return <ContractWindow caption={`${caption} ${extraCaption}`} description={description}
+                           mainContract={mainContract} mainContractInfo={contractInfo} refresh={refresh}>
+        <ParamsContext.Provider value={{paramsData}}>
             {children}
         </ParamsContext.Provider>
-    </Paper>;
+    </ContractWindow>
 }
