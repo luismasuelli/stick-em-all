@@ -4,6 +4,7 @@ import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
 import ErrorLauncherContext from "../Errors/ErrorLauncherContext";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import ParamsContext from "./ParamsContext";
 
 
 /**
@@ -20,8 +21,7 @@ function abbr(address) {
 
 
 /**
- * This is the main page. All the pages should look like this.
- * @returns {JSX.Element}
+ * This is a wrapper to create a params & contract-aware window.
  */
 export default function ParamsAwareContractWindow({
     caption, description, mainContract, paramsContract, params, showOwner, children
@@ -120,6 +120,8 @@ export default function ParamsAwareContractWindow({
                 </Alert>
             </>
         )}
-
+        <ParamsContext.Provider value={{wrappedCall, paramsData}}>
+            {children}
+        </ParamsContext.Provider>
     </Paper>;
 }
