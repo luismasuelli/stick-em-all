@@ -31,11 +31,13 @@ Then, in the `params_frontend/` directory create a `.env.development.custom.loca
 REACT_APP_PARAMS_CONTRACT=0xTheAddressYouCopied
 ```
 
-And finally, run this command in shell:
+And then, run this command in shell:
 
 ```shell
 npm run start
 ```
+
+Then, visit the local site (e.g. localhost:3000) ensuring the current network in your wallet is the local one.
 
 ### Launching against Polygon Amoy
 
@@ -44,11 +46,13 @@ First, you need to read the testnet deployment instructions [for the contracts](
 The later instructions are similar but with `.env.test.custom.local`, but after deploying the contracts
 to the "testnet" network.
 
-And finally, run this command in shell:
+And then, run this command in shell:
 
 ```shell
 npm run start:testnet
 ```
+
+Then, visit the local site (e.g. localhost:3000) ensuring the current network in your wallet is the testnet pme.
 
 ### Launching against Polygon Mainnet
 
@@ -57,8 +61,10 @@ First, you need to read the testnet deployment instructions [for the contracts](
 The later instructions are similar but with `.env.production.custom.local`, but after deploying the contracts
 to the "mainnet" network.
 
-And finally, run this command in shell:
+And then, run this command in shell:
 
 ```shell
 npm run start:mainnet
 ```
+
+Then, visit the local site (e.g. localhost:3000) ensuring the current network in your wallet is the mainnet one.
