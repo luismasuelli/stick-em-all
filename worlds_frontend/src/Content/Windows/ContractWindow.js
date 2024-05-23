@@ -27,7 +27,7 @@ export default function ContractWindow({
     // 1. Get the context-related utilities.
     const errorLauncher = useContext(ErrorLauncherContext);
 
-    // 4. This wrapped call component wraps an action inside an error capture
+    // 2. This wrapped call component wraps an action inside an error capture
     //    and a forced refresh. This utility is provided as a context for later.
     const wrappedCall = useMemo(() => ((f) => (
         errorLauncher.current.capturingError(async function(...args) {
@@ -38,6 +38,7 @@ export default function ContractWindow({
         }
     ))), [errorLauncher, refresh]);
 
+    // 3. Force a first refrseh.
     useEffect(() => {
         refresh();
     }, [refresh]);
