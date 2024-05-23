@@ -8,6 +8,7 @@ const ParamsContext = createContext({
         fiatCosts: {}, // Each key is a hash. Each value is value in USD.
         nativeCosts: {}, // Each key is a hash. Each value is value in ETH.
     },
+    paramsContract: null
 });
 
 export default ParamsContext;

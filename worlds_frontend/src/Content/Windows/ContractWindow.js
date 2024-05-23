@@ -67,7 +67,7 @@ export default function ContractWindow({
                 {mainContractInfo}
             </>
         )}
-        <ContractWindowContext.Provider value={{wrappedCall}}>
+        <ContractWindowContext.Provider value={{wrappedCall, mainContract}}>
             {children}
         </ContractWindowContext.Provider>
     </Paper>;
