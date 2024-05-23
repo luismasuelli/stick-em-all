@@ -4,7 +4,9 @@ This directory contains the contracts that are related to the Stick 'em All proj
 
 ## Install everything
 
-Run this command in a shell (the current directory must be the root of the project):
+This is a node project. All the `npm` / `npx` projects must be run in _this_ directory.
+
+Run this command in a shell:
 
 ```shell
 npm install
@@ -12,7 +14,7 @@ npm install
 
 ## Mounting the sample network
 
-Run this command in a shell (the current directory must be the root of the project):
+Run this command in a shell:
 
 ```shell
 npx hardhat node
