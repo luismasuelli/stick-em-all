@@ -3,7 +3,6 @@ import {Alert, AppBar, IconButton, Paper, Toolbar, Typography} from "@mui/materi
 import Web3Context from "../../Wrapping/Web3Context";
 import Web3AccountContext from "../../Wrapping/Web3AccountContext";
 import ErrorLauncherContext from "../../Errors/ErrorLauncherContext";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import ParamsContext from "../Contexts/ParamsContext";
 import ContractWindow from "./ContractWindow";
 
