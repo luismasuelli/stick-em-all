@@ -24,7 +24,7 @@ function abbr(address) {
  * This is a wrapper to create a params & contract-aware window.
  */
 export default function ParamsAwareContractWindow({
-    caption, description, mainContract, paramsContract, params, showOwner, children
+    caption, description, mainContract, paramsContract, params, showOwner, refresh, children
 }) {
     // 1. Get the context-related utilities.
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
@@ -43,7 +43,7 @@ export default function ParamsAwareContractWindow({
 
     // 3. Make the refresh function (depends on context elements, the params
     //    setter, and the params contract & spec props).
-    const refresh = useMemo(() => errorLauncher.current.capturingError(async function() {
+    const refresh_ = useMemo(() => errorLauncher.current.capturingError(async function() {
         if (paramsContract === null) return;
 
         // First, update the balance.
@@ -68,9 +68,18 @@ export default function ParamsAwareContractWindow({
         }));
 
         // Update everything.
-        console.log("Setting refresh data...");
+        console.log("Setting params data...");
         setParamsData({owner, earningsReceiver, earningsBalance, fiatCosts, nativeCosts});
-    }), [paramsContract, params, web3, balanceRefresher, errorLauncher, setParamsData]);
+
+        // Run the wrapped refresh.
+        console.log("Running the wrapped refresh...");
+        if (refresh) {
+            const ret = refresh();
+            if (ret instanceof Promise) {
+                await ret;
+            }
+        }
+    }), [paramsContract, params, web3, balanceRefresher, errorLauncher, setParamsData, refresh]);
 
     const contractInfo = (
         !showOwner ? null : !isOwner ? (
@@ -98,7 +107,7 @@ export default function ParamsAwareContractWindow({
     );
 
     return <ContractWindow caption={`${caption} ${extraCaption}`} description={description}
-                           mainContract={mainContract} mainContractInfo={contractInfo} refresh={refresh}>
+                           mainContract={mainContract} mainContractInfo={contractInfo} refresh={refresh_}>
         <ParamsContext.Provider value={{paramsData, paramsContract}}>
             {children}
         </ParamsContext.Provider>
