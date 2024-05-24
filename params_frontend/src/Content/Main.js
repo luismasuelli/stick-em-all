@@ -160,6 +160,6 @@ export default function Main() {
     return <ParamsAwareContractWindow caption={"Stick 'Em All - Management"} description={description}
                                       paramsContract={contract} params={params}
                                       mainContract={contract} showOwner={true}>
-        <MainContent />;
+        <MainContent />
     </ParamsAwareContractWindow>;
 }
