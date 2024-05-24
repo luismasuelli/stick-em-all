@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef, useState} from "react";
+import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
 import MakeWorldsContractClients from "./Main/MakeWorldsContractClients";
@@ -39,24 +39,24 @@ function _updateState(state, event, account) {
     if (event.name === "Transfer") {
         const {from, to, tokenId} = event.returnValue;
         if (from === account) {
-            const index = state.eventsIndices[tokenId];
+            const index = state.worldsIndices[tokenId];
             if (index === undefined) {
-                state.eventsIndices[tokenId] = state.eventsRelevance.length;
-                state.eventsRelevance.push({owned: true});
+                state.worldsIndices[tokenId] = state.worldsRelevance.length;
+                state.worldsRelevance.push({owned: true});
             }
         }
         if (to === account) {
-            const index = state.eventsIndices[tokenId];
+            const index = state.worldsIndices[tokenId];
             if (index !== undefined) {
-                state.eventsRelevance[index].owned = false;
+                state.worldsRelevance[index].owned = false;
             }
         }
     } else if (event.name === "WorldEditionAllowanceChanged") {
         const {worldId, who, allowed} = event.returnValue;
         if (who === account) {
-            const index = state.eventsIndices[worldId];
+            const index = state.worldsIndices[worldId];
             if (index !== undefined) {
-                state.eventsRelevance[index].allowed = allowed;
+                state.worldsRelevance[index].allowed = allowed;
             }
         }
     }
@@ -86,7 +86,7 @@ function updateAccountDependentNextState(state, event, account) {
  * @returns {*} The updated state.
  */
 function updateAccountDependentInitialState(state, event, account) {
-    return _updateState(state || {eventsIndices: {}, eventsRelevance: []});
+    return _updateState(state || {worldsIndices: {}, worldsRelevance: []});
 }
 
 
@@ -119,22 +119,42 @@ function MainContent({ contracts, account }) {
     //    cache of events.
     const {worlds, worldsManagement} = contracts;
 
-    // 2. Keeping a track of the events cache.
-    const {eventsCache, setEventsCache} = useState({eventsIndices: {}, eventsRelevance: []});
-    const ref = useRef(setEventsCache);
-    ref.current = setEventsCache;
+    // 2. Keeping a track of the worlds cache.
+    const {worldsCache, setWorldsCache} = useState({worldsIndices: {}, worldsRelevance: []});
+    const setWorldsCacheRef = useRef(setWorldsCache);
+    setWorldsCacheRef.current = setWorldsCache;
     useEffect(() => {
         let updateInitialState = (state, event) => updateAccountDependentInitialState(state, event, account);
         let updateNextState = (state, event) => updateAccountDependentNextState(state, event, account);
 
         return getEventsEffect(
             worlds, ["Transfer", "WorldEditionAllowanceChanged"],
-            {updateInitialState, finishInitialState}, updateNextState, ref.current, null
+            {updateInitialState, finishInitialState}, updateNextState, setWorldsCacheRef.current, null
         )();
-    }, [worlds, ref, account]);
+    }, [worlds, setWorldsCacheRef, account]);
 
-    // 3. Keeping a track of the data associated to events.
-    const {eventsDataCache, setEventsDataCache} = useState({});
+    // 3. Keeping a track of the data associated to worlds.
+    const {worldsDataCache, setWorldsDataCache} = useState({});
+    const setWorldsDataCacheRef = useRef(setWorldsDataCache);
+    setWorldsDataCacheRef.current = setWorldsDataCache;
+
+    // 4. Keeping a track of the data associated to new worlds.
+    const {newWorldData, setNewWorldData} = useState({});
+    const setNewWorldDataRef = useRef(setNewWorldData);
+    setNewWorldDataRef.current = setNewWorldData;
+
+    // 4. Keeping a track of the currently selected-for-edition world.
+    //    The first value (and the value when creating a world) is null.
+    const {selectedWorld, setSelectedWorld} = useState(null);
+    const setSelectedWorldData = useCallback((data) => {
+        if (selectedWorld === undefined) {
+            setWorldsDataCacheRef.current(produce(worldsDataCache, worldsDataCache => {
+                worldsDataCache[selectedWorld] = data;
+            }));
+        } else {
+            setNewWorldDataRef.current(data);
+        }
+    }, [selectedWorld, setWorldsDataCacheRef, worldsDataCache, setNewWorldDataRef]);
 }
 
 
