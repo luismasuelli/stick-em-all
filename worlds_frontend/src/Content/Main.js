@@ -138,7 +138,8 @@ function MainContent({ contracts, account }) {
     const setWorldsDataCacheRef = useRef(setWorldsDataCache);
     setWorldsDataCacheRef.current = setWorldsDataCache;
 
-    // 4. Keeping a track of the data associated to new worlds.
+    // 4. Keeping a track of the data associated to new worlds,
+    //    or editing an existing world.
     const {newWorldData, setNewWorldData} = useState({});
     const setNewWorldDataRef = useRef(setNewWorldData);
     setNewWorldDataRef.current = setNewWorldData;
