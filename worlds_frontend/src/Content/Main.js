@@ -1,4 +1,4 @@
-import {useCallback, useContext, useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
 import MakeWorldsContractClients from "./Main/MakeWorldsContractClients";
@@ -143,18 +143,12 @@ function MainContent({ contracts, account }) {
     const setNewWorldDataRef = useRef(setNewWorldData);
     setNewWorldDataRef.current = setNewWorldData;
 
-    // 4. Keeping a track of the currently selected-for-edition world.
+    // 5. Keeping a track of the currently selected-for-edition world.
     //    The first value (and the value when creating a world) is null.
     const {selectedWorld, setSelectedWorld} = useState(null);
-    const setSelectedWorldData = useCallback((data) => {
-        if (selectedWorld === undefined) {
-            setWorldsDataCacheRef.current(produce(worldsDataCache, worldsDataCache => {
-                worldsDataCache[selectedWorld] = data;
-            }));
-        } else {
-            setNewWorldDataRef.current(data);
-        }
-    }, [selectedWorld, setWorldsDataCacheRef, worldsDataCache, setNewWorldDataRef]);
+
+    // Rendering everything.
+    return <></>;
 }
 
 
