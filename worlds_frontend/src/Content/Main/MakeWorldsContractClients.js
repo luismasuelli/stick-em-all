@@ -1701,26 +1701,229 @@ const worldsManagementContractABI = [
     }
 ];
 
+const paramsContractABI = [
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_priceFeed",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableInvalidOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableUnauthorizedAccount",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "earningsBalance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [],
+        "name": "earningsReceiver",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "fiatCosts",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "_key",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "setFiatCost",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_earningsReceiver",
+                "type": "address"
+            }
+        ],
+        "name": "setEarningsReceiver",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "earningsWithdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "_key",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getNativeCost",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    }
+];
+
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 /**
  * Returns references to the Worlds and WorldsManagement contracts.
  * @param web3 The web3 client to use.
  * @param account The account to use.
- * @returns {Promise<{worldsManagementContract: web3.eth.Contract, worldsContract: web3.eth.Contract}|null>} Instances of both contracts (async function).
+ * @returns {Promise<{worldsManagement: web3.eth.Contract, worlds: web3.eth.Contract, params: web3.eth.Contract}|null>} Instances of the three contracts (async function).
  */
 export default async function MakeWorldsContractClients(web3, account) {
     const worldsManagementContractAddress = process.env.REACT_APP_WORLDS_MANAGEMENT_CONTRACT;
     if (worldsManagementContractAddress && web3.utils.isAddress(worldsManagementContractAddress) && (
         web3.utils.toChecksumAddress(worldsManagementContractAddress) !== web3.utils.toChecksumAddress(ZERO_ADDRESS)
     )) {
-        let worldsManagementContract = new web3.eth.Contract(
+        let worldsManagement = new web3.eth.Contract(
             worldsManagementContractABI, worldsManagementContractAddress, {from: account}
         );
-        let worldsContractAddress = await worldsManagementContract.methods.worlds().call();
+        let worldsContractAddress = await worldsManagement.methods.worlds().call();
+        let worlds = new web3.eth.Contract(worldsContractABI, worldsContractAddress);
+        let paramsContractAddress = await worlds.methods.params().call();
+        let params = new web3.eth.Contract(paramsContractABI, paramsContractAddress);
         return {
-            worldsManagementContract,
-            worldsContract: new web3.eth.Contract(worldsContractABI, worldsContractAddress)
+            worldsManagement, worlds, params
         }
     }
 
