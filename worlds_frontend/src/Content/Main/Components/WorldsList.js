@@ -1,4 +1,6 @@
 import {useNavigate} from 'react-router-dom';
+import Box from "@mui/material/Box";
+import ThemedBox from "../../Controls/ThemedBox";
 
 
 /**
@@ -11,6 +13,22 @@ import {useNavigate} from 'react-router-dom';
  */
 export default function WorldsList({ worldsList, worldsData }) {
     const navigate = useNavigate();
-    return <>
-    </>;
+
+    return <Box
+        sx={{
+            height: '100%',   // Use 100% of the parent height
+            width: '100%',    // Use 100% of the parent width
+            overflowY: 'auto' // Show vertical scrollbar when needed
+        }}
+    >
+        {worldsList.filter(world => (world.owner || world.allowed)).map((world, index) => (
+            <ThemedBox key={index} style={{padding: 1}} severity={world.owner ? "success" : "info"}>
+                {/* Display some content based on worldsData and worldsList */}
+                <h3 style={{textOverflow: "ellipsis"}}>ID: {world.worldId}</h3>
+                {(worldsData[world.worldId]) ? (
+                    <p style={{textOverflow: "ellipsis"}}>worldsData[world.worldId].name</p>
+                ) : null}
+            </ThemedBox>
+        ))}
+    </Box>;
 }
