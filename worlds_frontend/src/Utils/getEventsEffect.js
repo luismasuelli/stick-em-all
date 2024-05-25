@@ -135,34 +135,31 @@ function getEventsEffect(
     const {updateInitialState, finishInitialState} = prepareInitialState;
     updateNextState = updateNextState || defaultImmutableUpdateState;
 
-    // This function is suitable for an effect.
+    let wasEffectCanceled = false;
+    let eventHandlers = null;
+
+    async function setup() {
+        const result = await processPastEvents(
+            contract, eventNames, updateInitialState, finishInitialState, {lastBlock, lastState}
+        );
+        console.log("Setting the initial state...");
+        pushState(result);
+        if (!wasEffectCanceled) {
+            console.log("Preparing the collection of future events...");
+            eventHandlers = processFutureEvents(contract, eventNames, updateNextState, pushState, result);
+        }
+    }
+
+    setup().then(() => console.log("Events listening setup is done"));
+
     return function() {
-        let wasEffectCanceled = false;
-        let eventHandlers = null;
-
-        async function setup() {
-            const result = await processPastEvents(
-                contract, eventNames, updateInitialState, finishInitialState, {lastBlock, lastState}
-            );
-            console.log("Setting the initial state...");
-            pushState(result);
-            if (!wasEffectCanceled) {
-                console.log("Preparing the collection of future events...");
-                eventHandlers = processFutureEvents(contract, eventNames, updateNextState, pushState, result);
-            }
+        if (eventHandlers !== null) {
+            eventHandlers.forEach((eh, idx) => {
+                console.log(`>>> Stopping the handler for the ${eventNames[idx]} event type...`);
+                eh.unsubscribe();
+            });
         }
-
-        setup().then(() => console.log("Events listening setup is done"));
-
-        return function() {
-            if (eventHandlers !== null) {
-                eventHandlers.forEach((eh, idx) => {
-                    console.log(`>>> Stopping the handler for the ${eventNames[idx]} event type...`);
-                    eh.unsubscribe();
-                });
-            }
-            wasEffectCanceled = true;
-        }
+        wasEffectCanceled = true;
     }
 }
 
