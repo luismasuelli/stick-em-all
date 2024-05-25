@@ -43,15 +43,14 @@ function MainContent({ contracts, account }) {
     }, [worlds, setWorldsCacheRef, account]);
 
     // 3. Keeping a track of the data associated to worlds.
+    //    For each world, the cached data is name and description.
+    //    Other data appears only on retrieval and must be done in
+    //    real-time.
     const {worldsDataCache, setWorldsDataCache} = useState({});
-    const setWorldsDataCacheRef = useRef(setWorldsDataCache);
-    setWorldsDataCacheRef.current = setWorldsDataCache;
 
     // 4. Keeping a track of the data associated to new worlds,
     //    or editing an existing world.
     const {newWorldData, setNewWorldData} = useState({});
-    const setNewWorldDataRef = useRef(setNewWorldData);
-    setNewWorldDataRef.current = setNewWorldData;
 
     // 5. Keeping a track of the currently selected-for-edition world.
     //    The first value (and the value when creating a world) is null.
@@ -60,12 +59,25 @@ function MainContent({ contracts, account }) {
     // Rendering everything.
     return <MemoryRouter>
         <Routes>
-            <Route path="/" element={<SelectWorld />} />
-            <Route path="/create" element={<CreateWorld />} />
-            <Route path="/created/:worldId" element={<WorldCreated />} />
-            <Route path="/edit/:worldId" element={<EditWorld />} />
-            <Route path="/edit/:worldId/transfer" element={<TransferWorld />} />
-            <Route path="/manage/:worldId" element={<ManageWorld />} />
+            <Route path="/" element={<SelectWorld
+                worldsList={worldsCache.worldsRelevance} worldsData={worldsDataCache}
+            />} />
+            <Route path="/create" element={<CreateWorld
+                worldsList={worldsCache.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
+                setNewWorldData={setNewWorldData}
+            />} />
+            <Route path="/created/:worldId" element={<WorldCreated
+                worldsList={worldsCache.worldsRelevance} worldsData={worldsDataCache} newWorldData={newWorldData}
+            />} />
+            <Route path="/edit/:worldId" element={<EditWorld
+                worldsList={worldsCache.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
+            />} />
+            <Route path="/edit/:worldId/transfer" element={<TransferWorld
+                worldsList={worldsCache.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
+            />} />
+            <Route path="/manage/:worldId" element={<ManageWorld
+                worldsManagementContract={worldsManagement}
+            />} />
         </Routes>
     </MemoryRouter>;
 }
