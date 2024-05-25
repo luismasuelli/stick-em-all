@@ -1,4 +1,5 @@
 import {useContext, useEffect, useRef, useState} from "react";
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
 import worldsContractClients from "./Main/worldsContractClients";
@@ -6,6 +7,12 @@ import Web3 from "web3";
 import ParamsAwareContractWindow from "./Windows/ParamsAwareContractWindow";
 import StandaloneMessage from "./Windows/StandaloneMessage";
 import worldsEventsEffect from "./Main/worldsEventsEffect";
+import SelectWorld from './Main/SubStates/SelectWorld';
+import CreateWorld from './Main/SubStates/CreateWorld';
+import WorldCreated from './Main/SubStates/WorldCreated';
+import EditWorld from './Main/SubStates/EditWorld';
+import TransferWorld from './Main/SubStates/TransferWorld';
+import ManageWorld from './Main/SubStates/ManageWorld';
 
 
 // Which are the defined & relevant params of the app?
@@ -51,7 +58,16 @@ function MainContent({ contracts, account }) {
     const {selectedWorld, setSelectedWorld} = useState(null);
 
     // Rendering everything.
-    return <></>;
+    return <MemoryRouter>
+        <Routes>
+            <Route path="/" element={<SelectWorld />} />
+            <Route path="/create" element={<CreateWorld />} />
+            <Route path="/created/:worldId" element={<WorldCreated />} />
+            <Route path="/edit/:worldId" element={<EditWorld />} />
+            <Route path="/edit/:worldId/transfer" element={<TransferWorld />} />
+            <Route path="/manage/:worldId" element={<ManageWorld />} />
+        </Routes>
+    </MemoryRouter>;
 }
 
 
