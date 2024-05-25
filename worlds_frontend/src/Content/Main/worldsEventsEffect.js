@@ -29,28 +29,35 @@ import getEventsEffect from "../../Utils/getEventsEffect";
  * @private
  */
 function _updateState(state, event, account) {
+    /**
+     * Gets or adds a world entry.
+     * @param worldId The world id.
+     * @returns {{worldId}|*} The object.
+     */
+    function getOrAdd(worldId) {
+        const index = state.worldsIndices[worldId];
+        if (index === undefined) {
+            state.worldsIndices[worldId] = state.worldsRelevance.length;
+            let obj = {worldId};
+            state.worldsRelevance.push(obj);
+            return obj;
+        } else {
+            return state.worldsRelevance[index];
+        }
+    }
+
     if (event.name === "Transfer") {
         const {from, to, tokenId} = event.returnValue;
         if (from === account) {
-            const index = state.worldsIndices[tokenId];
-            if (index === undefined) {
-                state.worldsIndices[tokenId] = state.worldsRelevance.length;
-                state.worldsRelevance.push({owned: true});
-            }
+            getOrAdd(tokenId).owned = true;
         }
         if (to === account) {
-            const index = state.worldsIndices[tokenId];
-            if (index !== undefined) {
-                state.worldsRelevance[index].owned = false;
-            }
+            getOrAdd(tokenId).owned = false;
         }
     } else if (event.name === "WorldEditionAllowanceChanged") {
         const {worldId, who, allowed} = event.returnValue;
         if (who === account) {
-            const index = state.worldsIndices[worldId];
-            if (index !== undefined) {
-                state.worldsRelevance[index].allowed = allowed;
-            }
+            getOrAdd(worldId).allowed = allowed;
         }
     }
     return state;
