@@ -108,7 +108,7 @@ export default function ParamsAwareContractWindow({
 
     return <ContractWindow caption={`${caption} ${extraCaption}`} description={description}
                            mainContract={mainContract} mainContractInfo={contractInfo} refresh={refresh_}>
-        <ParamsContext.Provider value={{paramsData, paramsContract}}>
+        <ParamsContext.Provider value={{paramsData, paramsContract, params}}>
             {children}
         </ParamsContext.Provider>
     </ContractWindow>
