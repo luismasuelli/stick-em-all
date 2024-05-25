@@ -60,7 +60,7 @@ function MainContent() {
     // For the receiver.
     const [newEarningsReceiver, setNewEarningsReceiver] = useState(currentParamsData.earningsReceiver);
     useEffect(() => {
-        setNewEarningsReceiver(paramsData.earningsReceiver);
+        setNewEarningsReceiver(currentParamsData.earningsReceiver);
     }, [currentParamsData.earningsReceiver]);
 
     // eslint-disable-next-line no-undef
