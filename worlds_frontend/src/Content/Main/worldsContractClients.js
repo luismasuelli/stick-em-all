@@ -1914,7 +1914,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
  * @param account The account to use.
  * @returns {Promise<{worldsManagement: web3.eth.Contract, worlds: web3.eth.Contract, params: web3.eth.Contract}|null>} Instances of the three contracts (async function).
  */
-export default async function MakeWorldsContractClients(web3, account) {
+export default async function worldsContractClients(web3, account) {
     const worldsManagementContractAddress = process.env.REACT_APP_WORLDS_MANAGEMENT_CONTRACT;
     if (worldsManagementContractAddress && web3.utils.isAddress(worldsManagementContractAddress) && (
         web3.utils.toChecksumAddress(worldsManagementContractAddress) !== web3.utils.toChecksumAddress(ZERO_ADDRESS)
