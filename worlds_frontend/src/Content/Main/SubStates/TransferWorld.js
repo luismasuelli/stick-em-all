@@ -1,6 +1,9 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import {useParams, useNavigate} from 'react-router-dom';
+import {Grid} from "@mui/material";
 
 export default function TransferWorld() {
-    let { worldId } = useParams();
-    return <></>;
+    let {worldId} = useParams();
+    return <Grid container>
+
+    </Grid>;
 }
