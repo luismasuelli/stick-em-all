@@ -3,8 +3,5 @@ import {Grid} from "@mui/material";
 
 export default function ManageWorld() {
     let {worldId} = useParams();
-    return <Grid container>
-        <Grid item xs={5}></Grid>
-        <Grid item xs={7}></Grid>
-    </Grid>;
+    return <></>;
 }
