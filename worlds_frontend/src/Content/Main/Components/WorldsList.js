@@ -21,14 +21,17 @@ export default function WorldsList({ worldsList, worldsData }) {
             overflowY: 'auto' // Show vertical scrollbar when needed
         }}
     >
-        {worldsList.filter(world => (world.owner || world.allowed)).map((world, index) => (
+        {worldsList.length ? worldsList.filter(world => (world.owner || world.allowed)).map((world, index) => (
             <ThemedBox key={index} style={{padding: 1}} severity={world.owner ? "success" : "info"}>
-                {/* Display some content based on worldsData and worldsList */}
                 <h3 style={{textOverflow: "ellipsis"}}>ID: {world.worldId}</h3>
                 {(worldsData[world.worldId]) ? (
                     <p style={{textOverflow: "ellipsis"}}>worldsData[world.worldId].name</p>
                 ) : null}
             </ThemedBox>
-        ))}
+        )) : (
+            <ThemedBox style={{padding: 1}} severity="info">
+                <p style={{textOverflow: "ellipsis"}}>No defined worlds</p>
+            </ThemedBox>
+        )}
     </Box>;
 }
