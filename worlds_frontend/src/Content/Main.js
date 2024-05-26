@@ -71,6 +71,7 @@ function MainContent({ contracts, account }) {
             />} />
             <Route path="/edit/:worldId" element={<EditWorld
                 worldsList={worldsCache.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
+                setWorldsData={setWorldsDataCache}
             />} />
             <Route path="/edit/:worldId/transfer" element={<TransferWorld
                 worldsList={worldsCache.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
