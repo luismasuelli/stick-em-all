@@ -52,10 +52,6 @@ function MainContent({ contracts, account }) {
     //    or editing an existing world.
     const {newWorldData, setNewWorldData} = useState({});
 
-    // 5. Keeping a track of the currently selected-for-edition world.
-    //    The first value (and the value when creating a world) is null.
-    const {selectedWorld, setSelectedWorld} = useState(null);
-
     // Rendering everything.
     return <MemoryRouter>
         <Routes>
@@ -104,7 +100,7 @@ export default function Main() {
         return <ParamsAwareContractWindow caption={"Stick 'Em All - Worlds"} description={description}
                                           paramsContract={contracts.params} params={params}
                                           mainContract={contracts.worldsManagement} showOwner={true}>
-            <MainContent />
+            <MainContent account={account} contracts={contracts} />
         </ParamsAwareContractWindow>;
     } else {
         return <StandaloneMessage title="Loading..." content="Loading the contracts..." />;
