@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Web3Context from './Web3Context.js';
 import Web3 from 'web3';
 import ShowStopper from "./ShowStopper";
@@ -52,6 +52,8 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
 
         // Define a callback for when the chain id changes.
         function onChainIdChanged(chainId) {
+            // eslint-disable-next-line no-undef
+            chainId = BigInt(chainId);
             if (chainId !== expectedChainId) {
                 console.log(`chainId: ${chainId} (${typeof chainId}) vs expectedChainId: ${expectedChainId} (${typeof expectedChainId})`);
                 setUIStatus(STATUS_BAD_CHAIN);
