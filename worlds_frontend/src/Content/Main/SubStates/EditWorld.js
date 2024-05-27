@@ -1,5 +1,5 @@
 import {useParams} from 'react-router-dom';
-import {Button, Grid} from "@mui/material";
+import {Alert, Button, Grid} from "@mui/material";
 import React, {useContext, useEffect, useState} from "react";
 import WorldsList from "../Components/WorldsList";
 import ContractWindowContext from "../../Contexts/ContractWindowContext";
@@ -75,10 +75,10 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
     return <Grid container>
         <Grid item xs={5}><WorldsList worldsList={worldsList} worldsData={worldsData} /></Grid>
         <Grid item xs={7}>
-            <Label>
+            <Alert severity="info">
                 You're currently editing the world: {worldId.toString()}. Each field is edited
                 individually.
-            </Label>
+            </Alert>
             <Grid container>
                 {/* Name */}
                 <Grid item xs={5}><Label>Name:</Label></Grid>
