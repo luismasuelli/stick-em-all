@@ -73,18 +73,18 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
         </Alert>
         <Grid container sx={{marginTop: 4}}>
             {/* Name */}
-            <Grid item xs={5}><Label>Name:</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Name:</Label></Grid>
+            <Grid item xs={9}>
                 <TextField variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
             </Grid>
             {/* Description */}
-            <Grid item xs={5}><Label>Description:</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Description:</Label></Grid>
+            <Grid item xs={9}>
                 <TextField variant="outlined" value={description} onChange={(e) => setDescription(e.target.value)} />
             </Grid>
             {/* Logo */}
-            <Grid item xs={5}><Label>Logo (URL):</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Logo (URL):</Label></Grid>
+            <Grid item xs={9}>
                 <TextField variant="outlined" value={logo} onChange={(e) => setLogo(e.target.value)} />
             </Grid>
             {/* Button */}
