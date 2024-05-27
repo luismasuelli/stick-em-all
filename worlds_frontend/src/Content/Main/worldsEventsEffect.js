@@ -76,7 +76,7 @@ function _updateState(state, event, account) {
  */
 function updateAccountDependentNextState(state, event, account) {
     return produce(state, draft => {
-        _updateState(state, event, account);
+        _updateState(draft, event, account);
     });
 }
 
