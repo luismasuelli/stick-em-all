@@ -81,7 +81,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
             {/* Name */}
             <Grid item xs={5}><Label>Name:</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={name} onChange={setName} />
+                <TextField variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
             </Grid>
             <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateName}
@@ -90,7 +90,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
             {/* Description */}
             <Grid item xs={5}><Label>Description:</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={description} onChange={setDescription} />
+                <TextField variant="outlined" value={description} onChange={(e) => setDescription(e.target.value)} />
             </Grid>
             <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateDescription}
@@ -99,7 +99,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
             {/* Logo */}
             <Grid item xs={5}><Label>Logo (URL):</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={logo} onChange={setLogo} />
+                <TextField variant="outlined" value={logo} onChange={(e) => setLogo(e.target.value)} />
             </Grid>
             <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateLogo}
@@ -108,7 +108,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
             {/* Background */}
             <Grid item xs={5}><Label>Background (URL):</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={background} onChange={setBackground} />
+                <TextField variant="outlined" value={background} onChange={(e) => setBackground(e.target.value)} />
             </Grid>
             <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateBackground}
@@ -117,7 +117,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
             {/* External URL */}
             <Grid item xs={5}><Label>External URL:</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={externalUrl} onChange={setExternalUrl} />
+                <TextField variant="outlined" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)} />
             </Grid>
             <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateExternalUrl}
