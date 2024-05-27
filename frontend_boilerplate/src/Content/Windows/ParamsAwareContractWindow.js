@@ -1,5 +1,5 @@
 import {useContext, useMemo, useState} from "react";
-import {Alert, AppBar, IconButton, Paper, Toolbar, Typography} from "@mui/material";
+import {Alert} from "@mui/material";
 import Web3Context from "../../Wrapping/Web3Context";
 import Web3AccountContext from "../../Wrapping/Web3AccountContext";
 import ErrorLauncherContext from "../../Errors/ErrorLauncherContext";
