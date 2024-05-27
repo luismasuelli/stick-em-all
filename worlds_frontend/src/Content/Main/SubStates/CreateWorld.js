@@ -68,17 +68,17 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
             {/* Name */}
             <Grid item xs={5}><Label>Name:</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={name} onChange={setName} />
+                <TextField variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
             </Grid>
             {/* Description */}
             <Grid item xs={5}><Label>Description:</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={description} onChange={setDescription} />
+                <TextField variant="outlined" value={description} onChange={(e) => setDescription(e.target.value)} />
             </Grid>
             {/* Logo */}
             <Grid item xs={5}><Label>Logo (URL):</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={logo} onChange={setLogo} />
+                <TextField variant="outlined" value={logo} onChange={(e) => setLogo(e.target.value)} />
             </Grid>
             {/* Button */}
             <Grid item xs={12}>
