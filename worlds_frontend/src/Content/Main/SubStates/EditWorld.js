@@ -7,9 +7,13 @@ import TextField from "@mui/material/TextField";
 import {useDerivedState} from "../../../Utils/derived";
 import AddressInput from "../../Controls/AddressInput";
 import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
+import Web3Context from "../../../Wrapping/Web3Context";
+import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
 
 export default function EditWorld({ worldsList, worldsData, worldsContract, setWorldsData }) {
     let {worldId} = useParams();
+    const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
+    const {account} = context;
     let [currentWorldData, setCurrentWorldData] = useState({});
     let [name, setName] = useDerivedState(currentWorldData, setCurrentWorldData, "name");
     let [description, setDescription] = useDerivedState(currentWorldData, setCurrentWorldData, "description");
@@ -45,31 +49,31 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
     }, [/* Intentionally empty */]);
 
     const updateName = wrappedCall(async function() {
-        await worldsContract.methods.setName(worldId, name).send();
+        await worldsContract.methods.setName(worldId, name).send({from: account});
     });
 
     const updateDescription = wrappedCall(async function() {
-        await worldsContract.methods.setDescription(worldId, description).send();
+        await worldsContract.methods.setDescription(worldId, description).send({from: account});
     });
 
     const updateLogo = wrappedCall(async function() {
-        await worldsContract.methods.setLogo(worldId, logo).send();
+        await worldsContract.methods.setLogo(worldId, logo).send({from: account});
     });
 
     const updateBackground = wrappedCall(async function() {
-        await worldsContract.methods.setBackground(worldId, background).send();
+        await worldsContract.methods.setBackground(worldId, background).send({from: account});
     });
 
     const updateExternalUrl = wrappedCall(async function() {
-        await worldsContract.methods.setExternalUrl(worldId, externalUrl).send();
+        await worldsContract.methods.setExternalUrl(worldId, externalUrl).send({from: account});
     });
 
     const updateValidatorUrl = wrappedCall(async function() {
-        await worldsContract.methods.setValidatorUrl(worldId, validatorUrl).send();
+        await worldsContract.methods.setValidatorUrl(worldId, validatorUrl).send({from: account});
     });
 
     const updateEarningsReceiver = wrappedCall(async function() {
-        await worldsContract.methods.setEarningsReceiver(worldId, earningsReceiver).send();
+        await worldsContract.methods.setEarningsReceiver(worldId, earningsReceiver).send({from: account});
     });
 
     return <WorldsListEnabledLayout sx={{height: "600px"}} worldsList={worldsList} worldsData={worldsData}>

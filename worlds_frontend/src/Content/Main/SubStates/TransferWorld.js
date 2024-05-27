@@ -26,7 +26,7 @@ export default function TransferWorld({ worldsList, worldsData, worldsContract }
         if (!isAddress) {
             throw new Error("Cannot transfer the world to the zero address");
         }
-        await worldsContract.methods.transferFrom(account, targetAccount, worldId).send();
+        await worldsContract.methods.transferFrom(account, targetAccount, worldId).send({from: account});
         navigate("/");
     });
 
