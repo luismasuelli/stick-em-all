@@ -44,7 +44,7 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
     const createWorld = wrappedCall(async function() {
         const tx = await worldsContract.methods.createWorld(
             name, description, logo
-        ).send({value: nativePrice.mul(110).div(100)});
+        ).send({value: nativePrice * 110n / 100n, from: account});
         const logs = await getEventLogs(tx);
         const transferLogs = logs.filter(log => log.name === "Transfer" && log.event.to === account);
         if (transferLogs.length) {
