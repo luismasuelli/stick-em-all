@@ -18,6 +18,21 @@ function defaultImmutableUpdateState(s, e) {
 }
 
 
+function nextBlock(v) {
+    // eslint-disable-next-line no-undef
+    if (typeof v === "number") v = BigInt(v);
+    // eslint-disable-next-line no-undef
+    if (typeof v === "bigint") {
+        // eslint-disable-next-line no-undef
+        v = v + BigInt(1);
+    } else {
+        // eslint-disable-next-line no-undef
+        v = BigInt(0);
+    }
+    return v;
+}
+
+
 /**
  * Processes and returns the past events of a contract.
  * @param contract The contract.
@@ -31,7 +46,8 @@ function defaultImmutableUpdateState(s, e) {
 async function processPastEvents(contract, eventNames, updateState, finishState, {lastBlock, lastState}) {
     // First, get initial elements.
     let web3 = new Web3(contract.currentProvider);
-    let startBlock = lastBlock == null ? web3.utils.toBigInt(0) : lastBlock.add(1);
+    // eslint-disable-next-line no-undef
+    let startBlock = lastBlock == null ? web3.utils.toBigInt(0) : lastBlock + 1n;
     let state = lastState;
     updateState = updateState || defaultMutableUpdateState;
     finishState = finishState || defaultFinishState;
@@ -52,8 +68,8 @@ async function processPastEvents(contract, eventNames, updateState, finishState,
     console.log(`Cleaning and preparing the ${pastEvents.length} collected events...`);
     pastEvents = pastEvents.map(e => {
         return {
-            name: e.name,
-            returnValue: e.returnValue,
+            event: e.event,
+            returnValues: e.returnValues,
             blockNumber: web3.utils.toBigInt(e.blockNumber),
             transactionIndex: web3.utils.toBigInt(e.transactionIndex),
             logIndex: web3.utils.toBigInt(e.logIndex)
@@ -98,20 +114,20 @@ async function processPastEvents(contract, eventNames, updateState, finishState,
 function processFutureEvents(contract, eventNames, updateState, pushState, {lastBlock, lastState}) {
     // First, get interested in the events.
     let web3 = new Web3(contract.currentProvider);
-    let events = eventNames.map((en) => contract.events[en]({fromBlock: lastBlock.add(1)}));
+    let fromBlock = nextBlock(lastBlock);
+    let events = eventNames.map((en) => contract.events[en]({fromBlock}));
     updateState = updateState || defaultImmutableUpdateState;
 
     events.forEach((e) => {
-        console.log(`>>> Starting the handler for the ${e} event type...`);
         e.on('data', (ei) => {
             lastState = updateState(lastState, {
-                name: ei.name,
-                returnValue: ei.returnValue,
-                blockNumber: web3.utils.toBN(ei.blockNumber),
-                transactionIndex: web3.utils.toBN(ei.transactionIndex),
-                logIndex: web3.utils.toBN(ei.logIndex)
+                event: ei.event,
+                returnValues: ei.returnValues,
+                blockNumber: web3.utils.toBigInt(ei.blockNumber),
+                transactionIndex: web3.utils.toBigInt(ei.transactionIndex),
+                logIndex: web3.utils.toBigInt(ei.logIndex)
             });
-            pushState(lastState);
+            pushState({lastBlock: ei.blockNumber + 1n, lastState: lastState});
         })
     })
 
@@ -138,8 +154,10 @@ function getEventsEffect(
     contract, eventNames, prepareInitialState, updateNextState, pushState, checkpoint
 ) {
     const {lastBlock, lastState} = checkpoint || {};
-    const {updateInitialState, finishInitialState} = prepareInitialState;
+    let {updateInitialState, finishInitialState} = prepareInitialState || {};
     updateNextState = updateNextState || defaultImmutableUpdateState;
+    updateInitialState = updateInitialState || defaultMutableUpdateState;
+    finishInitialState = finishInitialState || defaultFinishState;
 
     let wasEffectCanceled = false;
     let eventHandlers = null;
