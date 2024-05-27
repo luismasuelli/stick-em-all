@@ -3,7 +3,7 @@ import Web3 from "web3";
 function decodeLogFromABI(contract, log) {
     const web3 = new Web3(contract.currentProvider);
     const event = contract.options.jsonInterface.find(item => {
-        return item.type === 'event' && web3.utils.keccak256(item.signature) === log.topics[0];
+        return item.type === 'event' && item.signature === log.topics[0];
     });
 
     if (!event) return null; // Event not found in the ABI
@@ -28,5 +28,5 @@ export async function getEventLogs(tx, contract) {
         tx.transactionHash
     );
     const logs = receipt ? receipt.logs : [];
-    return logs.map(log => decodeLogFromABI(contract, log));
+    return logs.map(log => decodeLogFromABI(contract, log)).filter(log => log);
 }
