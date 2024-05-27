@@ -19,15 +19,17 @@ export default function WorldsList({ worldsList, worldsData, ...props }) {
         navigate("/edit/" + worldId.toString());
     }
 
+    worldsList = worldsList.filter(world => (world.owned || world.allowed));
+
     return <Box sx={{
         height: '100%',   // Use 100% of the parent height
         width: '100%',    // Use 100% of the parent width
         overflowY: 'auto' // Show vertical scrollbar when needed
     }}>
-        {worldsList.length ? worldsList.filter(world => (world.owner || world.allowed)).map((world, index) => (
-            <ThemedBox key={index} {...props} severity={world.owner ? "success" : "info"}
+        {worldsList.length ? worldsList.map((world, index) => (
+            <ThemedBox key={index} {...props} severity={world.owned ? "success" : "info"}
                        onClick={() => handleClick(world.worldId)}>
-                <h3 style={{textOverflow: "ellipsis"}}>ID: {world.worldId}</h3>
+                <h3 style={{textOverflow: "ellipsis", padding: 0, margin: 0}}>ID: {world.worldId}</h3>
                 {(worldsData[world.worldId]) ? (
                     <p style={{textOverflow: "ellipsis", padding: 0, margin: 0}}>worldsData[world.worldId].name</p>
                 ) : null}

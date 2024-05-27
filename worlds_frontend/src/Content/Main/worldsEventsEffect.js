@@ -48,7 +48,6 @@ function _updateState(state, event, account) {
 
     if (event.event === "Transfer") {
         const {from, to, tokenId} = event.returnValues;
-        console.log(`Transfer event: ${from}, ${to}, ${account}`)
         if (from === account) {
             let obj = getOrAdd(tokenId);
             obj.owned = false;
