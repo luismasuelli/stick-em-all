@@ -48,7 +48,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
             setCurrentWorldData(retrievedWorldData);
         });
         getWorldData();
-    }, [/* Intentionally empty */]);
+    }, [worldId]);
 
     const reflectNewWorldData = function(key, value) {
         setWorldsData({
