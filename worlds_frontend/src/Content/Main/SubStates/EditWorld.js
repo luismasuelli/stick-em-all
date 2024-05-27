@@ -14,7 +14,9 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
     let {worldId} = useParams();
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
     const {account} = context;
-    let [currentWorldData, setCurrentWorldData] = useState({});
+    let [currentWorldData, setCurrentWorldData] = useState({
+        name: "", description: "", logo: "", background: "", externalUrl: "", validatorUrl: ""
+    });
     let [name, setName] = useDerivedState(currentWorldData, setCurrentWorldData, "name");
     let [description, setDescription] = useDerivedState(currentWorldData, setCurrentWorldData, "description");
     let [logo, setLogo] = useDerivedState(currentWorldData, setCurrentWorldData, "logo");
