@@ -1,5 +1,6 @@
 import Web3 from "web3";
 
+
 function defaultMutableUpdateState(s, e) {
     s = s || [];
     s.push(e);
@@ -30,8 +31,7 @@ function defaultImmutableUpdateState(s, e) {
 async function processPastEvents(contract, eventNames, updateState, finishState, {lastBlock, lastState}) {
     // First, get initial elements.
     let web3 = new Web3(contract.currentProvider);
-    console.log(web3);
-    let startBlock = lastBlock == null ? web3.utils.toBN(0) : lastBlock.add(1);
+    let startBlock = lastBlock == null ? web3.utils.toBigInt(0) : lastBlock.add(1);
     let state = lastState;
     updateState = updateState || defaultMutableUpdateState;
     finishState = finishState || defaultFinishState;
@@ -54,19 +54,22 @@ async function processPastEvents(contract, eventNames, updateState, finishState,
         return {
             name: e.name,
             returnValue: e.returnValue,
-            blockNumber: web3.utils.toBN(e.blockNumber),
-            transactionIndex: web3.utils.toBN(e.transactionIndex),
-            logIndex: web3.utils.toBN(e.logIndex)
+            blockNumber: web3.utils.toBigInt(e.blockNumber),
+            transactionIndex: web3.utils.toBigInt(e.transactionIndex),
+            logIndex: web3.utils.toBigInt(e.logIndex)
         }
     });
     pastEvents.sort((a, b) => {
-        let cmpBN = a.blockNumber.cmp(b.blockNumber);
-        if (cmpBN !== 0) return cmpBN;
+        if (a.blockNumber > b.blockNumber) return -1;
+        if (a.blockNumber < b.blockNumber) return 1;
 
-        let cmpTI = a.transactionIndex.cmp(b.transactionIndex);
-        if (cmpTI !== 0) return cmpTI;
+        if (a.transactionIndex > b.transactionIndex) return -1;
+        if (a.transactionIndex < b.transactionIndex) return 1;
 
-        return a.logIndex.cmp(b.logIndex);
+        if (a.logIndex > b.logIndex) return -1;
+        if (a.logIndex < b.logIndex) return 1;
+
+        return 0;
     });
 
     // For each event, process the current state based on it.
