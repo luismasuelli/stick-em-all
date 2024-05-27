@@ -29,7 +29,7 @@ export default function WorldsList({ worldsList, worldsData, ...props }) {
         {worldsList.length ? worldsList.map((world, index) => (
             <ThemedBox key={index} {...props} severity={world.owned ? "success" : "info"}
                        onClick={() => handleClick(world.worldId)}>
-                <h3 style={{textOverflow: "ellipsis", padding: 0, margin: 0}}>ID: {world.worldId}</h3>
+                <h3 style={{textOverflow: "ellipsis", padding: 0, margin: 0}}>ID: {world.worldId.toString()}</h3>
                 {(worldsData[world.worldId]) ? (
                     <p style={{textOverflow: "ellipsis", padding: 0, margin: 0}}>worldsData[world.worldId].name</p>
                 ) : null}
