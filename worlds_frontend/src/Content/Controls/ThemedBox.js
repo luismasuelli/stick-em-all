@@ -14,7 +14,7 @@ export default function ThemedBox({
     }
 
     if (severity !== 'none') {
-        const backgroundColor = theme.palette[severity]?.main; // Get main color based on severity
+        const backgroundColor = theme.palette[severity]?.light; // Get main color based on severity
         const color = theme.palette.getContrastText(backgroundColor);
         const borderColor = theme.palette[severity]?.dark;
 
