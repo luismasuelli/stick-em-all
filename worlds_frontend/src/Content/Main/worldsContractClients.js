@@ -1949,7 +1949,6 @@ export default async function worldsContractClients(web3, account) {
         );
         let worldsContractAddress = await worldsManagement.methods.worlds().call();
         let worlds = new web3.eth.Contract(worldsContractABI, worldsContractAddress);
-        console.log("Worlds' methods:", worlds.methods);
         let paramsContractAddress = await worlds.methods.params().call();
         let params = new web3.eth.Contract(paramsContractABI, paramsContractAddress);
         return {
