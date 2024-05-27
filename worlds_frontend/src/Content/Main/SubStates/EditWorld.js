@@ -1,12 +1,12 @@
 import {useParams} from 'react-router-dom';
 import {Alert, Button, Grid} from "@mui/material";
 import React, {useContext, useEffect, useState} from "react";
-import WorldsList from "../Components/WorldsList";
 import ContractWindowContext from "../../Contexts/ContractWindowContext";
 import Label from "../../Controls/Label";
 import TextField from "@mui/material/TextField";
 import {useDerivedState} from "../../../Utils/derived";
 import AddressInput from "../../Controls/AddressInput";
+import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
 
 export default function EditWorld({ worldsList, worldsData, worldsContract, setWorldsData }) {
     let {worldId} = useParams();
@@ -72,78 +72,75 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
         await worldsContract.methods.setEarningsReceiver(worldId, earningsReceiver).send();
     });
 
-    return <Grid container>
-        <Grid item xs={5}><WorldsList worldsList={worldsList} worldsData={worldsData} /></Grid>
-        <Grid item xs={7}>
-            <Alert severity="info">
-                You're currently editing the world: {worldId.toString()}. Each field is edited
-                individually.
-            </Alert>
-            <Grid container>
-                {/* Name */}
-                <Grid item xs={5}><Label>Name:</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={name} onChange={setName} />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button disabled={!worldsContract} onClick={updateName}
-                            variant="contained" color="primary" size="large">Update</Button>
-                </Grid>
-                {/* Description */}
-                <Grid item xs={5}><Label>Description:</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={description} onChange={setDescription} />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button disabled={!worldsContract} onClick={updateDescription}
-                            variant="contained" color="primary" size="large">Update</Button>
-                </Grid>
-                {/* Logo */}
-                <Grid item xs={5}><Label>Logo (URL):</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={logo} onChange={setLogo} />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button disabled={!worldsContract} onClick={updateLogo}
-                            variant="contained" color="primary" size="large">Update</Button>
-                </Grid>
-                {/* Background */}
-                <Grid item xs={5}><Label>Background (URL):</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={background} onChange={setBackground} />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button disabled={!worldsContract} onClick={updateBackground}
-                            variant="contained" color="primary" size="large">Update</Button>
-                </Grid>
-                {/* External URL */}
-                <Grid item xs={5}><Label>External URL:</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={externalUrl} onChange={setExternalUrl} />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button disabled={!worldsContract} onClick={updateExternalUrl}
-                            variant="contained" color="primary" size="large">Update</Button>
-                </Grid>
-                {/* Validator URL */}
-                <Grid item xs={5}><Label>Validator URL:</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={validatorUrl} onChange={setValidatorUrl} />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button disabled={!worldsContract} onClick={updateValidatorUrl}
-                            variant="contained" color="primary" size="large">Update</Button>
-                </Grid>
-                {/* Earnings Receiver */}
-                <Grid item xs={5}><Label>Earnings Receiver:</Label></Grid>
-                <Grid item xs={7}>
-                    <AddressInput value={earningsReceiver} onChange={setEarningsReceiver} />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button disabled={!worldsContract} onClick={updateEarningsReceiver}
-                            variant="contained" color="primary" size="large">Update</Button>
-                </Grid>
+    return <WorldsListEnabledLayout sx={{height: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+        <Alert severity="info">
+            You're currently editing the world: {worldId.toString()}. Each field is edited
+            individually.
+        </Alert>
+        <Grid container>
+            {/* Name */}
+            <Grid item xs={5}><Label>Name:</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={name} onChange={setName} />
+            </Grid>
+            <Grid item xs={12}>
+                <Button disabled={!worldsContract} onClick={updateName}
+                        variant="contained" color="primary" size="large">Update</Button>
+            </Grid>
+            {/* Description */}
+            <Grid item xs={5}><Label>Description:</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={description} onChange={setDescription} />
+            </Grid>
+            <Grid item xs={12}>
+                <Button disabled={!worldsContract} onClick={updateDescription}
+                        variant="contained" color="primary" size="large">Update</Button>
+            </Grid>
+            {/* Logo */}
+            <Grid item xs={5}><Label>Logo (URL):</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={logo} onChange={setLogo} />
+            </Grid>
+            <Grid item xs={12}>
+                <Button disabled={!worldsContract} onClick={updateLogo}
+                        variant="contained" color="primary" size="large">Update</Button>
+            </Grid>
+            {/* Background */}
+            <Grid item xs={5}><Label>Background (URL):</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={background} onChange={setBackground} />
+            </Grid>
+            <Grid item xs={12}>
+                <Button disabled={!worldsContract} onClick={updateBackground}
+                        variant="contained" color="primary" size="large">Update</Button>
+            </Grid>
+            {/* External URL */}
+            <Grid item xs={5}><Label>External URL:</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={externalUrl} onChange={setExternalUrl} />
+            </Grid>
+            <Grid item xs={12}>
+                <Button disabled={!worldsContract} onClick={updateExternalUrl}
+                        variant="contained" color="primary" size="large">Update</Button>
+            </Grid>
+            {/* Validator URL */}
+            <Grid item xs={5}><Label>Validator URL:</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={validatorUrl} onChange={setValidatorUrl} />
+            </Grid>
+            <Grid item xs={12}>
+                <Button disabled={!worldsContract} onClick={updateValidatorUrl}
+                        variant="contained" color="primary" size="large">Update</Button>
+            </Grid>
+            {/* Earnings Receiver */}
+            <Grid item xs={5}><Label>Earnings Receiver:</Label></Grid>
+            <Grid item xs={7}>
+                <AddressInput value={earningsReceiver} onChange={setEarningsReceiver} />
+            </Grid>
+            <Grid item xs={12}>
+                <Button disabled={!worldsContract} onClick={updateEarningsReceiver}
+                        variant="contained" color="primary" size="large">Update</Button>
             </Grid>
         </Grid>
-    </Grid>;
+    </WorldsListEnabledLayout>;
 }

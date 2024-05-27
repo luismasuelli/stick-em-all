@@ -1,6 +1,5 @@
 import {useNavigate} from 'react-router-dom';
 import {Alert, Button, Grid} from "@mui/material";
-import WorldsList from "../Components/WorldsList";
 import React, {useContext, useState} from "react";
 import ParamsContext from "../../Contexts/ParamsContext";
 import Label from "../../Controls/Label";
@@ -10,6 +9,7 @@ import ContractWindowContext from "../../Contexts/ContractWindowContext";
 import Web3Context from "../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
 import {getEventLogs} from "../../../Utils/eventLogs";
+import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
 
 
 function usdFromCents(v) {
@@ -49,7 +49,7 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
         const transferLogs = logs.filter(log => log.name === "Transfer" && log.event.to === account);
         if (transferLogs.length) {
             const firstTransferLog = transferLogs[0];
-            const tokenId = web3.utils.toBN(firstTransferLog.event.tokenId);
+            const tokenId = web3.utils.toBigInt(firstTransferLog.event.tokenId);
             navigate("/created/" + tokenId.toString());
         } else {
             throw new Error(
@@ -59,35 +59,32 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
         }
     });
 
-    return <Grid container>
-        <Grid item xs={5}><WorldsList worldsList={worldsList} worldsData={worldsData} /></Grid>
-        <Grid item xs={7}>
-            <Alert severity="info">
-                You're about to create a new world. The cost of creating a new world
-                is {usdFromCents(fiatPrice)} (MATIC: {nativePrice}).
-            </Alert>
-            <Grid container>
-                {/* Name */}
-                <Grid item xs={5}><Label>Name:</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={name} onChange={setName} />
-                </Grid>
-                {/* Description */}
-                <Grid item xs={5}><Label>Description:</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={description} onChange={setDescription} />
-                </Grid>
-                {/* Logo */}
-                <Grid item xs={5}><Label>Logo (URL):</Label></Grid>
-                <Grid item xs={7}>
-                    <TextField variant="outlined" value={logo} onChange={setLogo} />
-                </Grid>
-                {/* Button */}
-                <Grid item xs={12}>
-                    <Button disabled={!worldsContract} onClick={createWorld}
-                            variant="contained" color="primary" size="large">Create World</Button>
-                </Grid>
+    return <WorldsListEnabledLayout sx={{height: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+        <Alert severity="info">
+            You're about to create a new world. The cost of creating a new world
+            is {usdFromCents(fiatPrice)} (MATIC: {nativePrice}).
+        </Alert>
+        <Grid container>
+            {/* Name */}
+            <Grid item xs={5}><Label>Name:</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={name} onChange={setName} />
+            </Grid>
+            {/* Description */}
+            <Grid item xs={5}><Label>Description:</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={description} onChange={setDescription} />
+            </Grid>
+            {/* Logo */}
+            <Grid item xs={5}><Label>Logo (URL):</Label></Grid>
+            <Grid item xs={7}>
+                <TextField variant="outlined" value={logo} onChange={setLogo} />
+            </Grid>
+            {/* Button */}
+            <Grid item xs={12}>
+                <Button disabled={!worldsContract} onClick={createWorld}
+                        variant="contained" color="primary" size="large">Create World</Button>
             </Grid>
         </Grid>
-    </Grid>;
+    </WorldsListEnabledLayout>;
 }
