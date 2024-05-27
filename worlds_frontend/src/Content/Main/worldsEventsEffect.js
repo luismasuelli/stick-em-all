@@ -48,13 +48,14 @@ function _updateState(state, event, account) {
 
     if (event.event === "Transfer") {
         const {from, to, tokenId} = event.returnValues;
+        console.log(`Transfer event: ${from}, ${to}, ${account}`)
         if (from === account) {
             let obj = getOrAdd(tokenId);
-            obj.owned = true;
+            obj.owned = false;
         }
         if (to === account) {
             let obj = getOrAdd(tokenId);
-            obj.owned = false;
+            obj.owned = true;
         }
     } else if (event.event === "WorldEditionAllowanceChanged") {
         const {worldId, who, allowed} = event.returnValues;
