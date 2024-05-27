@@ -46,18 +46,21 @@ function _updateState(state, event, account) {
         }
     }
 
-    if (event.name === "Transfer") {
-        const {from, to, tokenId} = event.returnValue;
+    if (event.event === "Transfer") {
+        const {from, to, tokenId} = event.returnValues;
         if (from === account) {
-            getOrAdd(tokenId).owned = true;
+            let obj = getOrAdd(tokenId);
+            obj.owned = true;
         }
         if (to === account) {
-            getOrAdd(tokenId).owned = false;
+            let obj = getOrAdd(tokenId);
+            obj.owned = false;
         }
-    } else if (event.name === "WorldEditionAllowanceChanged") {
-        const {worldId, who, allowed} = event.returnValue;
+    } else if (event.event === "WorldEditionAllowanceChanged") {
+        const {worldId, who, allowed} = event.returnValues;
         if (who === account) {
-            getOrAdd(worldId).allowed = allowed;
+            let obj = getOrAdd(worldId);
+            obj.allowed = allowed;
         }
     }
     return state;
@@ -86,7 +89,7 @@ function updateAccountDependentNextState(state, event, account) {
  * @returns {*} The updated state.
  */
 function updateAccountDependentInitialState(state, event, account) {
-    return _updateState(state || {worldsIndices: {}, worldsRelevance: []});
+    return _updateState(state || {worldsIndices: {}, worldsRelevance: []}, event, account);
 }
 
 

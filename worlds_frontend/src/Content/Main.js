@@ -36,8 +36,7 @@ function MainContent({ contracts, account }) {
     const {worlds, worldsManagement} = contracts;
 
     // 2. Keeping a track of the worlds cache.
-    // eslint-disable-next-line no-undef
-    const [worldsCache, setWorldsCache] = useState({lastBlock: BigInt(0), lastState: {worldsIndices: {}, worldsRelevance: []}});
+    const [worldsCache, setWorldsCache] = useState({lastBlock: 0n, lastState: {worldsIndices: {}, worldsRelevance: []}});
     const setWorldsCacheRef = useRef(setWorldsCache);
     setWorldsCacheRef.current = setWorldsCache;
     useEffect(() => {

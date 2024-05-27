@@ -47,7 +47,7 @@ async function processPastEvents(contract, eventNames, updateState, finishState,
     // First, get initial elements.
     let web3 = new Web3(contract.currentProvider);
     // eslint-disable-next-line no-undef
-    let startBlock = lastBlock == null ? web3.utils.toBigInt(0) : lastBlock + BigInt(1);
+    let startBlock = lastBlock == null ? web3.utils.toBigInt(0) : lastBlock + 1n;
     let state = lastState;
     updateState = updateState || defaultMutableUpdateState;
     finishState = finishState || defaultFinishState;
@@ -68,8 +68,8 @@ async function processPastEvents(contract, eventNames, updateState, finishState,
     console.log(`Cleaning and preparing the ${pastEvents.length} collected events...`);
     pastEvents = pastEvents.map(e => {
         return {
-            name: e.name,
-            returnValue: e.returnValue,
+            event: e.event,
+            returnValues: e.returnValues,
             blockNumber: web3.utils.toBigInt(e.blockNumber),
             transactionIndex: web3.utils.toBigInt(e.transactionIndex),
             logIndex: web3.utils.toBigInt(e.logIndex)
@@ -119,16 +119,15 @@ function processFutureEvents(contract, eventNames, updateState, pushState, {last
     updateState = updateState || defaultImmutableUpdateState;
 
     events.forEach((e) => {
-        console.log(`>>> Starting the handler for the ${e} event type...`);
         e.on('data', (ei) => {
             lastState = updateState(lastState, {
-                name: ei.name,
-                returnValue: ei.returnValue,
+                event: ei.event,
+                returnValues: ei.returnValues,
                 blockNumber: web3.utils.toBigInt(ei.blockNumber),
                 transactionIndex: web3.utils.toBigInt(ei.transactionIndex),
                 logIndex: web3.utils.toBigInt(ei.logIndex)
             });
-            pushState(lastState);
+            pushState({lastBlock: ei.blockNumber + 1n, lastState: lastState});
         })
     })
 
@@ -155,8 +154,10 @@ function getEventsEffect(
     contract, eventNames, prepareInitialState, updateNextState, pushState, checkpoint
 ) {
     const {lastBlock, lastState} = checkpoint || {};
-    const {updateInitialState, finishInitialState} = prepareInitialState;
+    let {updateInitialState, finishInitialState} = prepareInitialState || {};
     updateNextState = updateNextState || defaultImmutableUpdateState;
+    updateInitialState = updateInitialState || defaultMutableUpdateState;
+    finishInitialState = finishInitialState || defaultFinishState;
 
     let wasEffectCanceled = false;
     let eventHandlers = null;
