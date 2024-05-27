@@ -13,6 +13,7 @@ import WorldCreated from './Main/SubStates/WorldCreated';
 import EditWorld from './Main/SubStates/EditWorld';
 import TransferWorld from './Main/SubStates/TransferWorld';
 import ManageWorld from './Main/SubStates/ManageWorld';
+import Section from "./Controls/Section";
 
 
 // Which are the defined & relevant params of the app?
@@ -54,30 +55,32 @@ function MainContent({ contracts, account }) {
     const [newWorldData, setNewWorldData] = useState({});
 
     // Rendering everything.
-    return <MemoryRouter>
-        <Routes>
-            <Route path="/" element={<SelectWorld
-                worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache}
-            />} />
-            <Route path="/create" element={<CreateWorld
-                worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
-                setNewWorldData={setNewWorldData}
-            />} />
-            <Route path="/created/:worldId" element={<WorldCreated
-                worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} newWorldData={newWorldData}
-            />} />
-            <Route path="/edit/:worldId" element={<EditWorld
-                worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
-                setWorldsData={setWorldsDataCache}
-            />} />
-            <Route path="/edit/:worldId/transfer" element={<TransferWorld
-                worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
-            />} />
-            <Route path="/manage/:worldId" element={<ManageWorld
-                worldsManagementContract={worldsManagement}
-            />} />
-        </Routes>
-    </MemoryRouter>;
+    return <Section title="Earnings management" color="primary.light" sx={{marginTop: 4}}>
+        <MemoryRouter>
+            <Routes>
+                <Route path="/" element={<SelectWorld
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache}
+                />} />
+                <Route path="/create" element={<CreateWorld
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
+                    setNewWorldData={setNewWorldData}
+                />} />
+                <Route path="/created/:worldId" element={<WorldCreated
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} newWorldData={newWorldData}
+                />} />
+                <Route path="/edit/:worldId" element={<EditWorld
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
+                    setWorldsData={setWorldsDataCache}
+                />} />
+                <Route path="/edit/:worldId/transfer" element={<TransferWorld
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
+                />} />
+                <Route path="/manage/:worldId" element={<ManageWorld
+                    worldsManagementContract={worldsManagement}
+                />} />
+            </Routes>
+        </MemoryRouter>
+    </Section>;
 }
 
 
