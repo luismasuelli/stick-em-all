@@ -1,6 +1,6 @@
 import {useNavigate} from 'react-router-dom';
 import {Alert, Button, Grid} from "@mui/material";
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import ParamsContext from "../../Contexts/ParamsContext";
 import Label from "../../Controls/Label";
 import TextField from "@mui/material/TextField";
@@ -49,6 +49,7 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
         ).send({value: nativePrice * 110n / 100n, from: account});
         const logs = await getEventLogs(tx, worldsContract);
         const transferLogs = logs.filter(log => log.name === "Transfer" && log.event.to === account);
+        setNewWorldData(currentWorldData);
         if (transferLogs.length) {
             const firstTransferLog = transferLogs[0];
             const tokenId = web3.utils.toBigInt(firstTransferLog.event.tokenId);
@@ -60,6 +61,10 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
             );
         }
     });
+
+    useEffect(() => {
+        setNewWorldData(currentWorldData);
+    }, []);
 
     return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
         <Alert severity="info">

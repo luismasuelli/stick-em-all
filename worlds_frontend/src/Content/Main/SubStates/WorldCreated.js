@@ -4,6 +4,7 @@ import WorldsList from "../Components/WorldsList";
 import ThemedBox from "../../Controls/ThemedBox";
 import {useEffect} from "react";
 import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
+import Box from "@mui/material/Box";
 
 export default function WorldCreated({ worldsList, worldsData, newWorldData }) {
     let {worldId} = useParams();
@@ -25,19 +26,17 @@ export default function WorldCreated({ worldsList, worldsData, newWorldData }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             height: '100%', width: '100%', padding: 2
         }}>
-            <p>The world was successfully created with this id: {worldId.toString()}</p>
-            <p>
-                Name: {newWorldData.name}<br />
-                Description: {newWorldData.description}<br />
-                Logo: {newWorldData.logo}<br />
-                Background: {newWorldData.background}<br />
-                External URL: {newWorldData.externalUrl}<br />
-                Validator URL: {newWorldData.validatorUrl}<br />
-                Earnings Receiver: {newWorldData.earningsReceiver}
-            </p>
-            <p>
-                You'll be properly redirected in 5 seconds...
-            </p>
+            <Box>
+                <p>The world was successfully created with this id: {worldId.toString()}</p>
+                <p>
+                    Name: {newWorldData.name}<br/>
+                    Description: {newWorldData.description}<br/>
+                    Logo: {newWorldData.logo}
+                </p>
+                <p>
+                    You'll be properly redirected in 5 seconds...
+                </p>
+            </Box>
         </ThemedBox>
     </WorldsListEnabledLayout>;
 }
