@@ -7,6 +7,7 @@ import Web3Context from "../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
 import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
 import AddressInput from "../../Controls/AddressInput";
+import Box from "@mui/material/Box";
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -31,17 +32,18 @@ export default function TransferWorld({ worldsList, worldsData, worldsContract }
     });
 
     return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+        <Box sx={{display: 'flex', justifyContent: 'flex-start' , marginBottom: 4}}>
+            <Button variant="contained" color="primary" onClick={() => navigate(`/edit/${worldId.toString()}`)}>&#9664; Back</Button>
+        </Box>
         <Alert severity="warning">
             You're about to transfer the world: {worldId.toString()}. Do this carefully
             since you're about to lose control over this world.
         </Alert>
         <Grid container>
             {/* Name */}
-            <Grid item xs={5}><Label>Target account:</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Target account:</Label></Grid>
+            <Grid item xs={9}>
                 <AddressInput variant="outlined" value={targetAccount} onChange={setTargetAccount} />
-            </Grid>
-            <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={transfer}
                         variant="contained" color="primary" size="large">Transfer</Button>
             </Grid>
