@@ -30,7 +30,7 @@ export default function TransferWorld({ worldsList, worldsData, worldsContract }
         navigate("/");
     });
 
-    return <WorldsListEnabledLayout sx={{height: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+    return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
         <Alert severity="warning">
             You're about to transfer the world: {worldId.toString()}. Do this carefully
             since you're about to lose control over this world.

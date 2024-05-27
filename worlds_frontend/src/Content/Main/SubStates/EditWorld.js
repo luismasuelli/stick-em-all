@@ -31,10 +31,10 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
     useEffect(() => {
         const getWorldData = wrappedCall(async function getWorldData() {
             // 1. Download the world data for the given id.
-            const [
+            const {
                 name, description, logo, background,
                 externalUrl, validatorUrl, earningsReceiver
-            ] = await worldsContract.methods.worlds(worldId).call();
+            } = await worldsContract.methods.worlds(worldId).call();
             let retrievedWorldData = {
                 name, description, logo, background,
                 externalUrl, validatorUrl, earningsReceiver
@@ -78,12 +78,12 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
         await worldsContract.methods.setEarningsReceiver(worldId, earningsReceiver).send({from: account});
     });
 
-    return <WorldsListEnabledLayout sx={{height: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+    return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
         <Alert severity="info">
             You're currently editing the world: {worldId.toString()}. Each field is edited
             individually.
         </Alert>
-        <Grid container>
+        <Grid container sx={{marginTop: 4}}>
             {/* Name */}
             <Grid item xs={5}><Label>Name:</Label></Grid>
             <Grid item xs={7}>
