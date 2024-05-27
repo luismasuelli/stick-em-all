@@ -50,32 +50,51 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
         getWorldData();
     }, [/* Intentionally empty */]);
 
+    const reflectNewWorldData = function(key, value) {
+        setWorldsData({
+            ...worldsData,
+            ...(Object.fromEntries([[worldId, {
+                ...currentWorldData,
+                ...(Object.fromEntries([[
+                    key, value
+                ]]))
+            }]]))
+        });
+    }
+
     const updateName = wrappedCall(async function() {
         await worldsContract.methods.setName(worldId, name).send({from: account});
+        reflectNewWorldData("name", name);
     });
 
     const updateDescription = wrappedCall(async function() {
         await worldsContract.methods.setDescription(worldId, description).send({from: account});
+        reflectNewWorldData("description", description);
     });
 
     const updateLogo = wrappedCall(async function() {
         await worldsContract.methods.setLogo(worldId, logo).send({from: account});
+        reflectNewWorldData("logo", logo);
     });
 
     const updateBackground = wrappedCall(async function() {
         await worldsContract.methods.setBackground(worldId, background).send({from: account});
+        reflectNewWorldData("background", background);
     });
 
     const updateExternalUrl = wrappedCall(async function() {
         await worldsContract.methods.setExternalUrl(worldId, externalUrl).send({from: account});
+        reflectNewWorldData("externalUrl", externalUrl);
     });
 
     const updateValidatorUrl = wrappedCall(async function() {
         await worldsContract.methods.setValidatorUrl(worldId, validatorUrl).send({from: account});
+        reflectNewWorldData("validatorUrl", validatorUrl);
     });
 
     const updateEarningsReceiver = wrappedCall(async function() {
         await worldsContract.methods.setEarningsReceiver(worldId, earningsReceiver).send({from: account});
+        reflectNewWorldData("earningsReceiver", earningsReceiver);
     });
 
     return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
