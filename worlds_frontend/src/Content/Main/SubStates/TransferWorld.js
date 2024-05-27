@@ -12,7 +12,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export default function TransferWorld({ worldsList, worldsData, worldsContract }) {
     let {worldId} = useParams();
-    let {targetAccount, setTargetAccount} = useState("0x0");
+    let [targetAccount, setTargetAccount] = useState("0x0");
     let {wrappedCall} = useContext(ContractWindowContext);
     const navigate = useNavigate();
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};

@@ -10,7 +10,7 @@ import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
 
 export default function EditWorld({ worldsList, worldsData, worldsContract, setWorldsData }) {
     let {worldId} = useParams();
-    let {currentWorldData, setCurrentWorldData} = useState({});
+    let [currentWorldData, setCurrentWorldData] = useState({});
     let {name, setName} = useDerivedState(currentWorldData, setCurrentWorldData, "name");
     let {description, setDescription} = useDerivedState(currentWorldData, setCurrentWorldData, "description");
     let {logo, setLogo} = useDerivedState(currentWorldData, setCurrentWorldData, "logo");
