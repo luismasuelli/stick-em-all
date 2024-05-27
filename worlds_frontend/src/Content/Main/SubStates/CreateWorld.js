@@ -62,7 +62,7 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
     return <WorldsListEnabledLayout sx={{height: "600px"}} worldsList={worldsList} worldsData={worldsData}>
         <Alert severity="info">
             You're about to create a new world. The cost of creating a new world
-            is {usdFromCents(fiatPrice)} (MATIC: {nativePrice}).
+            is {usdFromCents(fiatPrice)} (MATIC: {web3.utils.fromWei(nativePrice, "ether")}).
         </Alert>
         <Grid container>
             {/* Name */}
