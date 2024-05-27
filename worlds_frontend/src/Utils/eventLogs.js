@@ -1,5 +1,7 @@
+import Web3 from "web3";
+
 function decodeLogFromABI(contract, log) {
-    const web3 = contract.getContextObject();
+    const web3 = new Web3(contract.currentProvider);
     const event = contract.options.jsonInterface.find(item => {
         return item.type === 'event' && web3.utils.keccak256(item.signature) === log.topics[0];
     });
@@ -21,7 +23,7 @@ function decodeLogFromABI(contract, log) {
  * @returns The logs (async function).
  */
 export async function getEventLogs(tx, contract) {
-    const web3 = contract.getContextObject();
+    const web3 = new Web3(contract.currentProvider);
     const receipt = await web3.eth.getTransactionReceipt(
         tx.transactionHash
     );

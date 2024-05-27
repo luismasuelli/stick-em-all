@@ -1,3 +1,5 @@
+import Web3 from "web3";
+
 function defaultMutableUpdateState(s, e) {
     s = s || [];
     s.push(e);
@@ -27,7 +29,8 @@ function defaultImmutableUpdateState(s, e) {
  */
 async function processPastEvents(contract, eventNames, updateState, finishState, {lastBlock, lastState}) {
     // First, get initial elements.
-    let web3 = contract.getContextObject();
+    let web3 = new Web3(contract.currentProvider);
+    console.log(web3);
     let startBlock = lastBlock == null ? web3.utils.toBN(0) : lastBlock.add(1);
     let state = lastState;
     updateState = updateState || defaultMutableUpdateState;
@@ -91,7 +94,7 @@ async function processPastEvents(contract, eventNames, updateState, finishState,
  */
 function processFutureEvents(contract, eventNames, updateState, pushState, {lastBlock, lastState}) {
     // First, get interested in the events.
-    let web3 = contract.getContextObject();
+    let web3 = new Web3(contract.currentProvider);
     let events = eventNames.map((en) => contract.events[en]({fromBlock: lastBlock.add(1)}));
     updateState = updateState || defaultImmutableUpdateState;
 
