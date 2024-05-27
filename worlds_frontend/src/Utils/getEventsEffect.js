@@ -131,7 +131,7 @@ function processFutureEvents(contract, eventNames, updateState, pushState, {last
 function getEventsEffect(
     contract, eventNames, prepareInitialState, updateNextState, pushState, checkpoint
 ) {
-    const {lastBlock, lastState} = checkpoint;
+    const {lastBlock, lastState} = checkpoint || {};
     const {updateInitialState, finishInitialState} = prepareInitialState;
     updateNextState = updateNextState || defaultImmutableUpdateState;
 

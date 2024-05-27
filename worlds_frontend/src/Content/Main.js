@@ -35,7 +35,7 @@ function MainContent({ contracts, account }) {
     const {worlds, worldsManagement} = contracts;
 
     // 2. Keeping a track of the worlds cache.
-    const {worldsCache, setWorldsCache} = useState({worldsIndices: {}, worldsRelevance: []});
+    const [worldsCache, setWorldsCache] = useState({worldsIndices: {}, worldsRelevance: []});
     const setWorldsCacheRef = useRef(setWorldsCache);
     setWorldsCacheRef.current = setWorldsCache;
     useEffect(() => {
@@ -46,11 +46,11 @@ function MainContent({ contracts, account }) {
     //    For each world, the cached data is name and description.
     //    Other data appears only on retrieval and must be done in
     //    real-time.
-    const {worldsDataCache, setWorldsDataCache} = useState({});
+    const [worldsDataCache, setWorldsDataCache] = useState({});
 
     // 4. Keeping a track of the data associated to new worlds,
     //    or editing an existing world.
-    const {newWorldData, setNewWorldData} = useState({});
+    const [newWorldData, setNewWorldData] = useState({});
 
     // Rendering everything.
     return <MemoryRouter>
