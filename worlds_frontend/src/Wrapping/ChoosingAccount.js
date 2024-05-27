@@ -1,5 +1,5 @@
 import AccountPicker from "./AccountPicker.js";
-import {useMemo, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import Web3AccountContext from "./Web3AccountContext";
 
 
