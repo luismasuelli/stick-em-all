@@ -3,23 +3,8 @@ const worldsContractABI = [
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_economy",
+                "name": "_params",
                 "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_coordinator",
-                "type": "address"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "_keyHash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_subscriptionId",
-                "type": "uint256"
             }
         ],
         "stateMutability": "nonpayable",
@@ -29,42 +14,103 @@ const worldsContractABI = [
         "inputs": [
             {
                 "internalType": "address",
-                "name": "have",
+                "name": "sender",
                 "type": "address"
             },
             {
-                "internalType": "address",
-                "name": "want",
-                "type": "address"
-            }
-        ],
-        "name": "OnlyCoordinatorCanFulfill",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "have",
-                "type": "address"
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
             },
             {
                 "internalType": "address",
                 "name": "owner",
                 "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "coordinator",
-                "type": "address"
             }
         ],
-        "name": "OnlyOwnerOrCoordinator",
+        "name": "ERC721IncorrectOwner",
         "type": "error"
     },
     {
-        "inputs": [],
-        "name": "ZeroAddress",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "ERC721InsufficientApproval",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "approver",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidApprover",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidOperator",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidReceiver",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            }
+        ],
+        "name": "ERC721InvalidSender",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "ERC721NonexistentToken",
         "type": "error"
     },
     {
@@ -72,31 +118,49 @@ const worldsContractABI = [
         "inputs": [
             {
                 "indexed": true,
-                "internalType": "uint256",
-                "name": "albumId",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
             },
             {
                 "indexed": true,
-                "internalType": "uint16",
-                "name": "achievementId",
-                "type": "uint16"
+                "internalType": "address",
+                "name": "approved",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
             }
         ],
-        "name": "Achievement",
+        "name": "Approval",
         "type": "event"
     },
     {
         "anonymous": false,
         "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
             {
                 "indexed": false,
-                "internalType": "address",
-                "name": "vrfCoordinator",
-                "type": "address"
+                "internalType": "bool",
+                "name": "approved",
+                "type": "bool"
             }
         ],
-        "name": "CoordinatorSet",
+        "name": "ApprovalForAll",
         "type": "event"
     },
     {
@@ -113,9 +177,15 @@ const worldsContractABI = [
                 "internalType": "address",
                 "name": "to",
                 "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
             }
         ],
-        "name": "OwnershipTransferRequested",
+        "name": "Transfer",
         "type": "event"
     },
     {
@@ -123,149 +193,71 @@ const worldsContractABI = [
         "inputs": [
             {
                 "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
+                "internalType": "uint256",
+                "name": "worldId",
+                "type": "uint256"
             },
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "to",
+                "name": "who",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "allowed",
+                "type": "bool"
             }
         ],
-        "name": "OwnershipTransferred",
+        "name": "WorldEditionAllowanceChanged",
         "type": "event"
     },
     {
-        "inputs": [],
-        "name": "acceptOwnership",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "_isWorldEditionAllowed",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "approve",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "achieved",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "albumInstances",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "pastedStickers",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "completedPages",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bool",
-                "name": "completed",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "economy",
-        "outputs": [
-            {
-                "internalType": "contract StickEmAllEconomy",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_albumTypeId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint16",
-                "name": "_ruleId",
-                "type": "uint16"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "getBoosterPackFiatPrice",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_albumTypeId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint16",
-                "name": "_ruleId",
-                "type": "uint16"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "getBoosterPackNativePrice",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -274,26 +266,14 @@ const worldsContractABI = [
                 "internalType": "address",
                 "name": "owner",
                 "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_boosterPackAssetId",
-                "type": "uint256"
             }
         ],
-        "name": "openBoosterPack",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "owner",
+        "name": "balanceOf",
         "outputs": [
             {
-                "internalType": "address",
+                "internalType": "uint256",
                 "name": "",
-                "type": "address"
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -302,70 +282,22 @@ const worldsContractABI = [
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
             },
             {
-                "internalType": "uint16",
-                "name": "",
-                "type": "uint16"
-            }
-        ],
-        "name": "pastedStickers",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
+                "internalType": "string",
+                "name": "_description",
+                "type": "string"
             },
             {
-                "internalType": "uint16",
-                "name": "",
-                "type": "uint16"
+                "internalType": "string",
+                "name": "_logo",
+                "type": "string"
             }
         ],
-        "name": "pastedStickersCount",
-        "outputs": [
-            {
-                "internalType": "uint16",
-                "name": "",
-                "type": "uint16"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_albumTypeId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint16",
-                "name": "_ruleId",
-                "type": "uint16"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "purchaseBoosterPacks",
+        "name": "createWorld",
         "outputs": [],
         "stateMutability": "payable",
         "type": "function"
@@ -374,26 +306,131 @@ const worldsContractABI = [
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "requestId",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getApproved",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "_param",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "getNativeCost",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            }
+        ],
+        "name": "isApprovedForAll",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
                 "type": "uint256"
             },
             {
-                "internalType": "uint256[]",
-                "name": "randomWords",
-                "type": "uint256[]"
+                "internalType": "address",
+                "name": "_who",
+                "type": "address"
             }
         ],
-        "name": "rawFulfillRandomWords",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "name": "isWorldEditionAllowed",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
         "inputs": [],
-        "name": "s_vrfCoordinator",
+        "name": "name",
         "outputs": [
             {
-                "internalType": "contract IVRFCoordinatorV2Plus",
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "ownerOf",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "params",
+        "outputs": [
+            {
+                "internalType": "contract StickEmAllParams",
                 "name": "",
                 "type": "address"
             }
@@ -405,29 +442,21 @@ const worldsContractABI = [
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_vrfCoordinator",
+                "name": "from",
                 "type": "address"
-            }
-        ],
-        "name": "setCoordinator",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
+            },
             {
-                "internalType": "uint256",
-                "name": "_albumId",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
             },
             {
                 "internalType": "uint256",
-                "name": "_stickerId",
+                "name": "tokenId",
                 "type": "uint256"
             }
         ],
-        "name": "stick",
+        "name": "safeTransferFrom",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -436,22 +465,314 @@ const worldsContractABI = [
         "inputs": [
             {
                 "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "to",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
             }
         ],
-        "name": "transferOwnership",
+        "name": "safeTransferFrom",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "worldsManagement",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "approved",
+                "type": "bool"
+            }
+        ],
+        "name": "setApprovalForAll",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_value",
+                "type": "string"
+            }
+        ],
+        "name": "setBackground",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_value",
+                "type": "string"
+            }
+        ],
+        "name": "setDescription",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_earningsReceiver",
+                "type": "address"
+            }
+        ],
+        "name": "setEarningsReceiver",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_value",
+                "type": "string"
+            }
+        ],
+        "name": "setExternalUrl",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_value",
+                "type": "string"
+            }
+        ],
+        "name": "setLogo",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_value",
+                "type": "string"
+            }
+        ],
+        "name": "setName",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_value",
+                "type": "string"
+            }
+        ],
+        "name": "setValidatorUrl",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_worldId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_who",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_allowed",
+                "type": "bool"
+            }
+        ],
+        "name": "setWorldEditionAllowed",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes4",
+                "name": "interfaceId",
+                "type": "bytes4"
+            }
+        ],
+        "name": "supportsInterface",
         "outputs": [
             {
-                "internalType": "contract StickEmAllWorldsManagement",
+                "internalType": "bool",
                 "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "tokenURI",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "transferFrom",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "worlds",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "logo",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "background",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "externalUrl",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "validatorUrl",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "earningsReceiver",
                 "type": "address"
             }
         ],
@@ -1628,6 +1949,7 @@ export default async function worldsContractClients(web3, account) {
         );
         let worldsContractAddress = await worldsManagement.methods.worlds().call();
         let worlds = new web3.eth.Contract(worldsContractABI, worldsContractAddress);
+        console.log("Worlds' methods:", worlds.methods);
         let paramsContractAddress = await worlds.methods.params().call();
         let params = new web3.eth.Contract(paramsContractABI, paramsContractAddress);
         return {
