@@ -36,9 +36,9 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
     const fiatPrice = paramsContext.paramsData.fiatCosts[worldDefinitionHash];
     const nativePrice = paramsContext.paramsData.nativeCosts[worldDefinitionHash];
     let [currentWorldData, setCurrentWorldData] = useState({});
-    let {name, setName} = useDerivedState(currentWorldData, setCurrentWorldData, "name");
-    let {description, setDescription} = useDerivedState(currentWorldData, setCurrentWorldData, "description");
-    let {logo, setLogo} = useDerivedState(currentWorldData, setCurrentWorldData, "logo");
+    let [name, setName] = useDerivedState(currentWorldData, setCurrentWorldData, "name");
+    let [description, setDescription] = useDerivedState(currentWorldData, setCurrentWorldData, "description");
+    let [logo, setLogo] = useDerivedState(currentWorldData, setCurrentWorldData, "logo");
     let {wrappedCall} = useContext(ContractWindowContext);
 
     const createWorld = wrappedCall(async function() {

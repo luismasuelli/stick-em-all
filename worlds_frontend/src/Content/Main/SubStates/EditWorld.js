@@ -11,13 +11,13 @@ import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
 export default function EditWorld({ worldsList, worldsData, worldsContract, setWorldsData }) {
     let {worldId} = useParams();
     let [currentWorldData, setCurrentWorldData] = useState({});
-    let {name, setName} = useDerivedState(currentWorldData, setCurrentWorldData, "name");
-    let {description, setDescription} = useDerivedState(currentWorldData, setCurrentWorldData, "description");
-    let {logo, setLogo} = useDerivedState(currentWorldData, setCurrentWorldData, "logo");
-    let {background, setBackground} = useDerivedState(currentWorldData, setCurrentWorldData, "background");
-    let {externalUrl, setExternalUrl} = useDerivedState(currentWorldData, setCurrentWorldData, "externalUrl");
-    let {validatorUrl, setValidatorUrl} = useDerivedState(currentWorldData, setCurrentWorldData, "validatorUrl");
-    let {earningsReceiver, setEarningsReceiver} = useDerivedState(
+    let [name, setName] = useDerivedState(currentWorldData, setCurrentWorldData, "name");
+    let [description, setDescription] = useDerivedState(currentWorldData, setCurrentWorldData, "description");
+    let [logo, setLogo] = useDerivedState(currentWorldData, setCurrentWorldData, "logo");
+    let [background, setBackground] = useDerivedState(currentWorldData, setCurrentWorldData, "background");
+    let [externalUrl, setExternalUrl] = useDerivedState(currentWorldData, setCurrentWorldData, "externalUrl");
+    let [validatorUrl, setValidatorUrl] = useDerivedState(currentWorldData, setCurrentWorldData, "validatorUrl");
+    let [earningsReceiver, setEarningsReceiver] = useDerivedState(
         currentWorldData, setCurrentWorldData, "earningsReceiver"
     );
     let {wrappedCall} = useContext(ContractWindowContext);
