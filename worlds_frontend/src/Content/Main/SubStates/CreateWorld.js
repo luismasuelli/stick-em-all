@@ -47,7 +47,7 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
         const tx = await worldsContract.methods.createWorld(
             name, description, logo
         ).send({value: nativePrice * 110n / 100n, from: account});
-        const logs = await getEventLogs(tx);
+        const logs = await getEventLogs(tx, worldsContract);
         const transferLogs = logs.filter(log => log.name === "Transfer" && log.event.to === account);
         if (transferLogs.length) {
             const firstTransferLog = transferLogs[0];
