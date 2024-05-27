@@ -14,6 +14,10 @@ import ThemedBox from "../../Controls/ThemedBox";
 export default function WorldsList({ worldsList, worldsData }) {
     const navigate = useNavigate();
 
+    function handleClick(worldId) {
+        navigate("/edit/" + worldId.toString());
+    }
+
     return <Box
         sx={{
             height: '100%',   // Use 100% of the parent height
@@ -22,7 +26,8 @@ export default function WorldsList({ worldsList, worldsData }) {
         }}
     >
         {worldsList.length ? worldsList.filter(world => (world.owner || world.allowed)).map((world, index) => (
-            <ThemedBox key={index} style={{padding: 1}} severity={world.owner ? "success" : "info"}>
+            <ThemedBox key={index} style={{padding: 1}} severity={world.owner ? "success" : "info"}
+                       onClick={() => handleClick(world.worldId)}>
                 <h3 style={{textOverflow: "ellipsis"}}>ID: {world.worldId}</h3>
                 {(worldsData[world.worldId]) ? (
                     <p style={{textOverflow: "ellipsis"}}>worldsData[world.worldId].name</p>
