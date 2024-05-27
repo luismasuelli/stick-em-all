@@ -1,4 +1,4 @@
-import {useParams} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Button, Grid} from "@mui/material";
 import React, {useContext, useEffect, useState} from "react";
 import ContractWindowContext from "../../Contexts/ContractWindowContext";
@@ -9,9 +9,11 @@ import AddressInput from "../../Controls/AddressInput";
 import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
 import Web3Context from "../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
+import Box from "@mui/material/Box";
 
 export default function EditWorld({ worldsList, worldsData, worldsContract, setWorldsData }) {
     let {worldId} = useParams();
+    const navigate = useNavigate();
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
     const {account} = context;
     let [currentWorldData, setCurrentWorldData] = useState({
@@ -98,71 +100,62 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
     });
 
     return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+        <Box sx={{display: 'flex', justifyContent: 'space-between', marginBottom: 4}}>
+            <Button variant="contained" color="primary" onClick={() => navigate("/")}>&#9664; Back</Button>
+            <Button variant="contained" color="primary"
+                    onClick={() => {navigate(`/edit/${worldId.toString()}/transfer`)}}>Transfer &#9654;</Button>
+        </Box>
         <Alert severity="info">
             You're currently editing the world: {worldId.toString()}. Each field is edited
             individually.
         </Alert>
         <Grid container sx={{marginTop: 4}}>
             {/* Name */}
-            <Grid item xs={5}><Label>Name:</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Name:</Label></Grid>
+            <Grid item xs={9}>
                 <TextField variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
-            </Grid>
-            <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateName}
                         variant="contained" color="primary" size="large">Update</Button>
             </Grid>
             {/* Description */}
-            <Grid item xs={5}><Label>Description:</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Description:</Label></Grid>
+            <Grid item xs={9}>
                 <TextField variant="outlined" value={description} onChange={(e) => setDescription(e.target.value)} />
-            </Grid>
-            <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateDescription}
                         variant="contained" color="primary" size="large">Update</Button>
             </Grid>
             {/* Logo */}
-            <Grid item xs={5}><Label>Logo (URL):</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Logo (URL):</Label></Grid>
+            <Grid item xs={9}>
                 <TextField variant="outlined" value={logo} onChange={(e) => setLogo(e.target.value)} />
-            </Grid>
-            <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateLogo}
                         variant="contained" color="primary" size="large">Update</Button>
             </Grid>
             {/* Background */}
-            <Grid item xs={5}><Label>Background (URL):</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Background (URL):</Label></Grid>
+            <Grid item xs={9}>
                 <TextField variant="outlined" value={background} onChange={(e) => setBackground(e.target.value)} />
-            </Grid>
-            <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateBackground}
                         variant="contained" color="primary" size="large">Update</Button>
             </Grid>
             {/* External URL */}
-            <Grid item xs={5}><Label>External URL:</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>External URL:</Label></Grid>
+            <Grid item xs={9}>
                 <TextField variant="outlined" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)} />
-            </Grid>
-            <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateExternalUrl}
                         variant="contained" color="primary" size="large">Update</Button>
             </Grid>
             {/* Validator URL */}
-            <Grid item xs={5}><Label>Validator URL:</Label></Grid>
-            <Grid item xs={7}>
-                <TextField variant="outlined" value={validatorUrl} onChange={setValidatorUrl} />
-            </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={3}><Label>Validator URL:</Label></Grid>
+            <Grid item xs={9}>
+                <TextField variant="outlined" value={validatorUrl} onChange={(e) => setValidatorUrl(e.target.value)} />
                 <Button disabled={!worldsContract} onClick={updateValidatorUrl}
                         variant="contained" color="primary" size="large">Update</Button>
             </Grid>
             {/* Earnings Receiver */}
-            <Grid item xs={5}><Label>Earnings Receiver:</Label></Grid>
-            <Grid item xs={7}>
+            <Grid item xs={3}><Label>Earnings Receiver:</Label></Grid>
+            <Grid item xs={9}>
                 <AddressInput value={earningsReceiver} onChange={setEarningsReceiver} />
-            </Grid>
-            <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={updateEarningsReceiver}
                         variant="contained" color="primary" size="large">Update</Button>
             </Grid>
