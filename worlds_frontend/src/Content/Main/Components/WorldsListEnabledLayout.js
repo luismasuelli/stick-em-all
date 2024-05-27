@@ -7,13 +7,13 @@ export default function WorldsListEnabledLayout({ worldsList, worldsData, childr
     const navigate = useNavigate();
 
     return <Grid container {...props} sx={{...(sx||{}), display: 'flex', alignItems: 'stretch'}}>
-        <Grid item xs={4} sx={{display: 'flex', flexDirection: 'column'}}>
+        <Grid item xs={4} sx={{display: 'flex', flexDirection: 'column', padding: 2}}>
             <WorldsList worldsList={worldsList} worldsData={worldsData} sx={{ flexGrow: 1, overflow: 'auto' }} />
             <Button onClick={() => navigate("/create")} variant="contained" color="primary" size="large">
                 Create
             </Button>
         </Grid>
-        <Grid item xs={8} sx={{display: 'flex', flexDirection: 'column'}}>
+        <Grid item xs={8} sx={{display: 'flex', flexDirection: 'column', padding: 2}}>
             {children}
         </Grid>
     </Grid>;
