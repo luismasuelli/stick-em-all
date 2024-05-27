@@ -3,10 +3,10 @@ import {Alert, Button, Grid} from "@mui/material";
 import React, {useContext, useState} from "react";
 import ContractWindowContext from "../../Contexts/ContractWindowContext";
 import Label from "../../Controls/Label";
-import TextField from "@mui/material/TextField";
 import Web3Context from "../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
 import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
+import AddressInput from "../../Controls/AddressInput";
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -39,7 +39,7 @@ export default function TransferWorld({ worldsList, worldsData, worldsContract }
             {/* Name */}
             <Grid item xs={5}><Label>Target account:</Label></Grid>
             <Grid item xs={7}>
-                <TextField variant="outlined" value={targetAccount} onChange={setTargetAccount} />
+                <AddressInput variant="outlined" value={targetAccount} onChange={setTargetAccount} />
             </Grid>
             <Grid item xs={12}>
                 <Button disabled={!worldsContract} onClick={transfer}
