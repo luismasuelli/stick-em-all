@@ -24,7 +24,8 @@ export default function WorldsList({ worldsList, worldsData, ...props }) {
     return <Box sx={{
         height: '100%',   // Use 100% of the parent height
         width: '100%',    // Use 100% of the parent width
-        overflowY: 'auto' // Show vertical scrollbar when needed
+        overflowY: 'auto', // Show vertical scrollbar when needed
+        flexGrow: 1
     }}>
         {worldsList.length ? worldsList.map((world, index) => (
             <ThemedBox key={index} {...props} severity={world.owned ? "success" : "info"}

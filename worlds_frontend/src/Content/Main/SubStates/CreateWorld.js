@@ -10,6 +10,7 @@ import Web3Context from "../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
 import {getEventLogs} from "../../../Utils/eventLogs";
 import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
+import Box from "@mui/material/Box";
 
 
 function usdFromCents(v) {
@@ -66,7 +67,10 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
         setNewWorldData(currentWorldData);
     }, []);
 
-    return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+    return <WorldsListEnabledLayout worldsList={worldsList} worldsData={worldsData}>
+        <Box sx={{display: 'flex', justifyContent: 'start', marginBottom: 4}}>
+            <Button variant="contained" color="primary" onClick={() => navigate("/")}>&#9664; Back</Button>
+        </Box>
         <Alert severity="info">
             You're about to create a new world. The cost of creating a new world
             is {usdFromCents(fiatPrice)} (MATIC: {web3.utils.fromWei(nativePrice, "ether")}).

@@ -48,7 +48,7 @@ export default function TransferWorld({ worldsList, worldsData, worldsContract }
         ).send({from: account});
     });
 
-    return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+    return <WorldsListEnabledLayout worldsList={worldsList} worldsData={worldsData}>
         <Box sx={{display: 'flex', justifyContent: 'flex-start' , marginBottom: 4}}>
             <Button variant="contained" color="primary" onClick={() => navigate(`/edit/${worldId.toString()}`)}>&#9664; Back</Button>
         </Box>

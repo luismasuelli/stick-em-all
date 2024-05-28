@@ -99,7 +99,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
         reflectNewWorldData("earningsReceiver", earningsReceiver);
     });
 
-    return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+    return <WorldsListEnabledLayout worldsList={worldsList} worldsData={worldsData}>
         <Box sx={{display: 'flex', justifyContent: 'space-between', marginBottom: 4}}>
             <Button variant="contained" color="primary" onClick={() => navigate("/")}>&#9664; Back</Button>
             <Button variant="contained" color="primary"

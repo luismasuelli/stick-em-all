@@ -21,7 +21,7 @@ export default function WorldCreated({ worldsList, worldsData, newWorldData }) {
         };
     }, [worldId, newWorldData, navigate]);
 
-    return <WorldsListEnabledLayout sx={{minHeight: "600px"}} worldsList={worldsList} worldsData={worldsData}>
+    return <WorldsListEnabledLayout worldsList={worldsList} worldsData={worldsData}>
         <ThemedBox severity="none" sx={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             height: '100%', width: '100%', padding: 2
