@@ -62,8 +62,14 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
             }
         }
 
+        function setChecksumAccounts(accounts) {
+            setAccounts(accounts.map((account) => {
+                return web3_.utils.toChecksumAddress(account);
+            }));
+        }
+
         // Link the events of data update.
-        ethereum.on('accountsChanged', setAccounts);
+        ethereum.on('accountsChanged', setChecksumAccounts);
         ethereum.on('chainChanged', onChainIdChanged);
 
         // Finally, get the initial data for chainId and accounts.
@@ -93,7 +99,7 @@ const Wrapper = ({ expectedChainId, expectedChainName, children }) => {
         });
 
         return () => {
-            ethereum.off('accountsChanged', setAccounts);
+            ethereum.off('accountsChanged', setChecksumAccounts);
             ethereum.off('chainChanged', onChainIdChanged);
         };
     }, [expectedChainName, expectedChainId]);
