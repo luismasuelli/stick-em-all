@@ -36,11 +36,16 @@ function MainContent({ contracts, account }) {
     const {worlds, worldsManagement} = contracts;
 
     // 2. Keeping a track of the worlds cache.
-    const [worldsCache, setWorldsCache] = useState({lastBlock: 0n, lastState: {worldsIndices: {}, worldsRelevance: []}});
+    const [worldsCache, setWorldsCache] = useState(
+        {lastBlock: null, lastState: {worldsIndices: {}, worldsRelevance: []}}
+    );
     const setWorldsCacheRef = useRef(setWorldsCache);
     setWorldsCacheRef.current = setWorldsCache;
     useEffect(() => {
-        return worldsEventsEffect(worlds, worldsCache, setWorldsCacheRef, account);
+        return worldsEventsEffect(
+            worlds, {lastBlock: null, lastState: {worldsIndices: {}, worldsRelevance: []}},
+            setWorldsCacheRef, account
+        );
     }, [worlds, setWorldsCacheRef, account]);
 
     // 3. Keeping a track of the data associated to worlds.
