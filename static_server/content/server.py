@@ -9,10 +9,14 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         super().end_headers()
 
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.end_headers()
+
 def run_server(port, bind):
     Handler = CORSRequestHandler
     with socketserver.TCPServer((bind, port), Handler) as httpd:
-        print(f"Serving on {bind} port {port}")
+        print(f"Serving on {bind}:{port}")
         httpd.serve_forever()
 
 if __name__ == "__main__":
