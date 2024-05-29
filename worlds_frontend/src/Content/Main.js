@@ -12,7 +12,10 @@ import CreateWorld from './Main/SubStates/CreateWorld';
 import WorldCreated from './Main/SubStates/WorldCreated';
 import EditWorld from './Main/SubStates/EditWorld';
 import TransferWorld from './Main/SubStates/TransferWorld';
-import ManageWorld from './Main/SubStates/ManageWorld';
+import SelectAlbum from './Main/SubStates/Management/SelectAlbum';
+import CreateAlbum from './Main/SubStates/Management/CreateAlbum';
+import EditAlbum from './Main/SubStates/Management/EditAlbum';
+import EditAlbumPage from './Main/SubStates/Management/EditAlbumPage';
 import Section from "./Controls/Section";
 
 
@@ -79,7 +82,16 @@ function MainContent({ contracts, account }) {
                 <Route path="/edit/:worldId/transfer" element={<TransferWorld
                     worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
                 />} />
-                <Route path="/manage/:worldId" element={<ManageWorld
+                <Route path="/manage/:worldId" element={<SelectAlbum
+                    worldsManagementContract={worldsManagement}
+                />} />
+                <Route path="/manage/:worldId/create" element={<CreateAlbum
+                    worldsManagementContract={worldsManagement}
+                />} />
+                <Route path="/manage/:worldId/edit/:albumId" element={<EditAlbum
+                    worldsManagementContract={worldsManagement}
+                />} />
+                <Route path="/manage/:worldId/edit/:albumId/:pageId" element={<EditAlbumPage
                     worldsManagementContract={worldsManagement}
                 />} />
             </Routes>
