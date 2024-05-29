@@ -11,6 +11,7 @@ import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
 import {getEventLogs} from "../../../Utils/eventLogs";
 import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
 import Box from "@mui/material/Box";
+import {ImagePreview} from "../../Controls/ImagePreview";
 
 
 function usdFromCents(v) {
@@ -90,6 +91,7 @@ export default function CreateWorld({ worldsList, worldsData, worldsContract, se
             <Grid item xs={3}><Label>Logo (URL):</Label></Grid>
             <Grid item xs={9}>
                 <TextField variant="outlined" value={logo} onChange={(e) => setLogo(e.target.value)} />
+                <ImagePreview aspectRatio="1 / 1" cover={true} url={logo} style={{maxWidth: "400px"}} />
             </Grid>
             {/* Button */}
             <Grid item xs={12}>
