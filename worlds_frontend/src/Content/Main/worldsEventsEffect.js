@@ -117,7 +117,11 @@ export default function worldsEventsEffect(worlds, worldsCache, setWorldsCacheRe
     let prepareInitialState = {updateInitialState, finishInitialState};
 
     return getEventsEffect(
-        worlds, ["Transfer", "WorldEditionAllowanceChanged"], prepareInitialState,
+        worlds, [
+            {name: "Transfer", filter: {from: account}},
+            {name: "Transfer", filter: {to: account}},
+            {name: "WorldEditionAllowanceChanged", filter: {who: account}}
+        ], prepareInitialState,
         updateNextState, setWorldsCacheRef.current, worldsCache
     );
 }
