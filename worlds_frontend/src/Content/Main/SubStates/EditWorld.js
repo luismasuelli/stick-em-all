@@ -10,6 +10,8 @@ import WorldsListEnabledLayout from "../Components/WorldsListEnabledLayout";
 import Web3Context from "../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
 import Box from "@mui/material/Box";
+import {ImagePreview} from "../../Controls/ImagePreview";
+import {ReverseChallenge} from "../../Controls/ReverseChallenge";
 
 export default function EditWorld({ worldsList, worldsData, worldsContract, setWorldsData }) {
     let {worldId} = useParams();
@@ -130,6 +132,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
                 <TextField variant="outlined" value={logo} onChange={(e) => setLogo(e.target.value)} />
                 <Button disabled={!worldsContract} onClick={updateLogo}
                         variant="contained" color="primary" size="large">Update</Button>
+                <ImagePreview aspectRatio="1 / 1" cover={true} url={logo} style={{maxWidth: "400px", display: "block"}} />
             </Grid>
             {/* Background */}
             <Grid item xs={3}><Label>Background (URL):</Label></Grid>
@@ -137,6 +140,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
                 <TextField variant="outlined" value={background} onChange={(e) => setBackground(e.target.value)} />
                 <Button disabled={!worldsContract} onClick={updateBackground}
                         variant="contained" color="primary" size="large">Update</Button>
+                <ImagePreview aspectRatio="16 / 9" cover={true} url={background} style={{maxWidth: "800px", display: "block"}} />
             </Grid>
             {/* External URL */}
             <Grid item xs={3}><Label>External URL:</Label></Grid>
@@ -151,6 +155,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
                 <TextField variant="outlined" value={validatorUrl} onChange={(e) => setValidatorUrl(e.target.value)} />
                 <Button disabled={!worldsContract} onClick={updateValidatorUrl}
                         variant="contained" color="primary" size="large">Update</Button>
+                <ReverseChallenge worldId={worldId} validatorUrl={validatorUrl} externalUrl={externalUrl} />
             </Grid>
             {/* Earnings Receiver */}
             <Grid item xs={3}><Label>Earnings Receiver:</Label></Grid>
