@@ -33,3 +33,13 @@ See [the instructions](params_frontend/README.md) to mount or build the applicat
 
 When building the application for distribution, the ideal scenario involves serving it as a whole
 directory through a static HTTP server or using an IPFS pinning service.
+
+### Worlds
+
+This is a React project holding an application that allows users defining and maintaining the
+worlds (and defining/maintaining associated albums and booster packs).
+
+See [the instructions](worlds_frontend/README.md) to mount or build the application.
+
+When building the application for distribution, the ideal scenario involves serving it as a whole
+directory through a static HTTP server or using an IPFS pinning service.
