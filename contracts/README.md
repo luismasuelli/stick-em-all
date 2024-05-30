@@ -164,7 +164,7 @@ Additionally, curl must also be present in the system. So, having both curl and 
 this one to configure the tunnel:
 
 ```shell
-curl https://tunnel.pyjam.as/8545 > ~/sta-contracts-tunnel.conf
+curl https://tunnel.pyjam.as/8545 > ~/statunnel.conf
 ```
 
 Then just see the contents (e.g. using `cat`) and keep it for yourself, save for the URL you'll see. The URL
@@ -175,12 +175,38 @@ Keep this file forever, and use that URL as the wallet's RPC URL.
 Then, the commands to start / stop the tunnel is:
 
 ```shell
-# Start
-wg-quick up ~/sta-contracts-tunnel.conf
+# Start (will ask for administrative password)
+wg-quick up ~/statunnel.conf
 
-# Stop
-wg-quick up ~/sta-contracts-tunnel.conf
+# Stop (will ask for administrative password)
+wg-quick up ~/statunnel.conf
+
+# Show all the existing tunnels.
+sudo wg show
 ```
+
+There are some things however to consider:
+
+1. The name of the file must be 15 characters or less, end in ".conf", and consist only of letters/numbers.
+2. Do NOT rename the file or, at least, do not use the same file twice for different tunnels.
+   1. If you start the tunnel and then rename the file, you'll not be able to stop the tunnel later.
+   2. Also, you'll not be able to launch the tunnel with a new name in the meantime.
+   3. This is because the virtual IP address is already used in the other tunnel. You'll get errors like this:
+
+      ```shell
+      [#] ip link add statunnel type wireguard
+      [#] wg setconf statunnel /dev/fd/63
+      [#] ip -4 address add 10.101.0.35/32 dev statunnel
+      [#] ip link set mtu 1420 up dev statunnel
+      [#] ip -4 route add 10.101.0.1/32 dev statunnel
+      RTNETLINK answers: File exists
+      [#] ip link delete dev statunnel
+      ```
+      
+      The "File exists" error means exactly this. So, you use `wg show` and then rename your file to the name
+      of the tunnel you want to close, and then use `wg-quick down <the file>`.
+3. Always use absolute paths when specifying the file.
+
 
 ### Other alternatives
 
