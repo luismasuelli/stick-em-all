@@ -144,3 +144,31 @@ If you're the responsible for deploying the contract on testnet or mainnet, ensu
 main contract and add it as a valid consumer to your VRF subscription. Otherwise, the VRF calls will fail.
 
 This is not needed (and cannot be done) for your local network.
+
+## Alternatives to ngrok
+
+It might happen that you run out of bandwidth when using ngrok to expose your wallet. In this case, and if you
+don't want to purchase any license, you can try different services. Some instructions will be given here:
+
+### localtonet.com
+
+The process is similar to ngrok:
+
+1. Register your account (it has a free plan).
+2. Log-in, obtain a free API key, and create a random subdomain and http tunnel in the dashboard.
+3. Download the localtonet application (for Windows, it has an installer; for Linux systems, it has an executable
+   which you should place in a reachable place like /usr/local/bin).
+4. Run the localtonet application (it will ask you for the token, so copy it from what you did in step 2).
+5. Go to your dashboard and START the tunnel.
+
+Then, take the fully qualified subdomain name and use it as the RPC URL in your wallet.
+
+Otherwise, using this endpoint is the same.
+
+### Why not locally mounting an HTTPS-enabled server?
+
+Because you'll otherwise have to handle self-signed certificates and for sure even developers try to avoid that
+as much as possible - this will be even worse for the non-dev people.
+
+However, if you feel you can deal with the hassle... then try it: See how to create certificates and mount a local
+nginx with https support proxying your localhost:8545 and good luck. But it is harder than it sounds.
