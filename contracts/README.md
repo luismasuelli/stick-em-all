@@ -150,20 +150,42 @@ This is not needed (and cannot be done) for your local network.
 It might happen that you run out of bandwidth when using ngrok to expose your wallet. In this case, and if you
 don't want to purchase any license, you can try different services. Some instructions will be given here:
 
-### localtonet.com
+### tunnel.pyjam.as
 
-The process is similar to ngrok:
+This service is free, and I'm not sure about the quotas, but it requires an OS having WireGuard installed.
 
-1. Register your account (it has a free plan).
-2. Log-in, obtain a free API key, and create a random subdomain and http tunnel in the dashboard.
-3. Download the localtonet application (for Windows, it has an installer; for Linux systems, it has an executable
-   which you should place in a reachable place like /usr/local/bin).
-4. Run the localtonet application (it will ask you for the token, so copy it from what you did in step 2).
-5. Go to your dashboard and START the tunnel.
+Ubuntu systems can install wireguard with:
 
-Then, take the fully qualified subdomain name and use it as the RPC URL in your wallet.
+```shell
+sudo apt install wireguard-tools
+```
 
-Otherwise, using this endpoint is the same.
+Additionally, curl must also be present in the system. So, having both curl and wg-quick, run commands like
+this one to configure the tunnel:
+
+```shell
+curl https://tunnel.pyjam.as/8545 > ~/sta-contracts-tunnel.conf
+```
+
+Then just see the contents (e.g. using `cat`) and keep it for yourself, save for the URL you'll see. The URL
+looks like this: https://qr6yab.tunnel.pyjam.as/. This URL is generated due to the public key therein.
+
+Keep this file forever, and use that URL as the wallet's RPC URL.
+
+Then, the commands to start / stop the tunnel is:
+
+```shell
+# Start
+wg-quick up ~/sta-contracts-tunnel.conf
+
+# Stop
+wg-quick up ~/sta-contracts-tunnel.conf
+```
+
+### Other alternatives
+
+Check [these](https://github.com/anderspitman/awesome-tunneling?tab=readme-ov-file) on your own. They might
+be quite technical, depending.
 
 ### Why not locally mounting an HTTPS-enabled server?
 
