@@ -3,7 +3,7 @@ import ErrorNotification from "./Errors/ErrorNotification";
 import Wrapper from "./Wrapping/Wrapper";
 // import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Main from "./Content/Main";
-import {useRef, useState} from "react";
+import {StrictMode, useRef, useState} from "react";
 import ProgressDialog from "./Progress/ProgressDialog";
 
 function App() {
@@ -19,13 +19,15 @@ function App() {
     const errorDialogRef = useRef(null);
 
     return (
-        <ErrorLauncherContext.Provider value={errorDialogRef}>
-            <ErrorNotification ref={errorDialogRef} setInProgress={setInProgress} />
-            <Wrapper expectedChainId={chainId} expectedChainName={chainName}>
-                <Main />
-            </Wrapper>
-            <ProgressDialog open={inProgress} />
-        </ErrorLauncherContext.Provider>
+        <StrictMode>
+            <ErrorLauncherContext.Provider value={errorDialogRef}>
+                <ErrorNotification ref={errorDialogRef} setInProgress={setInProgress} />
+                <Wrapper expectedChainId={chainId} expectedChainName={chainName}>
+                    <Main />
+                </Wrapper>
+                <ProgressDialog open={inProgress} />
+            </ErrorLauncherContext.Provider>
+        </StrictMode>
     );
 }
 
