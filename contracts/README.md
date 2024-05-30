@@ -150,6 +150,35 @@ This is not needed (and cannot be done) for your local network.
 It might happen that you run out of bandwidth when using ngrok to expose your wallet. In this case, and if you
 don't want to purchase any license, you can try different services. Some instructions will be given here:
 
+### LocalXpose
+
+Go to [localxpose](https://localxpose.io), create an account, validate the e-mail address and log in.
+
+1. There, in the dashboard, go to the "Access" section and copy your "Access Token". You'll use it later.
+2. In the same section, download the client (it supports many OSs and architectures) and install it.
+3. After installing it, open a terminal and run this command:
+
+   ```shell
+   loclx account login
+   ```
+   
+   It will prompt you to paste the access token from step 1.
+4. Run this command to start the tunnel manager:
+
+   ```shell
+   loclx
+   ```
+
+   It will open a page and prompt you to set up a new tunnel. So click on "Add new tunnel" and set:
+   1. Type: HTTP
+   2. Region: Whatever. I use US.
+   3. Name: Whatever. I use hardhat.
+   4. Local service: localhost:8545.
+   5. Domain: Leave it empty. You'll not be able unless you use a paid account.
+   6. Accept, and you'll see the tunnel just created. Copy its URL and use it as RPC URL in your wallet.
+      - **CAVEATS**: EVERY TIME you start your loclx client and their tunnels, you'll have to update the domain.
+      - This is because it is served with random domains everytime, and not a fixed one.
+
 ### tunnel.pyjam.as
 
 This service is free, and I'm not sure about the quotas, but it requires an OS having WireGuard installed.
