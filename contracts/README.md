@@ -20,41 +20,12 @@ Run this command in a shell:
 npx hardhat node
 ```
 
-## Forward your network to https:// for your wallet
+Some wallets (e.g. MetaMask) allow you to use http://localhost:8545 (the local RPC node you just mounted).
+Ensure you use a proper wallet and configure that one as a new "Local" network.
 
-Your network will run in localhost:8545 (chain ID: 31337), but you'll need to expose it through https.
+### Copy your Wallet address
 
-My advice is like this:
-
-1. Create an account at [ngrok.com](https://ngrok.com).
-2. Go to the [domain](https://dashboard.ngrok.com/cloud-edge/domains) dashboard and create a FREE domain.
-     - Let's say your free domain becomes your-awesome-domain.ngrok-free.app
-3. Go to the [auth](https://dashboard.ngrok.com/get-started/your-authtoken) dashboard and copy your auth token.
-     - Let's say your API key is: `7K79cBvZVo4jaDOHRpE86RmoHaD_2NDGNSn5GPEF1uivUeRQR`.
-4. [Install](https://ngrok.com/download) a ngrok client suitable for your OS.
-5. Run this command in a shell (with the appropriate key):
-
-   ```shell
-   ngrok config add-authtoken 7K79cBvZVo4jaDOHRpE86RmoHaD_2NDGNSn5GPEF1uivUeRQR
-   ```
-
-With everything setup, you can run this command in a shell (with the appropriate domain):
-
-```shell
-ngrok http --domain=your-awesome-domain.ngrok-free.app 8545
-```
-
-Then, configure the local network in MetaMask (or whatever wallet you're using) with the following data:
-
-1. Any name for the network.
-2. Symbol: GO (at least, MetaMask will not complain by choosing that symbol).
-3. RPC: https://your-awesome-domain.ngrok-free.app.
-4. Chain ID: 31337 (If you've already set up your network to Ganache, change the id from 1337 to 31337).
-5. No block explorer.
-
-### Copy your MetaMask address
-
-Choose one of your MetaMask accounts you want to work with (you will have at least one account) and copy it.
+Choose one of your wallet's accounts you want to work with (you will have at least one account) and copy it.
 We'll be using that address in the next step(s).
 
 ## Deploy all the contracts
@@ -144,108 +115,3 @@ If you're the responsible for deploying the contract on testnet or mainnet, ensu
 main contract and add it as a valid consumer to your VRF subscription. Otherwise, the VRF calls will fail.
 
 This is not needed (and cannot be done) for your local network.
-
-## Alternatives to ngrok
-
-It might happen that you run out of bandwidth when using ngrok to expose your wallet. In this case, and if you
-don't want to purchase any license, you can try different services. Some instructions will be given here:
-
-### LocalXpose
-
-Go to [localxpose](https://localxpose.io), create an account, validate the e-mail address and log in.
-
-1. There, in the dashboard, go to the "Access" section and copy your "Access Token". You'll use it later.
-2. In the same section, download the client (it supports many OSs and architectures) and install it.
-3. After installing it, open a terminal and run this command:
-
-   ```shell
-   loclx account login
-   ```
-   
-   It will prompt you to paste the access token from step 1.
-4. Run this command to start the tunnel manager:
-
-   ```shell
-   loclx
-   ```
-
-   It will open a page and prompt you to set up a new tunnel. So click on "Add new tunnel" and set:
-   1. Type: HTTP
-   2. Region: Whatever. I use US.
-   3. Name: Whatever. I use hardhat.
-   4. Local service: localhost:8545.
-   5. Domain: Leave it empty. You'll not be able unless you use a paid account.
-   6. Accept, and you'll see the tunnel just created. Copy its URL and use it as RPC URL in your wallet.
-      - **CAVEATS**: EVERY TIME you start your loclx client and their tunnels, you'll have to update the domain.
-      - This is because it is served with random domains everytime, and not a fixed one.
-
-### tunnel.pyjam.as
-
-This service is free, and I'm not sure about the quotas, but it requires an OS having WireGuard installed.
-
-Ubuntu systems can install wireguard with:
-
-```shell
-sudo apt install wireguard-tools
-```
-
-Additionally, curl must also be present in the system. So, having both curl and wg-quick, run commands like
-this one to configure the tunnel:
-
-```shell
-curl https://tunnel.pyjam.as/8545 > ~/statunnel.conf
-```
-
-Then just see the contents (e.g. using `cat`) and keep it for yourself, save for the URL you'll see. The URL
-looks like this: https://qr6yab.tunnel.pyjam.as/. This URL is generated due to the public key therein.
-
-Keep this file forever, and use that URL as the wallet's RPC URL.
-
-Then, the commands to start / stop the tunnel is:
-
-```shell
-# Start (will ask for administrative password)
-wg-quick up ~/statunnel.conf
-
-# Stop (will ask for administrative password)
-wg-quick up ~/statunnel.conf
-
-# Show all the existing tunnels.
-sudo wg show
-```
-
-There are some things however to consider:
-
-1. The name of the file must be 15 characters or less, end in ".conf", and consist only of letters/numbers.
-2. Do NOT rename the file or, at least, do not use the same file twice for different tunnels.
-   1. If you start the tunnel and then rename the file, you'll not be able to stop the tunnel later.
-   2. Also, you'll not be able to launch the tunnel with a new name in the meantime.
-   3. This is because the virtual IP address is already used in the other tunnel. You'll get errors like this:
-
-      ```shell
-      [#] ip link add statunnel type wireguard
-      [#] wg setconf statunnel /dev/fd/63
-      [#] ip -4 address add 10.101.0.35/32 dev statunnel
-      [#] ip link set mtu 1420 up dev statunnel
-      [#] ip -4 route add 10.101.0.1/32 dev statunnel
-      RTNETLINK answers: File exists
-      [#] ip link delete dev statunnel
-      ```
-      
-      The "File exists" error means exactly this. So, you use `wg show` and then rename your file to the name
-      of the tunnel you want to close, and then use `wg-quick down <the file>`.
-3. Always use absolute paths when specifying the file.
-
-
-### Other alternatives
-
-Check [these](https://github.com/anderspitman/awesome-tunneling?tab=readme-ov-file) on your own. They might
-be quite technical, depending.
-
-### Why not locally mounting an HTTPS-enabled server?
-
-Because you'll otherwise have to handle self-signed certificates and for sure even developers try to avoid that
-as much as possible - this will be even worse for the non-dev people.
-
-However, if you feel you can deal with the hassle... then try it: See how to create certificates and mount a local
-nginx with https support proxying your localhost:8545 and good luck. But it is harder than it sounds.
