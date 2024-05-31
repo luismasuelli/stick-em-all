@@ -9,5 +9,6 @@ import {useRef} from "react";
 export function useNonReactive(f) {
     const ref = useRef(f);
     ref.current = f;
-    return (...args) => ref.current(...args);
+    ref.call ||= (...args) => ref.current(...args);
+    return ref.call;
 }
