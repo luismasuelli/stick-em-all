@@ -7,7 +7,7 @@ import {WorldManagementBreadcrumbs} from "./WorldManagementBreadcrumbs";
 
 export default function AlbumsListEnabledLayout({
     worldsData, albumsList, albumsData, children, sx={}, minHeight = "600px",
-    selectedWorldId, setSelectedWorldId, ...props
+    selectedWorldId, setSelectedWorldId, backToEdit = false, ...props
 }) {
     worldsData ||= {};
     const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function AlbumsListEnabledLayout({
 
     return <Box>
         {/* eslint-disable-next-line no-undef */}
-        <WorldManagementBreadcrumbs worldId={worldId} worldData={worldsData[BigInt(worldId)]} />
+        <WorldManagementBreadcrumbs worldId={worldId} worldData={worldsData[BigInt(worldId)]} backToEdit={backToEdit} />
         <Grid container {...props} sx={{...(sx||{}), alignItems: "stretch", minHeight}}>
             <Grid item xs={4} sx={{display: 'flex', flexDirection: 'column', padding: 2}}>
                 <AlbumsList albumsList={albumsList} albumsData={albumsData} />
