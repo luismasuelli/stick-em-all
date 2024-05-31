@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
@@ -7,6 +7,7 @@ import Web3 from "web3";
 import ParamsAwareContractWindow from "./Windows/ParamsAwareContractWindow";
 import StandaloneMessage from "./Windows/StandaloneMessage";
 import worldsEventsEffect from "./Main/worldsEventsEffect";
+import albumsEventsEffect from "./Main/albumsEventsEffect";
 import SelectWorld from './Main/SubStates/SelectWorld';
 import CreateWorld from './Main/SubStates/CreateWorld';
 import WorldCreated from './Main/SubStates/WorldCreated';
@@ -61,6 +62,27 @@ function MainContent({ contracts, account }) {
     //    or editing an existing world.
     const [newWorldData, setNewWorldData] = useState({});
 
+    // 5. Add the ability to select worlds and get albums data.
+    let [selectedWorldId, setSelectedWorldId] = useState();
+    setSelectedWorldId = useNonReactive(setSelectedWorldId);
+    let [albumsCache, setAlbumsCache] = useState(
+        {lastBlock: null, lastState: {albumsIndices: {}, albumsRelevance: []}}
+    );
+    setAlbumsCache = useNonReactive(setAlbumsCache);
+    useEffect(() => {
+        setAlbumsCache({lastBlock: null, lastState: {albumsIndices: {}, albumsRelevance: []}});
+        if (typeof selectedWorldId === "bigint" && selectedWorldId >= 0n) {
+            // start fetching albums data.
+            return albumsEventsEffect(
+                worldsManagement, {lastBlock: null, lastState: {albumsIndices: {}, albumsRelevance: []}},
+                setAlbumsCache, selectedWorldId
+            );
+        }
+    }, [selectedWorldId, setAlbumsCache, worldsManagement]);
+
+    // 6. Finally, tracking the albums data cache.
+    const [albumsDataCache, setAlbumsDataCache] = useState({});
+
     // Rendering everything.
     return <Section title="Earnings management" color="primary.light" sx={{marginTop: 4}}>
         <MemoryRouter>
@@ -84,15 +106,27 @@ function MainContent({ contracts, account }) {
                 />} />
                 <Route path="/manage/:worldId" element={<SelectAlbum
                     worldsManagementContract={worldsManagement}
+                    albumsCache={albumsCache}
+                    albumsDataCache={albumsDataCache}
+                    setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
                 <Route path="/manage/:worldId/create" element={<CreateAlbum
                     worldsManagementContract={worldsManagement}
+                    albumsCache={albumsCache}
+                    albumsDataCache={albumsDataCache}
+                    setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
                 <Route path="/manage/:worldId/edit/:albumId" element={<EditAlbum
                     worldsManagementContract={worldsManagement}
+                    albumsCache={albumsCache}
+                    albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
+                    setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
                 <Route path="/manage/:worldId/edit/:albumId/:pageId" element={<EditAlbumPage
                     worldsManagementContract={worldsManagement}
+                    albumsCache={albumsCache}
+                    albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
+                    setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
             </Routes>
         </MemoryRouter>
