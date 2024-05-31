@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 
 export function WorldManagementBreadcrumbs({ worldId, worldData }) {
     const navigate = useNavigate();
+    worldData ||= {};
 
     return <Box sx={{display: 'flex', justifyContent: 'space-between', marginBottom: 4}}>
         <Button variant="contained" color="primary"

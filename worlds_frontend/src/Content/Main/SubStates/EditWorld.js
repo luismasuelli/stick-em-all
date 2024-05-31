@@ -104,6 +104,7 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
     return <WorldsListEnabledLayout worldsList={worldsList} worldsData={worldsData}>
         <Box sx={{display: 'flex', justifyContent: 'space-between', marginBottom: 4}}>
             <Button variant="contained" color="primary" onClick={() => navigate("/")}>&#9664; Back</Button>
+            <Button variant="contained" color="primary" onClick={() => navigate(`/manage/${worldId.toString()}`)}>Manage</Button>
             <Button variant="contained" color="primary"
                     onClick={() => {navigate(`/edit/${worldId.toString()}/transfer`)}}>Transfer &#9654;</Button>
         </Box>
