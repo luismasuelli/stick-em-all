@@ -11,7 +11,7 @@ import ThemedBox from "../../Controls/ThemedBox";
  * @param albumsData The cached data. Some albums do not have cached.
  * @param props More props to be forwarded.
  */
-export default function WorldsList({ albumsList, albumsData, ...props }) {
+export default function AlbumsList({ albumsList, albumsData, ...props }) {
     const navigate = useNavigate();
     let {worldId} = useParams();
 
