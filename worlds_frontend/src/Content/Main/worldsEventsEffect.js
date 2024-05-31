@@ -107,11 +107,11 @@ function finishInitialState(state) {
  * Creates an events effect for the worlds events.
  * @param worlds The current worlds contract.
  * @param worldsCache The initial cache.
- * @param setWorldsCacheRef A setter for the worlds cache.
+ * @param setWorldsCache A setter for the worlds cache.
  * @param account The current account.
  * @returns {function(): void} The close function for the effect.
  */
-export default function worldsEventsEffect(worlds, worldsCache, setWorldsCacheRef, account) {
+export default function worldsEventsEffect(worlds, worldsCache, setWorldsCache, account) {
     let updateInitialState = (state, event) => updateAccountDependentInitialState(state, event, account);
     let updateNextState = (state, event) => updateAccountDependentNextState(state, event, account);
     let prepareInitialState = {updateInitialState, finishInitialState};
@@ -122,6 +122,6 @@ export default function worldsEventsEffect(worlds, worldsCache, setWorldsCacheRe
             {name: "Transfer", filter: {to: account}},
             {name: "WorldEditionAllowanceChanged", filter: {who: account}}
         ], prepareInitialState,
-        updateNextState, setWorldsCacheRef.current, worldsCache
+        updateNextState, setWorldsCache, worldsCache
     );
 }

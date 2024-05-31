@@ -17,6 +17,7 @@ import CreateAlbum from './Main/SubStates/Management/CreateAlbum';
 import EditAlbum from './Main/SubStates/Management/EditAlbum';
 import EditAlbumPage from './Main/SubStates/Management/EditAlbumPage';
 import Section from "./Controls/Section";
+import {useNonReactive} from "../Utils/nonReactive";
 
 
 // Which are the defined & relevant params of the app?
@@ -39,17 +40,16 @@ function MainContent({ contracts, account }) {
     const {worlds, worldsManagement} = contracts;
 
     // 2. Keeping a track of the worlds cache.
-    const [worldsCache, setWorldsCache] = useState(
+    let [worldsCache, setWorldsCache] = useState(
         {lastBlock: null, lastState: {worldsIndices: {}, worldsRelevance: []}}
     );
-    const setWorldsCacheRef = useRef(setWorldsCache);
-    setWorldsCacheRef.current = setWorldsCache;
+    setWorldsCache = useNonReactive(setWorldsCache);
     useEffect(() => {
         return worldsEventsEffect(
             worlds, {lastBlock: null, lastState: {worldsIndices: {}, worldsRelevance: []}},
-            setWorldsCacheRef, account
+            setWorldsCache, account
         );
-    }, [worlds, setWorldsCacheRef, account]);
+    }, [worlds, setWorldsCache, account]);
 
     // 3. Keeping a track of the data associated to worlds.
     //    For each world, the cached data is name and description.
