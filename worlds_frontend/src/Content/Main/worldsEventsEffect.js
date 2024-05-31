@@ -104,7 +104,7 @@ function finishInitialState(state) {
 
 
 /**
- * Creates an events effect for the worlds event.
+ * Creates an events effect for the worlds events.
  * @param worlds The current worlds contract.
  * @param worldsCache The initial cache.
  * @param setWorldsCacheRef A setter for the worlds cache.
