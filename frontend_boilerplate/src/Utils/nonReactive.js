@@ -6,8 +6,9 @@ import {useRef} from "react";
  * @param f The function.
  * @returns {function(...[*]): *} The non-reactive wrapper.
  */
-export default function useNonReactive(f) {
+export function useNonReactive(f) {
     const ref = useRef(f);
     ref.current = f;
-    return (...args) => ref.current(...args);
+    ref.call ||= (...args) => ref.current(...args);
+    return ref.call;
 }
