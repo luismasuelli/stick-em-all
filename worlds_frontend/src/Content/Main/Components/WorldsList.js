@@ -10,7 +10,6 @@ import ThemedBox from "../../Controls/ThemedBox";
  * @param worldsList The list of worlds.
  * @param worldsData The cached data. Some worlds do not have cached.
  * @param props More props to be forwarded.
- * data for them. This is until they're visited.
  */
 export default function WorldsList({ worldsList, worldsData, ...props }) {
     const navigate = useNavigate();
