@@ -1,12 +1,14 @@
 import AlbumsListEnabledLayout from "../../Components/AlbumsListEnabledLayout";
 import {useNavigate, useParams} from "react-router-dom";
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import Web3Context from "../../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../../Wrapping/Web3AccountContext";
 import ContractWindowContext from "../../../Contexts/ContractWindowContext";
 import Box from "@mui/material/Box";
 import {Alert, Button} from "@mui/material";
 import ParamsContext from "../../../Contexts/ParamsContext";
+import {getEventLogs} from "../../../../Utils/eventLogs";
+import {useDerivedState} from "../../../../Utils/derived";
 
 
 function usdFromCents(v) {
@@ -37,6 +39,41 @@ export default function CreateAlbum({
     const fiatPrices = paramsContext.paramsData.fiatCosts;
     const nativePrices = paramsContext.paramsData.nativeCosts;
 
+    const [albumData, setAlbumData] = useState({
+        name: "", edition: "", frontImage: "", backImage: "", rarityIcons: "",
+        achievementType: "", achievementName: "", achievementImage: "", achievementData: ""
+    });
+    const [name, setName] = useDerivedState(albumData, setAlbumData, "name");
+    const [edition, setEdition] = useDerivedState(albumData, setAlbumData, "edition");
+    const [frontImage, setFrontImage] = useDerivedState(albumData, setAlbumData, "frontImage");
+    const [backImage, setBackImage] = useDerivedState(albumData, setAlbumData, "backImage");
+    const [rarityIcons, setRarityIcons] = useDerivedState(albumData, setAlbumData, "rarityIcons");
+    const [achievementType, setAchievementType] = useDerivedState(albumData, setAlbumData, "achievementType");
+    const [achievementName, setAchievementName] = useDerivedState(albumData, setAlbumData, "achievementName");
+    const [achievementImage, setAchievementImage] = useDerivedState(albumData, setAlbumData, "achievementImage");
+    const [achievementData, setAchievementData] = useDerivedState(albumData, setAlbumData, "achievementData");
+
+    const defineAlbum = wrappedCall(async function() {
+        const tx = await worldsManagement.methods.defineAlbum(
+            worldId, name, edition, frontImage, backImage, rarityIcons,
+            achievementType, achievementName, achievementImage, achievementData
+        ).send({from: account});
+
+        const logs = await getEventLogs(tx, worldsManagement);
+        const definitionLogs = logs.filter(log => log.name === "AlbumDefined");
+
+        if (definitionLogs.length) {
+            const firstTransferLog = definitionLogs[0];
+            const id = web3.utils.toBigInt(firstTransferLog.event.id);
+            navigate(`/manage/${worldId.toString()}/edit/${id.toString()}`);
+        } else {
+            throw new Error(
+                "The id of the created album could not be fetched. See the changes " +
+                "in the events list to get a hint of your just-created album"
+            );
+        }
+    });
+
     return <AlbumsListEnabledLayout worldsData={worldsData} albumsData={albumsDataCache}
                                     selectedWorldId={selectedWorldId} setSelectedWorldId={setSelectedWorldId}
                                     albumsList={albumsCache.lastState.albumsRelevance}>
@@ -59,6 +96,7 @@ export default function CreateAlbum({
 
         <Box sx={{marginTop: 4}}>
             {/*
+                TODO implement form:
                 uint256 _worldId, string memory _name, string memory _edition,
                 string memory _frontImage, string memory _backImage, string memory _rarityIcons,
                 bytes32 _achievementType, string memory _achievementName, string memory _achievementImage,
