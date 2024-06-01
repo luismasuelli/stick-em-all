@@ -2,6 +2,7 @@ require("@nomicfoundation/hardhat-toolbox");
 require("@nomicfoundation/hardhat-ignition-ethers");
 require('hardhat-contract-sizer');
 require('./tasks/DeployEverything');
+require('./tasks/AddCallOfTheVoidSamples');
 require('./tasks/VRFTasks');
 
 /** @type import('hardhat/config').HardhatUserConfig */
