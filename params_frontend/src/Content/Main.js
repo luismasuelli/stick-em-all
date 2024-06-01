@@ -1,7 +1,7 @@
 import {useContext, useEffect, useState} from "react";
 import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
-import {Button, Grid} from "@mui/material";
+import {Alert, Button, Grid} from "@mui/material";
 import MakeContractClient from './MakeContractClient';
 import AddressInput from "./Controls/AddressInput";
 import Section from "./Controls/Section";
@@ -12,6 +12,7 @@ import ParamsAwareContractWindow from "./Windows/ParamsAwareContractWindow";
 import Web3 from "web3";
 import ParamsContext from "./Contexts/ParamsContext";
 import ContractWindowContext from "./Contexts/ContractWindowContext";
+import {useNonReactive} from "../Utils/nonReactive";
 
 
 const params = [
@@ -66,6 +67,9 @@ function MainContent() {
     // eslint-disable-next-line no-undef
     const [amountToWithdraw, setAmountToWithdraw] = useState(BigInt(0));
 
+    // The achievement types.
+    const [achievementTypes, setAchievementTypes] = useState([]);
+
     // This function sets the new earnings receiver.
     const updateEarningsReceiver = wrappedCall(async function() {
         await paramsContract.methods.setEarningsReceiver(newEarningsReceiver).send();
@@ -82,6 +86,25 @@ function MainContent() {
         console.log("Values:", paramsData.fiatCosts[hash]);
         await paramsContract.methods.setFiatCost(hash, currentParamsData.fiatCosts[hash]).send();
     });
+
+    /*
+    // This function reloads the achievement types.
+    const reloadAchievementTypes = useNonReactive(wrappedCall(async function() {
+        const count = await paramsContract.methods.getAchievementTypesListCount().call();
+        let newAchievementTypes = [];
+        for (let idx = 0; idx < count; idx++) {
+            let id = await paramsContract.methods.achievementTypesList(idx).call();
+            let record = await paramsContract.methods.achievementTypes(id).call();
+            newAchievementTypes.push(record);
+        }
+        setAchievementTypes(newAchievementTypes);
+        console.log(newAchievementTypes);
+    }));
+
+    useEffect(() => {
+        reloadAchievementTypes();
+    }, [reloadAchievementTypes]);
+    */
 
     const earningsReceiver = paramsData.earningsReceiver;
     const costParams = paramsData.fiatCosts;
@@ -141,6 +164,16 @@ function MainContent() {
                     </Grid>
                 </Grid>
             ))}
+        </Section>
+        <Section title="Achievement types" color="primary.light">
+            <Alert severity="warning">
+                Manage this section carefully. Defined achievement types cannot be removed (only deactivated).
+            </Alert>
+            <Grid container>
+                {achievementTypes.map((record) => {
+                    <Grid item xs={12}>{record}</Grid>
+                })}
+            </Grid>
         </Section>
     </>;
 }
