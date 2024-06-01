@@ -2,6 +2,10 @@
 
 This directory contains the contracts that are related to the Stick 'em All project.
 
+The local network is: A Hardhat project
+The testnet is: Polygon Amoy
+The mainnet is: Polygon Mainnet
+
 ## Install everything
 
 This is a node project. All the `npm` / `npx` projects must be run in _this_ directory.
@@ -28,7 +32,7 @@ Ensure you use a proper wallet and configure that one as a new "Local" network.
 Choose one of your wallet's accounts you want to work with (you will have at least one account) and copy it.
 We'll be using that address in the next step(s).
 
-## Deploy all the contracts
+## Deploy all the contracts on local network
 
 With your local hardhat node and ngrok forwarding running, and your wallet aware of that network, open yet another
 new console and run this command:
@@ -42,6 +46,16 @@ This command will install all the contracts and also set the ownership of the se
 You'll notice that the address you specified in the --owner argument now has 100.0 fake MATIC coins.
 
 Your local network can be considered ready by this point.
+
+### Install some Call of the Void samples
+
+This is only intended to test in your local network or testnet. It does not make that much sense in mainnet.
+
+Run this command to have some example worlds/albums/pages defined to quickly work with.
+
+```shell
+npx hardhat add-callofthevoid-samples --network localhost --owner {0xTheAddressYouCopied}
+```
 
 ## Restarting the network
 
