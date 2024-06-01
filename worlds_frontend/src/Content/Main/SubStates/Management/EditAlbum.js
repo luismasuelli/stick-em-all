@@ -192,7 +192,7 @@ function AlbumPages({ worldsManagement }) {
                 <Grid item xs={4}><Label>Stickers:</Label></Grid>
                 <Grid item xs={8}>
                     <Box sx={{paddingTop: 2, paddingBottom: 2}}>
-                        {page.currentlyDefinedStickers} (complete: {page.complete ? "Yes" : "No"})
+                        {page.currentlyDefinedStickers.toString()} (complete: {page.complete ? "Yes" : "No"})
                     </Box>
                 </Grid>
             </>)}
