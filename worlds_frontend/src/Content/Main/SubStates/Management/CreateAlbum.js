@@ -36,6 +36,7 @@ export default function CreateAlbum({
     const {wrappedCall} = useContext(ContractWindowContext);
     const navigate = useNavigate();
     const paramsContext = useContext(ParamsContext);
+    const params = paramsContext.params;
     const fiatPrices = paramsContext.paramsData.fiatCosts;
     const nativePrices = paramsContext.paramsData.nativeCosts;
 
@@ -83,10 +84,10 @@ export default function CreateAlbum({
         <Alert severity="info">
             You're about to define a new album. The associated definition costs are: <br />
             <ul>
-                <li>Album: USD {usdFromCents(fiatPrices[1])} / MATIC: {web3.utils.fromWei(nativePrices[1], "ether")}</li>
-                <li>Per page: USD {usdFromCents(fiatPrices[2])} / MATIC: {web3.utils.fromWei(nativePrices[2], "ether")}</li>
-                <li>Per achievement: USD {usdFromCents(fiatPrices[3])} / MATIC: {web3.utils.fromWei(nativePrices[3], "ether")}</li>
-                <li>Per sticker: USD {usdFromCents(fiatPrices[4])} / MATIC: {web3.utils.fromWei(nativePrices[4], "ether")}</li>
+                <li>Album: USD {usdFromCents(fiatPrices[params[1].hash])} / MATIC: {web3.utils.fromWei(nativePrices[params[1].hash], "ether")}</li>
+                <li>Per page: USD {usdFromCents(fiatPrices[params[2].hash])} / MATIC: {web3.utils.fromWei(nativePrices[params[2].hash], "ether")}</li>
+                <li>Per achievement: USD {usdFromCents(fiatPrices[params[3].hash])} / MATIC: {web3.utils.fromWei(nativePrices[params[3].hash], "ether")}</li>
+                <li>Per sticker: USD {usdFromCents(fiatPrices[params[4].hash])} / MATIC: {web3.utils.fromWei(nativePrices[params[4].hash], "ether")}</li>
             </ul>
         </Alert>
         <Alert severity="warning">
