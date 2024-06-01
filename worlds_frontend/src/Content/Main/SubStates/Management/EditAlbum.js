@@ -13,6 +13,7 @@ export default function EditAlbum({
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
     const {account} = context;
     const {wrappedCall} = useContext(ContractWindowContext);
+    const albumData = albumsDataCache[albumId];
 
     useEffect(() => {
         const getWorldData = wrappedCall(async function getWorldData() {
