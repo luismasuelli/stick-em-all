@@ -82,8 +82,6 @@ function MainContent() {
 
     // This function updates a cost parameter.
     const updateCostParameter = wrappedCall(async function(hash) {
-        console.log("Hash:", hash);
-        console.log("Values:", paramsData.fiatCosts[hash]);
         await paramsContract.methods.setFiatCost(hash, currentParamsData.fiatCosts[hash]).send();
     });
 
@@ -97,7 +95,6 @@ function MainContent() {
             newAchievementTypes.push(record);
         }
         setAchievementTypes(newAchievementTypes);
-        console.log(newAchievementTypes);
     }));
 
     // This function updates the achievement types.
