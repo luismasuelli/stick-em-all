@@ -60,6 +60,43 @@ contract StickEmAllParams is Ownable {
     address private priceFeed;
 
     /**
+     * The status of an achievement type.
+     */
+    enum AchievementTypeStatus {
+        Unknown, Active, Inactive
+    }
+
+    /**
+     * The achievement type (name and status).
+     */
+    struct AchievementType {
+        /**
+         * A display name.
+         */
+        string name;
+
+        /**
+         * The key/id of the achievement type.
+         */
+        bytes32 id;
+
+        /**
+         * The status of an achievement type.
+         */
+        AchievementTypeStatus status;
+    }
+
+    /**
+     * The achievement types, so they can be checked.
+     */
+    mapping(bytes32 => AchievementType) public achievementTypes;
+
+    /**
+     * The list of achievement types (active or inactive).
+     */
+    bytes32[] public achievementTypesList;
+
+    /**
      * Initialization involves the following arguments:
      * 1. The earnings receiver will be the sender itself.
      * 2. The price feed will be specified here. IT MUST
@@ -74,6 +111,43 @@ contract StickEmAllParams is Ownable {
     constructor(address _priceFeed) Ownable(msg.sender) {
         earningsReceiver = msg.sender;
         priceFeed = _priceFeed;
+    }
+
+    /**
+     * The count of ever-declared achievement types.
+     */
+    function getAchievementTypesListCount() public view returns (uint256) {
+        return achievementTypesList.length;
+    }
+
+    /**
+     * Adds an achievement type.
+     */
+    function addAchievementType(bytes32 id, string memory name) public onlyOwner {
+        require(
+            achievementTypes[id].status == AchievementTypeStatus.Unknown,
+            "StickEmAllParams: Achievement type already declared"
+        );
+        achievementTypes[id] = AchievementType({name: name, id: id, status: AchievementTypeStatus.Active});
+        achievementTypesList.push(id);
+    }
+
+    /**
+     * Sets an achievement type status.
+     */
+    function setAchievementType(bytes32 id, bool active) public onlyOwner {
+        checkAchievementType(id);
+        achievementTypes[id].status = active ? AchievementTypeStatus.Active : AchievementTypeStatus.Inactive;
+    }
+
+    /**
+     * Checks that a type is active (this function is intended to be used publicly).
+     */
+    function checkAchievementType(bytes32 id) public {
+        require(
+            achievementTypes[id].status != AchievementTypeStatus.Unknown,
+            "StickEmAllParams: Unknown achievement type"
+        );
     }
 
     /**
