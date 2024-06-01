@@ -12,7 +12,7 @@ import ParamsAwareContractWindow from "./Windows/ParamsAwareContractWindow";
 import Web3 from "web3";
 import ParamsContext from "./Contexts/ParamsContext";
 import ContractWindowContext from "./Contexts/ContractWindowContext";
-import {useNonReactive} from "../Utils/nonReactive";
+import TextField from "@mui/material/TextField";
 
 
 const params = [
@@ -67,8 +67,8 @@ function MainContent() {
     // eslint-disable-next-line no-undef
     const [amountToWithdraw, setAmountToWithdraw] = useState(BigInt(0));
 
-    // The achievement types.
-    const [achievementTypes, setAchievementTypes] = useState([]);
+    // A name for the new achievements. The same one will also be used as key.
+    const [achievementName, setAchievementName] = useState('');
 
     // This function sets the new earnings receiver.
     const updateEarningsReceiver = wrappedCall(async function() {
@@ -85,27 +85,18 @@ function MainContent() {
         await paramsContract.methods.setFiatCost(hash, currentParamsData.fiatCosts[hash]).send();
     });
 
-    // This function reloads the achievement types.
-    const reloadAchievementTypes = useNonReactive(wrappedCall(async function() {
-        const count = await paramsContract.methods.getAchievementTypesListCount().call();
-        let newAchievementTypes = [];
-        for (let idx = 0; idx < count; idx++) {
-            let id = await paramsContract.methods.achievementTypesList(idx).call();
-            let record = await paramsContract.methods.achievementTypes(id).call();
-            newAchievementTypes.push(record);
-        }
-        setAchievementTypes(newAchievementTypes);
-    }));
-
     // This function updates the achievement types.
     const setAchievementType = wrappedCall(async function(id, active) {
         await paramsContract.methods.setAchievementType(id, active).send();
-        await reloadAchievementTypes();
     });
 
-    useEffect(() => {
-        reloadAchievementTypes();
-    }, [reloadAchievementTypes]);
+    // This function creates an achievement type.
+    const addAchievementType = wrappedCall(async function() {
+        let name = (achievementName || "").trim();
+        if (name === "") throw new Error("The achievement name cannot be empty");
+        const id = Web3.utils.soliditySha3(name);
+        await paramsContract.methods.addAchievementType(id, name).send();
+    });
 
     const earningsReceiver = paramsData.earningsReceiver;
     const costParams = paramsData.fiatCosts;
@@ -172,7 +163,7 @@ function MainContent() {
             </Alert>
             <Grid container sx={{marginTop: 2}}>
                 <Grid item xs={12}><Heading>Existing achievement types</Heading></Grid>
-                {achievementTypes.map((record) => {
+                {paramsData.achievementTypes.map((record) => {
                     return <Fragment key={record[1]}>
                         <Grid item xs={3}><Label>{record[0]}</Label></Grid>
                         <Grid item xs={9} sx={{display: "flex", alignItems: "center"}}>
@@ -184,6 +175,17 @@ function MainContent() {
                     </Fragment>;
                 })}
                 <Grid item xs={12}><Heading>Create achievement type</Heading></Grid>
+                <Grid item xs={3}><Label>Name</Label></Grid>
+                <Grid item xs={9}>
+                    <TextField variant="outlined" value={achievementName}
+                               onChange={(e) => setAchievementName(e.target.value)} />
+                </Grid>
+                <Grid item xs={12}>
+                    <Button variant="contained" color="primary" size="large"
+                            onClick={() => addAchievementType()}>
+                        Create
+                    </Button>
+                </Grid>
             </Grid>
         </Section>
     </>;

@@ -38,6 +38,7 @@ export default function ParamsAwareContractWindow({
         earningsBalance: BigInt(0),
         fiatCosts: {}, // Each key is a hash. Each value is value in USD.
         nativeCosts: {}, // Each key is a hash. Each value is value in ETH.
+        achievementTypes: [] // The achievement types.
     });
     const isOwner = paramsData.owner === account;
 
@@ -67,12 +68,19 @@ export default function ParamsAwareContractWindow({
             nativeCosts[e.hash] = await paramsContract.methods['getNativeCost(bytes32)'](e.hash).call();
         }));
 
+        // The new achievements list.
+        const count = await paramsContract.methods.getAchievementTypesListCount().call();
+        let achievementTypes = [];
+        for (let idx = 0; idx < count; idx++) {
+            let id = await paramsContract.methods.achievementTypesList(idx).call();
+            let record = await paramsContract.methods.achievementTypes(id).call();
+            achievementTypes.push(record);
+        }
+
         // Update everything.
-        console.log("Setting params data...");
-        setParamsData({owner, earningsReceiver, earningsBalance, fiatCosts, nativeCosts});
+        setParamsData({owner, earningsReceiver, earningsBalance, fiatCosts, nativeCosts, achievementTypes});
 
         // Run the wrapped refresh.
-        console.log("Running the wrapped refresh...");
         if (refresh) {
             const ret = refresh();
             if (ret instanceof Promise) {
