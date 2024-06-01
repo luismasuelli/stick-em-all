@@ -10,7 +10,7 @@ function Section({ title, children, titleColor, sx }) {
             <ThemedPaper color={titleColor} sx={{
                 width: 'auto', padding: 0, elevation: 0,
                 borderRadius: 0, boxShadow: 'none'
-            }}> {/* Adjust width as needed */}
+            }}>
                 <Toolbar>
                     <Typography variant="h6" noWrap>
                         {title}
