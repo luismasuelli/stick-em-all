@@ -543,6 +543,7 @@ contract StickEmAllWorldsManagement {
         bytes memory _achievementData
     ) external validWorldId(_worldId) {
         uint256 _index = albumDefinitions.length;
+        worlds.params().checkAchievementType(_achievementType);
         albumDefinitions.push(AlbumDefinition({
             worldId: _worldId, name: _name, edition: _edition, frontImage: _frontImage,
             backImage: _backImage, rarityIcons: _rarityIcons, completedPages: 0,
@@ -562,6 +563,7 @@ contract StickEmAllWorldsManagement {
         uint256 _albumId, bytes32 type_, string memory _name, string memory _image, bytes memory _data
     ) private returns (uint16) {
         if (type_ != bytes32(0)) {
+            worlds.params().checkAchievementType(type_);
             AchievementDefinition[] storage achievements = albumAchievementDefinitions[_albumId];
             uint16 achievementId = uint16(achievements.length);
             achievements.push(AchievementDefinition({
