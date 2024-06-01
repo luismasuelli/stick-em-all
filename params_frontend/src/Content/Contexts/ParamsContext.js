@@ -7,6 +7,7 @@ const ParamsContext = createContext({
         earningsBalance: BigInt(0),
         fiatCosts: {}, // Each key is a hash. Each value is value in USD.
         nativeCosts: {}, // Each key is a hash. Each value is value in ETH.
+        achievementTypes: [] // The achievement types.
     },
     paramsContract: null,
     params: {}
