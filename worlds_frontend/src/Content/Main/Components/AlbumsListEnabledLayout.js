@@ -3,6 +3,7 @@ import AlbumsList from "./AlbumsList";
 import {useNavigate, useParams} from "react-router-dom";
 import Box from "@mui/material/Box";
 import {WorldManagementBreadcrumbs} from "./WorldManagementBreadcrumbs";
+import {useEffect} from "react";
 
 
 export default function AlbumsListEnabledLayout({
@@ -12,9 +13,11 @@ export default function AlbumsListEnabledLayout({
     worldsData ||= {};
     const navigate = useNavigate();
     let {worldId} = useParams();
-    if (selectedWorldId === undefined || selectedWorldId.toString() !== worldId.toString()) {
-        setSelectedWorldId(selectedWorldId);
-    }
+    useEffect(() => {
+        if (selectedWorldId === undefined || selectedWorldId.toString() !== worldId.toString()) {
+            setSelectedWorldId(selectedWorldId);
+        }
+    }, [setSelectedWorldId, worldId, selectedWorldId]);
 
     return <Box>
         {/* eslint-disable-next-line no-undef */}
