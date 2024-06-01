@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import {Fragment, useContext, useEffect, useState} from "react";
 import Web3Context from "../Wrapping/Web3Context";
 import Web3AccountContext from "../Wrapping/Web3AccountContext";
 import {Alert, Button, Grid} from "@mui/material";
@@ -87,7 +87,6 @@ function MainContent() {
         await paramsContract.methods.setFiatCost(hash, currentParamsData.fiatCosts[hash]).send();
     });
 
-    /*
     // This function reloads the achievement types.
     const reloadAchievementTypes = useNonReactive(wrappedCall(async function() {
         const count = await paramsContract.methods.getAchievementTypesListCount().call();
@@ -101,10 +100,15 @@ function MainContent() {
         console.log(newAchievementTypes);
     }));
 
+    // This function updates the achievement types.
+    const setAchievementType = wrappedCall(async function(id, active) {
+        await paramsContract.methods.setAchievementType(id, active).send();
+        await reloadAchievementTypes();
+    });
+
     useEffect(() => {
         reloadAchievementTypes();
     }, [reloadAchievementTypes]);
-    */
 
     const earningsReceiver = paramsData.earningsReceiver;
     const costParams = paramsData.fiatCosts;
@@ -169,10 +173,20 @@ function MainContent() {
             <Alert severity="warning">
                 Manage this section carefully. Defined achievement types cannot be removed (only deactivated).
             </Alert>
-            <Grid container>
+            <Grid container sx={{marginTop: 2}}>
+                <Grid item xs={12}><Heading>Existing achievement types</Heading></Grid>
                 {achievementTypes.map((record) => {
-                    <Grid item xs={12}>{record}</Grid>
+                    return <Fragment key={record[1]}>
+                        <Grid item xs={3}><Label>{record[0]}</Label></Grid>
+                        <Grid item xs={9} sx={{display: "flex", alignItems: "center"}}>
+                            <Button variant="contained" color="primary" size="large"
+                                    onClick={() => setAchievementType(record[1], record[2].toString() === "2")}>
+                                {(record[2].toString() === "1") ? "Deactivate" : "Activate"}
+                            </Button>
+                        </Grid>
+                    </Fragment>;
                 })}
+                <Grid item xs={12}><Heading>Create achievement type</Heading></Grid>
             </Grid>
         </Section>
     </>;
