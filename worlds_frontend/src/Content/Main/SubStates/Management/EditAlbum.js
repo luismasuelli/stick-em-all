@@ -11,6 +11,7 @@ import Heading from "../../../Controls/Heading";
 import Label from "../../../Controls/Label";
 import TextField from "@mui/material/TextField";
 import ParamsContext from "../../../Contexts/ParamsContext";
+import Box from "@mui/material/Box";
 
 function useGlobalContextData() {
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
@@ -49,7 +50,7 @@ function AlbumData({ worldsManagement, setAlbumData }) {
         getAlbumData();
     }, [albumId, wrappedCall, worldsManagement, setAlbumData]);
 
-    return <Section title="Album data" color="primary.light" sx={{marginTop: 4}}>
+    return <Section title="Album data" color="primary.light">
         <Grid container>
             <Grid item xs={4}>
                 <Label>Base data:</Label>
@@ -136,15 +137,30 @@ function AlbumPages({ worldsManagement }) {
     });
 
     useEffect(() => {
-        const getAlbumData = wrappedCall(async function getWorldData() {
+        const getAlbumPages = wrappedCall(async function getWorldData() {
             // 1. Download the pages' data.
+            // eslint-disable-next-line no-undef
+            const count = await worldsManagement.methods.albumPageDefinitionsCount(BigInt(albumId)).call();
+            let pages = [];
+            for(let index = 0; index < count; index++) {
+                let {
+                    name, backgroundImage, layout, maxStickers,
+                    currentlyDefinedStickers, complete
+                    // eslint-disable-next-line no-undef
+                } = await worldsManagement.methods.albumPageDefinitions(BigInt(albumId), index).call();
+                pages.push({
+                    name, backgroundImage, layout, maxStickers,
+                    currentlyDefinedStickers, complete
+                });
+            }
+
             // 2. Set the downloaded world's data into the worldsData for the worldId.
-            setAlbumPages([]);
+            setAlbumPages(pages);
         });
-        getAlbumData();
+        getAlbumPages();
     }, [albumId, wrappedCall, worldsManagement, setAlbumPages, refreshFlag]);
 
-    return <Section title="Album data" color="primary.light" sx={{marginTop: 4}}>
+    return <Section title="Pages" color="primary.light" sx={{marginTop: 4}}>
         <Grid container>
             <Grid item xs={12} sx={{display: "flex", alignItems: "flex-end"}}>
                 <Button size="large" color="primary" variant="contained"
@@ -154,7 +170,7 @@ function AlbumPages({ worldsManagement }) {
                 <Grid item xs={12}>
                     <Heading>
                         Page #{idx + 1} - {page.name}
-                        <Button size="small" color="primary" variant="contained"
+                        <Button size="small" color="primary" variant="contained" sx={{marginLeft: 2}}
                                 onClick={() => navigate(`/manage/${worldId.toString()}/edit/${albumId.toString()}/${idx + 1}`)}>
                             Visit
                         </Button>
@@ -162,16 +178,22 @@ function AlbumPages({ worldsManagement }) {
                 </Grid>
                 <Grid item xs={4}><Label>Background:</Label></Grid>
                 <Grid item xs={8}>
-                    <ImagePreview url={page.backgroundImage} aspectRatio="8 / 9" cover={true}
-                                  style={{maxWidth: "400px"}} />
+                    <Box sx={{paddingTop: 2, paddingBottom: 2}}>
+                        <ImagePreview url={page.backgroundImage} aspectRatio="8 / 9" cover={true}
+                                      style={{maxWidth: "400px"}} />
+                    </Box>
                 </Grid>
                 <Grid item xs={4}><Label>Layout:</Label></Grid>
                 <Grid item xs={8}>
-                    <div className={`layout layout-${page.layout}`} />
+                    <Box sx={{paddingTop: 2, paddingBottom: 2}}>
+                        <div className={`layout layout-${page.layout}`}/>
+                    </Box>
                 </Grid>
                 <Grid item xs={4}><Label>Stickers:</Label></Grid>
                 <Grid item xs={8}>
-                    {page.currentlyDefinedStickers} (complete: {page.complete ? "Yes" : "No"})
+                    <Box sx={{paddingTop: 2, paddingBottom: 2}}>
+                        {page.currentlyDefinedStickers} (complete: {page.complete ? "Yes" : "No"})
+                    </Box>
                 </Grid>
             </>)}
             <Heading>Create new page</Heading>
