@@ -121,25 +121,25 @@ function MainContent({ contracts, account }) {
                     worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
                 />} />
                 <Route path="/manage/:worldId" element={<SelectAlbum
-                    worldsManagementContract={worldsManagement} worldsData={worldsDataCache}
+                    worldsManagement={worldsManagement} worldsData={worldsDataCache}
                     albumsCache={albumsCache}
                     albumsDataCache={albumsDataCache}
                     setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
                 <Route path="/manage/:worldId/create" element={<CreateAlbum
-                    worldsManagementContract={worldsManagement} worldsData={worldsDataCache}
+                    worldsManagement={worldsManagement} worldsData={worldsDataCache}
                     albumsCache={albumsCache}
                     albumsDataCache={albumsDataCache}
                     setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
                 <Route path="/manage/:worldId/edit/:albumId" element={<EditAlbum
-                    worldsManagementContract={worldsManagement} worldsData={worldsDataCache}
+                    worldsManagement={worldsManagement} worldsData={worldsDataCache}
                     albumsCache={albumsCache}
                     albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
                     setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
                 <Route path="/manage/:worldId/edit/:albumId/:pageId" element={<EditAlbumPage
-                    worldsManagementContract={worldsManagement} worldsData={worldsDataCache}
+                    worldsManagement={worldsManagement} worldsData={worldsDataCache}
                     albumsCache={albumsCache}
                     albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
                     setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}

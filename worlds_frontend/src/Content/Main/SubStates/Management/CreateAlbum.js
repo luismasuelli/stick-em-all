@@ -5,10 +5,13 @@ import Web3Context from "../../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../../Wrapping/Web3AccountContext";
 import ContractWindowContext from "../../../Contexts/ContractWindowContext";
 import Box from "@mui/material/Box";
-import {Alert, Button} from "@mui/material";
+import {Alert, Button, Grid, MenuItem, Select} from "@mui/material";
 import ParamsContext from "../../../Contexts/ParamsContext";
 import {getEventLogs} from "../../../../Utils/eventLogs";
 import {useDerivedState} from "../../../../Utils/derived";
+import Label from "../../../Controls/Label";
+import TextField from "@mui/material/TextField";
+import {ImagePreview} from "../../../Controls/ImagePreview";
 
 
 function usdFromCents(v) {
@@ -39,6 +42,7 @@ export default function CreateAlbum({
     const params = paramsContext.params;
     const fiatPrices = paramsContext.paramsData.fiatCosts;
     const nativePrices = paramsContext.paramsData.nativeCosts;
+    const achievementTypes = paramsContext.paramsData.achievementTypes;
 
     const [albumData, setAlbumData] = useState({
         name: "", edition: "", frontImage: "", backImage: "", rarityIcons: "",
@@ -55,9 +59,14 @@ export default function CreateAlbum({
     const [achievementData, setAchievementData] = useDerivedState(albumData, setAlbumData, "achievementData");
 
     const defineAlbum = wrappedCall(async function() {
+        let _achievementData = (achievementData || "").trim().toLowerCase() || "0x0000000000000000000000000000000000000000000000000000000000000000";
+        if (!/^0x[a-f0-9]{64}$/.test(_achievementData)) {
+            throw new Error("The achievement data must be blank or a 0x-prefixed string + 64 hexadecimal chars");
+        }
+
         const tx = await worldsManagement.methods.defineAlbum(
             worldId, name, edition, frontImage, backImage, rarityIcons,
-            achievementType, achievementName, achievementImage, achievementData
+            achievementType, achievementName, achievementImage, _achievementData
         ).send({from: account});
 
         const logs = await getEventLogs(tx, worldsManagement);
@@ -95,14 +104,67 @@ export default function CreateAlbum({
             Pages (and achievements) and stickers (and achievements) will be added later.
         </Alert>
 
-        <Box sx={{marginTop: 4}}>
+        <Grid container sx={{marginTop: 4}}>
             {/*
-                TODO implement form:
-                uint256 _worldId, string memory _name, string memory _edition,
-                string memory _frontImage, string memory _backImage, string memory _rarityIcons,
-                bytes32 _achievementType, string memory _achievementName, string memory _achievementImage,
+                string memory _achievementName, string memory _achievementImage,
                 bytes memory _achievementData
             */}
-        </Box>
+            <Grid item xs={3}><Label>Name:</Label></Grid>
+            <Grid item xs={9}>
+                <TextField variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
+            </Grid>
+            <Grid item xs={3}><Label>Edition:</Label></Grid>
+            <Grid item xs={9}>
+                <TextField placeholder="E.g. 2024" variant="outlined" value={edition} onChange={(e) => setEdition(e.target.value)} />
+            </Grid>
+            <Grid item xs={3}><Label>Front image (URL):</Label></Grid>
+            <Grid item xs={9}>
+                <TextField variant="outlined" value={frontImage} onChange={(e) => setFrontImage(e.target.value)} />
+                <ImagePreview aspectRatio="8 / 9" cover={true} url={frontImage} style={{maxWidth: "400px"}} />
+            </Grid>
+            <Grid item xs={3}><Label>Back image (URL):</Label></Grid>
+            <Grid item xs={9}>
+                <TextField variant="outlined" value={backImage} onChange={(e) => setBackImage(e.target.value)} />
+                <ImagePreview aspectRatio="8 / 9" cover={true} url={backImage} style={{maxWidth: "400px"}} />
+            </Grid>
+            <Grid item xs={3}><Label>Rarity Icons (URL):</Label></Grid>
+            <Grid item xs={9}>
+                <TextField variant="outlined" value={rarityIcons} onChange={(e) => setRarityIcons(e.target.value)} />
+                <ImagePreview aspectRatio="4 / 1" cover={true} url={rarityIcons} style={{maxWidth: "400px"}} />
+            </Grid>
+            <Grid item xs={3}><Label>Achievement Type:</Label></Grid>
+            <Grid item xs={9}>
+                <Select autoWidth label="Achievement Type" sx={{ minWidth: 100, bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
+                        value={achievementType} onChange={(e) => setAchievementType(e.target.value)}>
+                    {achievementTypes.filter(
+                        (achievementType) => achievementType[2] === 1n
+                    ).map(
+                        (achievementType, index) => (
+                            <MenuItem value={achievementType[1]} key={index}>{achievementType[0]}</MenuItem>
+                        )
+                    )}
+                </Select>
+            </Grid>
+            <Grid item xs={3}><Label>Achievement Name:</Label></Grid>
+            <Grid item xs={9}>
+                <TextField variant="outlined" value={achievementName} onChange={(e) => setAchievementName(e.target.value)} />
+            </Grid>
+            <Grid item xs={3}><Label>Achievement Image (URL):</Label></Grid>
+            <Grid item xs={9}>
+                <TextField variant="outlined" value={achievementImage} onChange={(e) => setAchievementImage(e.target.value)} />
+                <ImagePreview aspectRatio="1 / 1" cover={true} url={achievementImage} style={{maxWidth: "400px"}} />
+            </Grid>
+            <Grid item xs={3}><Label>Achievement Data:</Label></Grid>
+            <Grid item xs={9}>
+                <TextField variant="outlined" placeholder="Optional, 0x + 64 hex. chars" value={achievementData}
+                           onChange={(e) => setAchievementData(e.target.value)} />
+            </Grid>
+            <Grid item xs={12}>
+                <Button variant="contained" color="primary" size="large"
+                        onClick={() => defineAlbum()}>
+                    Create
+                </Button>
+            </Grid>
+        </Grid>
     </AlbumsListEnabledLayout>;
 }
