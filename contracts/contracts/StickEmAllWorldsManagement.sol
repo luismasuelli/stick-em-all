@@ -542,7 +542,7 @@ contract StickEmAllWorldsManagement {
         bytes32 _achievementType, string memory _achievementName, string memory _achievementImage,
         bytes memory _achievementData
     ) external validWorldId(_worldId) {
-        uint256 _index = albumDefinitions.length;
+        uint256 _index = albumDefinitions.length + 1;
         worlds.params().checkAchievementType(_achievementType);
         albumDefinitions.push(AlbumDefinition({
             worldId: _worldId, name: _name, edition: _edition, frontImage: _frontImage,
