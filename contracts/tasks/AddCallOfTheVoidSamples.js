@@ -104,11 +104,12 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
         const definePageCostParam = keccak256(hre.ethers, "Costs::Albums::DefinePage");
         const defineAchievementCostParam = keccak256(hre.ethers, "Costs::Albums::DefineAchievement");
         const defineStickerCostParam = keccak256(hre.ethers, "Costs::Albums::DefineSticker");
-        const defineWorldNativePrice = await params.getNativeCost(defineWorldCostParam);
-        const defineAlbumNativePrice = await params.getNativeCost(defineWorldCostParam);
-        const definePageNativePrice = await params.getNativeCost(defineWorldCostParam);
-        const defineAchievementNativePrice = await params.getNativeCost(defineWorldCostParam);
-        const defineStickerNativePrice = await params.getNativeCost(defineWorldCostParam);
+        console.log(params);
+        const defineWorldNativePrice = await params["getNativeCost(bytes32)"](defineWorldCostParam);
+        const defineAlbumNativePrice = await params["getNativeCost(bytes32)"](defineAlbumCostParam);
+        const definePageNativePrice = await params["getNativeCost(bytes32)"](definePageCostParam);
+        const defineAchievementNativePrice = await params["getNativeCost(bytes32)"](defineAchievementCostParam);
+        const defineStickerNativePrice = await params["getNativeCost(bytes32)"](defineStickerCostParam);
 
         const cardAchievementType = keccak256(hre.ethers, "AchievementType::Card");
         const badgeAchievementType = keccak256(hre.ethers, "AchievementType::Badge");
@@ -120,10 +121,11 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
         console.log("Defining the world: Call of the Void...");
         await worlds.createWorld(
             "Call of the Void", "A lovecraftian adventure collectibles company",
-            `${baseImageUrl}/world-logo.webp`
-        ).send({value: defineWorldNativePrice * 110n / 100n});
+            `${baseImageUrl}/world-logo.webp`,
+            {value: defineWorldNativePrice * 110n / 100n}
+        );
 
-        // 2. Define the album (worldId=1, id=1).
+        // 2. Define the album (worldId=1, id=0).
         console.log("Defining the album: Eldritch Armies...");
         await worldsManagement.defineAlbum(
             1n, "Eldritch Armies", "2024", `${baseImageUrl}/album-cover.webp`,
@@ -132,41 +134,41 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
             "0x0000000000000000000000000000000000000000000000000000000000000000"
         );
 
-        // 2. Define the album pages (worldId=1, albumId=1, pageIdx=0..6).
+        // 2. Define the album pages (worldId=1, albumId=0, pageIdx=0..6).
         console.log("Defining the pages of the album...");
         console.log(">>> Page: Sun...");
         await worldsManagement.defineAlbumPage(
-            1n, 1n, "Sun", `${baseImageUrl}/page-sun.webp`, 15,
+            1n, 0n, "Sun", `${baseImageUrl}/page-sun.webp`, 15,
             badgeAchievementType, "Withering Hydra", `${baseImageUrl}/achievement-sun.webp`,
             "0x0000000000000000000000000000000000000000000000000000000000000000"
         );
         console.log(">>> Page: Moon...");
         await worldsManagement.defineAlbumPage(
-            1n, 1n, "Moon", `${baseImageUrl}/page-moon.webp`, 16,
+            1n, 0n, "Moon", `${baseImageUrl}/page-moon.webp`, 16,
             badgeAchievementType, "Shadow Man", `${baseImageUrl}/achievement-moon.webp`,
             "0x0000000000000000000000000000000000000000000000000000000000000000"
         );
         console.log(">>> Page: Space...");
         await worldsManagement.defineAlbumPage(
-            1n, 1n, "Space", `${baseImageUrl}/page-space.webp`, 12,
+            1n, 0n, "Space", `${baseImageUrl}/page-space.webp`, 12,
             badgeAchievementType, "Aeon of The Way", `${baseImageUrl}/achievement-space.webp`,
             "0x0000000000000000000000000000000000000000000000000000000000000000"
         );
         console.log(">>> Page: Time...");
         await worldsManagement.defineAlbumPage(
-            1n, 1n, "Time", `${baseImageUrl}/page-time.webp`, 13,
+            1n, 0n, "Time", `${baseImageUrl}/page-time.webp`, 13,
             badgeAchievementType, "Entropic Manifestation", `${baseImageUrl}/achievement-time.webp`,
             "0x0000000000000000000000000000000000000000000000000000000000000000"
         );
         console.log(">>> Page: Stars...");
         await worldsManagement.defineAlbumPage(
-            1n, 1n, "Stars", `${baseImageUrl}/page-stars.webp`, 14,
+            1n, 0n, "Stars", `${baseImageUrl}/page-stars.webp`, 14,
             badgeAchievementType, "Emissary of the Ancient Ones", `${baseImageUrl}/achievement-stars.webp`,
             "0x0000000000000000000000000000000000000000000000000000000000000000"
         );
         console.log(">>> Page: Glitch...");
         await worldsManagement.defineAlbumPage(
-            1n, 1n, "Glitch", `${baseImageUrl}/page-glitch.webp`, 0,
+            1n, 0n, "Glitch", `${baseImageUrl}/page-glitch.webp`, 0,
             "0x0000000000000000000000000000000000000000000000000000000000000000", "", "",
             "0x0000000000000000000000000000000000000000000000000000000000000000"
         );
