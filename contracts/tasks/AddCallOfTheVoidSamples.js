@@ -124,6 +124,9 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
             `${baseImageUrl}/world-logo.webp`,
             {value: defineWorldNativePrice * 110n / 100n}
         );
+        await worlds.setBackground(1n, `${baseImageUrl}/world-background.webp`);
+        await worlds.setExternalUrl(1n, baseUrl);
+        await worlds.setValidatorUrl(1n, `${baseUrl}/validator.json`);
 
         // 2. Define the album (worldId=1, id=0).
         console.log("Defining the album: Eldritch Armies...");
