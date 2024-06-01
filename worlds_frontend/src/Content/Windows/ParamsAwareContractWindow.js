@@ -64,7 +64,7 @@ export default function ParamsAwareContractWindow({
         // - native costs:
         let nativeCosts = {};
         await Promise.all(params.map(async (e) => {
-            nativeCosts[e.hash] = await paramsContract.methods.getNativeCost(e.hash).call();
+            nativeCosts[e.hash] = await paramsContract.methods['getNativeCost(bytes32)'](e.hash).call();
         }));
 
         // Update everything.
