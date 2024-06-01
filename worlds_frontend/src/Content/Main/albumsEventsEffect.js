@@ -94,11 +94,11 @@ function finishInitialState(state) {
  * Creates an events effect for the albums events.
  * @param worldsManagement The current worldsManagement contract.
  * @param albumsCache The initial cache.
- * @param setAlbumsCacheRef A setter for the albums cache.
+ * @param setAlbumsCache A setter for the albums cache.
  * @param worldId The id of the world to get the albums from.
  * @returns {function(): void} The close function for the effect.
  */
-export default function worldsEventsEffect(worldsManagement, albumsCache, setAlbumsCacheRef, worldId) {
+export default function albumsEventsEffect(worldsManagement, albumsCache, setAlbumsCache, worldId) {
     let updateInitialState = (state, event) => updateAccountDependentInitialState(state, event);
     let updateNextState = (state, event) => updateAccountDependentNextState(state, event);
     let prepareInitialState = {updateInitialState, finishInitialState};
@@ -108,6 +108,6 @@ export default function worldsEventsEffect(worldsManagement, albumsCache, setAlb
             {name: "AlbumDefined", filter: {worldId}},
             {name: "AlbumReleased", filter: {worldId}},
         ], prepareInitialState,
-        updateNextState, setAlbumsCacheRef.current, albumsCache
+        updateNextState, setAlbumsCache, albumsCache
     );
 }

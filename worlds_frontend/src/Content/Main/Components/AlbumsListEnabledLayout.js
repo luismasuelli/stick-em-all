@@ -15,7 +15,8 @@ export default function AlbumsListEnabledLayout({
     let {worldId} = useParams();
     useEffect(() => {
         if (selectedWorldId === undefined || selectedWorldId.toString() !== worldId.toString()) {
-            setSelectedWorldId(selectedWorldId);
+            // eslint-disable-next-line no-undef
+            setSelectedWorldId(worldId === undefined ? undefined : BigInt(worldId));
         }
     }, [setSelectedWorldId, worldId, selectedWorldId]);
 

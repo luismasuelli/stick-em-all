@@ -19,7 +19,7 @@ export default function AlbumsList({ albumsList, albumsData, ...props }) {
         navigate("/manage/" + worldId.toString() + "/edit/" + albumId.toString());
     }
 
-    albumsList = albumsList.filter(album => album.worldId === worldId);
+    albumsList = albumsList.filter(album => album.worldId.toString() === worldId);
 
     return <Box sx={{
         height: '100%',   // Use 100% of the parent height
@@ -32,7 +32,7 @@ export default function AlbumsList({ albumsList, albumsData, ...props }) {
                 <ThemedBox key={index} {...props} severity={album.released ? "success" : "info"}
                            onClick={() => handleClick(album.albumId)} style={{userSelect: "none"}}>
                     <h3 style={{textOverflow: "ellipsis", padding: 0, margin: 0}}>ID: {album.albumId.toString()}</h3>
-                    {(albumsList[album.albumId]) ? (
+                    {(albumsData[album.albumId]) ? (
                         <p style={{textOverflow: "ellipsis", padding: 0, margin: 0}}>{albumsData[album.albumId].name}</p>
                     ) : null}
                 </ThemedBox>
