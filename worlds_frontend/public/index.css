@@ -9,3 +9,84 @@ body {
     background: url('background.webp') center center no-repeat;
     background-size: cover;
 }
+
+div.layout {
+    display: inline-block;
+    width: 80px;
+    height: 90px;
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+}
+
+div.layout.layout-0 {
+    background-image: url('layout-0.png');
+}
+
+div.layout.layout-1 {
+    background-image: url('layout-1.png');
+}
+
+div.layout.layout-2 {
+    background-image: url('layout-2.png');
+}
+
+div.layout.layout-3 {
+    background-image: url('layout-3.png');
+}
+
+div.layout.layout-4 {
+    background-image: url('layout-4.png');
+}
+
+div.layout.layout-5 {
+    background-image: url('layout-5.png');
+}
+
+div.layout.layout-6 {
+    background-image: url('layout-6.png');
+}
+
+div.layout.layout-7 {
+    background-image: url('layout-7.png');
+}
+
+div.layout.layout-8 {
+    background-image: url('layout-8.png');
+}
+
+div.layout.layout-9 {
+    background-image: url('layout-9.png');
+}
+
+div.layout.layout-10 {
+    background-image: url('layout-10.png');
+}
+
+div.layout.layout-11 {
+    background-image: url('layout-11.png');
+}
+
+div.layout.layout-12 {
+    background-image: url('layout-12.png');
+}
+
+div.layout.layout-13 {
+    background-image: url('layout-13.png');
+}
+
+div.layout.layout-14 {
+    background-image: url('layout-14.png');
+}
+
+div.layout.layout-15 {
+    background-image: url('layout-15.png');
+}
+
+div.layout.layout-16 {
+    background-image: url('layout-16.png');
+}
+
+div.layout.layout-17 {
+    background-image: url('layout-17.png');
+}
