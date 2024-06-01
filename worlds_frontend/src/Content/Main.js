@@ -73,6 +73,12 @@ function MainContent({ contracts, account }) {
     //    Other data appears only on retrieval and must be done in
     //    real-time.
     const [worldsDataCache, setWorldsDataCache] = useState({});
+    const setWorldsData = useNonReactive((worldId, worldData) => {
+        setWorldsDataCache({
+            ...worldsDataCache,
+            ...(Object.fromEntries([[worldId, worldData]]))
+        });
+    });
 
     // 4. Keeping a track of the data associated to new worlds,
     //    or editing an existing world.
@@ -91,13 +97,20 @@ function MainContent({ contracts, account }) {
             // start fetching albums data.
             return albumsEventsEffect(
                 worldsManagement, {lastBlock: null, lastState: {albumsIndices: {}, albumsRelevance: []}},
-                setAlbumsCache, selectedWorldId
+                // eslint-disable-next-line no-undef
+                setAlbumsCache, BigInt(selectedWorldId)
             );
         }
     }, [selectedWorldId, setAlbumsCache, worldsManagement]);
 
     // 6. Finally, tracking the albums data cache.
     const [albumsDataCache, setAlbumsDataCache] = useState({});
+    const setAlbumsData = useNonReactive((albumId, albumData) => {
+        setAlbumsDataCache({
+            ...albumsDataCache,
+            ...(Object.fromEntries([[albumId, albumData]]))
+        });
+    });
 
     // Rendering everything.
     return <Section title="Earnings management" color="primary.light" sx={{marginTop: 4}}>
@@ -107,18 +120,20 @@ function MainContent({ contracts, account }) {
                     worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache}
                 />} />
                 <Route path="/create" element={<CreateWorld
-                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
-                    setNewWorldData={setNewWorldData}
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache}
+                    worldsContract={worlds} setNewWorldData={setNewWorldData}
                 />} />
                 <Route path="/created/:worldId" element={<WorldCreated
-                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} newWorldData={newWorldData}
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache}
+                    newWorldData={newWorldData}
                 />} />
                 <Route path="/edit/:worldId" element={<EditWorld
-                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
-                    setWorldsData={setWorldsDataCache}
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache}
+                    worldsContract={worlds} setWorldsData={setWorldsData}
                 />} />
                 <Route path="/edit/:worldId/transfer" element={<TransferWorld
-                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache} worldsContract={worlds}
+                    worldsList={worldsCache.lastState.worldsRelevance} worldsData={worldsDataCache}
+                    worldsContract={worlds}
                 />} />
                 <Route path="/manage/:worldId" element={<SelectAlbum
                     worldsManagement={worldsManagement} worldsData={worldsDataCache}
@@ -135,13 +150,13 @@ function MainContent({ contracts, account }) {
                 <Route path="/manage/:worldId/edit/:albumId" element={<EditAlbum
                     worldsManagement={worldsManagement} worldsData={worldsDataCache}
                     albumsCache={albumsCache}
-                    albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
+                    albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsData}
                     setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
                 <Route path="/manage/:worldId/edit/:albumId/:pageId" element={<EditAlbumPage
                     worldsManagement={worldsManagement} worldsData={worldsDataCache}
                     albumsCache={albumsCache}
-                    albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
+                    albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsData}
                     setSelectedWorldId={setSelectedWorldId} selectedWorldId={selectedWorldId}
                 />} />
             </Routes>

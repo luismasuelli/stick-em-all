@@ -44,15 +44,12 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
                 externalUrl, validatorUrl, earningsReceiver
             }
             // 2. Set the downloaded world's data into the worldsData for the worldId.
-            setWorldsData({
-                ...worldsData,
-                ...(Object.fromEntries([[worldId, retrievedWorldData]]))
-            });
+            setWorldsData(worldId, retrievedWorldData);
             // 3. Also set the downloaded world's data into the current world data.
             setCurrentWorldData(retrievedWorldData);
         });
         getWorldData();
-    }, [worldId]);
+    }, [worldId, wrappedCall, worldsContract, setWorldsData]);
 
     const reflectNewWorldData = function(key, value) {
         setWorldsData({
