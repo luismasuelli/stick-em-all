@@ -248,12 +248,16 @@ task("deploy-everything", "Deploys all our ecosystem")
         console.log("Economy address: " + economyAddress);
         console.log("Main address: " + mainAddress);
 
-        // Define world parameters.
+        // Define world pAdarameters.
         await params.setFiatCost(keccak256(hre.ethers, "Costs::DefineWorld"), 10);
         await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefineAlbum"), 5);
         await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefinePage"), 3);
         await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefineAchievement"), 2);
         await params.setFiatCost(keccak256(hre.ethers, "Costs::Albums::DefineSticker"), 1);
+
+        // Adding two achievement types.
+        await params.addAchievementType(keccak256(hre.ethers, "AchievementType::Card"), "Card");
+        await params.addAchievementType(keccak256(hre.ethers, "AchievementType::Badge"), "Badge");
 
         if (owner) {
             console.log("Transferring ownership to " + owner + "...");
