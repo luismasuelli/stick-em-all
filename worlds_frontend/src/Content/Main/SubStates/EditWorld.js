@@ -13,7 +13,7 @@ import Box from "@mui/material/Box";
 import {ImagePreview} from "../../Controls/ImagePreview";
 import {ReverseChallenge} from "../../Controls/ReverseChallenge";
 
-export default function EditWorld({ worldsList, worldsData, worldsContract, setWorldsData }) {
+export default function EditWorld({ worldsList, worldsData, worldsContract, setWorldData }) {
     let {worldId} = useParams();
     const navigate = useNavigate();
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
@@ -44,15 +44,15 @@ export default function EditWorld({ worldsList, worldsData, worldsContract, setW
                 externalUrl, validatorUrl, earningsReceiver
             }
             // 2. Set the downloaded world's data into the worldsData for the worldId.
-            setWorldsData(worldId, retrievedWorldData);
+            setWorldData(worldId, retrievedWorldData);
             // 3. Also set the downloaded world's data into the current world data.
             setCurrentWorldData(retrievedWorldData);
         });
         getWorldData();
-    }, [worldId, wrappedCall, worldsContract, setWorldsData]);
+    }, [worldId, wrappedCall, worldsContract, setWorldData]);
 
     const reflectNewWorldData = function(key, value) {
-        setWorldsData({
+        setWorldData({
             ...worldsData,
             ...(Object.fromEntries([[worldId, {
                 ...currentWorldData,
