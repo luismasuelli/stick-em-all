@@ -1782,18 +1782,83 @@ const paramsContractABI = [
         "type": "event"
     },
     {
-        "inputs": [],
-        "name": "earningsBalance",
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "achievementTypes",
         "outputs": [
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "id",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "enum StickEmAllParams.AchievementTypeStatus",
+                "name": "status",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
             {
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
             }
         ],
+        "name": "achievementTypesList",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "id",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            }
+        ],
+        "name": "addAchievementType",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "id",
+                "type": "bytes32"
+            }
+        ],
+        "name": "checkAchievementType",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
         "inputs": [],
@@ -1806,8 +1871,20 @@ const paramsContractABI = [
             }
         ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "earningsWithdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
         "inputs": [
@@ -1826,8 +1903,58 @@ const paramsContractABI = [
             }
         ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getAchievementTypesListCount",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_fiatValue",
+                "type": "uint256"
+            }
+        ],
+        "name": "getNativeCost",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "_key",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getNativeCost",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
         "inputs": [],
@@ -1840,8 +1967,7 @@ const paramsContractABI = [
             }
         ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
     },
     {
         "inputs": [],
@@ -1853,12 +1979,30 @@ const paramsContractABI = [
     {
         "inputs": [
             {
+                "internalType": "bytes32",
+                "name": "id",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bool",
+                "name": "active",
+                "type": "bool"
+            }
+        ],
+        "name": "setAchievementType",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "address",
-                "name": "newOwner",
+                "name": "_earningsReceiver",
                 "type": "address"
             }
         ],
-        "name": "transferOwnership",
+        "name": "setEarningsReceiver",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -1885,47 +2029,18 @@ const paramsContractABI = [
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_earningsReceiver",
+                "name": "newOwner",
                 "type": "address"
             }
         ],
-        "name": "setEarningsReceiver",
+        "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "earningsWithdraw",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "_key",
-                "type": "bytes32"
-            }
-        ],
-        "name": "getNativeCost",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "stateMutability": "payable",
+        "type": "receive"
     }
 ];
 
