@@ -57,12 +57,12 @@ function _updateState(state, event) {
 
 
 /**
- * Related to an account, processes an event in an immutable way.
+ * Processes an event in an immutable way.
  * @param state The current state.
  * @param event The event being processed.
  * @returns {unknown} The NEW updated state.
  */
-function updateAccountDependentNextState(state, event) {
+function updateNextState(state, event) {
     return produce(state, draft => {
         _updateState(draft, event);
     });
@@ -70,12 +70,12 @@ function updateAccountDependentNextState(state, event) {
 
 
 /**
- * Related to an account, processes an event in a mutable way.
+ * Processes an event in a mutable way.
  * @param state The current state.
  * @param event The event being processed.
  * @returns {*} The updated state.
  */
-function updateAccountDependentInitialState(state, event) {
+function updateInitialState(state, event) {
     return _updateState(state || {albumsIndices: {}, albumsRelevance: []}, event);
 }
 
@@ -99,8 +99,6 @@ function finishInitialState(state) {
  * @returns {function(): void} The close function for the effect.
  */
 export default function albumsEventsEffect(worldsManagement, albumsCache, setAlbumsCache, worldId) {
-    let updateInitialState = (state, event) => updateAccountDependentInitialState(state, event);
-    let updateNextState = (state, event) => updateAccountDependentNextState(state, event);
     let prepareInitialState = {updateInitialState, finishInitialState};
 
     return getEventsEffect(
