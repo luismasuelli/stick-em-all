@@ -50,7 +50,7 @@ function _updateState(state, event) {
         const {albumId, worldId} = event.returnValues;
 
         let obj = getOrAdd(albumId);
-        obj.worldId = worldId;
+        obj.released = true;
     }
     return state;
 }
