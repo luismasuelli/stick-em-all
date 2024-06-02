@@ -211,7 +211,7 @@ function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag, isReleased 
             {isReleased ? <>
                 <Heading>Create new page</Heading>
                 <Alert severity="warning" sx={{margin: 1}}>
-                    Please take special care while creating the bare album here. Changes cannot be done later.
+                    Please take special care while creating a page for the album here. Changes cannot be done later.
                     Stickers (and THEIR achievements) will be added later.
                 </Alert>
                 <Grid container>
@@ -448,7 +448,7 @@ function AlbumReleasePreview({ worldsManagement, refreshFlag, setRefreshFlag }) 
             <Grid item xs={12}>
                 {(canBeReleased) ? (<>
                     <Alert severity="warning" sx={{marginTop: 1, marginBottom: 1}}>
-                        Please take special care while creating the bare album here. Releasing cannot be undone.
+                        Please take special care while releasing the here. Releasing cannot be undone.
                     </Alert>
                     <Button size="large" color="primary" variant="contained"
                             onClick={() => release()}>Release</Button>
