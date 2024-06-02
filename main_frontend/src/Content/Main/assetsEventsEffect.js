@@ -51,14 +51,14 @@ function _updateState(state, event, account) {
      * @returns {{albumId}|*} The object.
      */
     function getOrAdd(albumId, worldId) {
-        const index = state.albumsIndices[albumId];
+        const index = state.assetsIndices[albumId];
         if (index === undefined) {
-            state.albumsIndices[albumId] = state.albumsRelevance.length;
+            state.assetsIndices[albumId] = state.assetsRelevance.length;
             let obj = {albumId, worldId};
-            state.albumsRelevance.push(obj);
+            state.assetsRelevance.push(obj);
             return obj;
         } else {
-            return state.albumsRelevance[index];
+            return state.assetsRelevance[index];
         }
     }
 
