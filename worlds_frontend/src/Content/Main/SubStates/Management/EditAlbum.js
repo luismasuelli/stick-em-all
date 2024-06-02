@@ -47,6 +47,7 @@ function AlbumData({ worldsManagement, setAlbumData, refreshFlag }) {
     });
 
     useEffect(() => {
+        console.log("Setting album data...");
         const getAlbumData = wrappedCall(async function() {
             // 1. Download the album data for the given id.
             const {
@@ -57,6 +58,7 @@ function AlbumData({ worldsManagement, setAlbumData, refreshFlag }) {
                 worldId, name, edition, frontImage, backImage, rarityIcons,
                 totalStickers, completedPages, released
             }
+            console.log(">>>>>>>>>> RELEASED:", released);
 
             // 2. Set the downloaded album's data into the albumsData for the albumId.
             setAlbumData(albumId, retrievedAlbumData);
@@ -82,12 +84,12 @@ function AlbumData({ worldsManagement, setAlbumData, refreshFlag }) {
                 <Label>Front image:</Label>
             </Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'left', p: 2, paddingLeft: 0}}>
+                <Box sx={{textAlign: 'left', p: 2, paddingLeft: 0}}>
                     {localAlbumData.frontImage
                         ? <ImagePreview url={localAlbumData.frontImage}
                                         aspectRatio="8 / 9" cover={true} style={{maxWidth: "400px"}} />
                         : "none"}
-                </Typography>
+                </Box>
             </Grid>
             <Grid item xs={4}>
                 <Label>Back image:</Label>
@@ -471,7 +473,7 @@ export default function EditAlbum({
     // A refresh flag.
     const [refreshFlag, setRefreshFlag] = useState(0);
 
-
+    console.log("Album data:", albumData);
     return <AlbumsListEnabledLayout worldsData={worldsData} albumsData={albumsDataCache}
                                     selectedWorldId={selectedWorldId} setSelectedWorldId={setSelectedWorldId}
                                     albumsList={albumsCache.lastState.albumsRelevance}>
