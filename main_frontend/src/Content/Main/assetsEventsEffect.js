@@ -75,11 +75,11 @@ function _updateState(state, event, account) {
                     state.boosterPacks[albumTypeId].push({id, ruleId});
                     break;
                 case "sticker":
-                    state.boosterPacks[albumTypeId] ||= {};
-                    state.boosterPacks[albumTypeId][pageId] ||= [];
-                    state.boosterPacks[albumTypeId][pageId].push({id, pageId, slotId});
-                    state.boosterPacks[albumTypeId]["__all__"] ||= [];
-                    state.boosterPacks[albumTypeId]["__all__"].push({id, pageId, slotId});
+                    state.stickers[albumTypeId] ||= {};
+                    state.stickers[albumTypeId][pageId] ||= [];
+                    state.stickers[albumTypeId][pageId].push({id, pageId, slotId});
+                    state.stickers[albumTypeId]["__all__"] ||= [];
+                    state.stickers[albumTypeId]["__all__"].push({id, pageId, slotId});
                     break;
             }
 
