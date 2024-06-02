@@ -6,12 +6,14 @@ import Web3AccountContext from "../../../../Wrapping/Web3AccountContext";
 import ContractWindowContext from "../../../Contexts/ContractWindowContext";
 import ParamsContext from "../../../Contexts/ParamsContext";
 import Section from "../../../Controls/Section";
-import {Alert, Button, Grid, MenuItem, Select, Typography} from "@mui/material";
+import {Alert, Button, Grid, MenuItem, Select, Switch, Typography} from "@mui/material";
 import {ImagePreview} from "../../../Controls/ImagePreview";
 import Heading from "../../../Controls/Heading";
 import Label from "../../../Controls/Label";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import StaticText from "../../../Controls/StaticText";
+import TokenInput from "../../../Controls/TokenInput";
 
 function usdFromCents(v) {
     v = v.toString();
@@ -95,23 +97,23 @@ function AlbumData({ worldsManagement, setAlbumData, refreshFlag }) {
                 <Label>Back image:</Label>
             </Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'left', p: 2, paddingLeft: 0}}>
+                <StaticText>
                     {localAlbumData.backImage
                         ? <ImagePreview url={localAlbumData.backImage}
                                         aspectRatio="8 / 9" cover={true} style={{maxWidth: "400px"}} />
                         : "none"}
-                </Typography>
+                </StaticText>
             </Grid>
             <Grid item xs={4}>
                 <Label>Rarity icons:</Label>
             </Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'left', p: 2, paddingLeft: 0}}>
+                <StaticText>
                     {localAlbumData.rarityIcons
                         ? <ImagePreview url={localAlbumData.rarityIcons}
                                         aspectRatio="4 / 1" cover={true} style={{maxWidth: "100px"}} />
                         : "none"}
-                </Typography>
+                </StaticText>
             </Grid>
         </Grid>
     </Section>;
@@ -341,13 +343,95 @@ function AlbumAchievements({ worldsManagement, refreshFlag, setRefreshFlag }) {
                     <Label>Data:</Label>
                 </Grid>
                 <Grid item xs={8}>
-                    <Typography sx={{textAlign: 'left', p: 2, paddingLeft: 0}}>
+                    <StaticText>
                         {achievement.data}
-                    </Typography>
+                    </StaticText>
                 </Grid>
             </Fragment>)}
         </Grid>
     </Section>;
+}
+
+function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setRefreshFlag }) {
+    // Global contexts.
+    const {wrappedCall, albumId, worldId} = useGlobalContextData();
+
+    // Local data.
+    const [platinumProbs, setPlatinumProbs] = useState(0n);
+    const [active, setActive] = useState(false);
+    const [fiatPrice, setFiatPrice] = useState(0);
+
+    useEffect(() => {
+        // eslint-disable-next-line no-undef
+        setPlatinumProbs(BigInt(rule.platinumProbability));
+    }, [rule.platinumProbability]);
+
+    useEffect(() => {
+        setActive(rule.active);
+    }, [rule.active]);
+
+    useEffect(() => {
+        setFiatPrice(rule.fiatPrice);
+    }, [rule.fiatPrice]);
+
+    const content = (
+        `${rule.bronzeStickersCount.toString()}/${rule.silverStickersCount.toString()}/` +
+        `${rule.hasGoldOrPlatinumSticker.toString()}`
+    );
+
+    function setConstrainedPlatinumProbs(platinumProbs) {
+        if (platinumProbs < 0n) {
+            setPlatinumProbs(0n);
+        } else if (platinumProbs > 10000n) {
+            setPlatinumProbs(10000n)
+        } else {
+            setPlatinumProbs(platinumProbs);
+        }
+    }
+
+    const handleChange = (event) => {
+        setActive(event.target.checked);
+    };
+
+    const updateRule = wrappedCall(async function() {
+        await worldsManagement.methods.updateBoosterPackRule(
+            worldId, albumId, index, active, fiatPrice, platinumProbs
+        );
+        setRefreshFlag((refreshFlag + 1) % 2);
+    });
+
+    return <>
+        <Grid item xs={3}>
+            <ImagePreview url={rule.image} cover={false} aspectRatio="2 / 3" />
+        </Grid>
+        <Grid item xs={9}>
+            <Grid container>
+                <Grid xs={4}><Label>Name:</Label></Grid>
+                <Grid xs={8}><StaticText>{rule.name}</StaticText></Grid>
+                <Grid xs={4}><Label>Price:</Label></Grid>
+                <Grid xs={8}>
+                    <TokenInput unit={2} value={fiatPrice} onChange={(v) => setFiatPrice(v)} />
+                </Grid>
+                <Grid xs={4}><Label>Platinum chance:</Label></Grid>
+                <Grid xs={8}>
+                    <TokenInput value={platinumProbs} onChange={setConstrainedPlatinumProbs} unit="wei"
+                                placeholder="0 to 10000" />
+                </Grid>
+                <Grid xs={4}><Label>Content:</Label></Grid>
+                <Grid xs={8}><StaticText>{content}</StaticText></Grid>
+                <Grid xs={4}><Label>Active:</Label></Grid>
+                <Grid xs={8} sx={{alignItems: 'center'}}>
+                    <Switch
+                        checked={rule.active}
+                        onChange={handleChange}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                    <Button size="large" color="primary" variant="contained"
+                            onClick={() => updateRule}>Release</Button>
+                </Grid>
+            </Grid>
+        </Grid>
+    </>;
 }
 
 function AlbumBoosterPackRules({ worldsManagement, refreshFlag, setRefreshFlag }) {
@@ -357,8 +441,36 @@ function AlbumBoosterPackRules({ worldsManagement, refreshFlag, setRefreshFlag }
     // Local data.
     const [albumBoosterPackRules, setAlbumBoosterPackRules] = useState([]);
 
-    return <Section title="Booster Packs" color="primary.light" sx={{marginTop: 4}}>
+    useEffect(() => {
+        const getAlbumBoosterPackRules = wrappedCall(async function() {
+            // 1. Download the achievements' data.
+            // eslint-disable-next-line no-undef
+            const count = await worldsManagement.methods.albumBoosterPackRulesCount(BigInt(albumId)).call();
+            let boosterPackRules = [];
+            for(let index = 0; index < count; index++) {
+                let {
+                    active, fiatPrice, name, image, bronzeStickersCount,
+                    silverStickersCount, hasGoldOrPlatinumSticker, platinumProbability
+                    // eslint-disable-next-line no-undef
+                } = await worldsManagement.methods.albumBoosterPackRules(BigInt(albumId), index).call();
+                boosterPackRules.push({
+                    active, fiatPrice, name, image, bronzeStickersCount,
+                    silverStickersCount, hasGoldOrPlatinumSticker, platinumProbability
+                });
+            }
 
+            // 2. Set the downloaded data properly.
+            setAlbumBoosterPackRules(boosterPackRules);
+        });
+        getAlbumBoosterPackRules();
+    }, [albumId, wrappedCall, worldsManagement, setAlbumBoosterPackRules, refreshFlag]);
+
+    return <Section title="Booster Packs" color="primary.light" sx={{marginTop: 4}}>
+        <Grid container>
+            {albumBoosterPackRules.map((rule, idx) =>
+                <AlbumBoosterPackRule key={idx} index={idx} rule={rule} />)}
+
+        </Grid>
     </Section>;
 }
 
@@ -413,39 +525,39 @@ function AlbumReleasePreview({ worldsManagement, refreshFlag, setRefreshFlag }) 
         <Grid container>
             <Grid item xs={4}><Label>Album:</Label></Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                <StaticText>
                     {usdFromCents(albumDefinitionCost)}
-                </Typography>
+                </StaticText>
             </Grid>
             <Grid item xs={4}><Label>Pages:</Label></Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                <StaticText>
                     {amounts.pages.toString()} x {usdFromCents(albumPageDefinitionCost)} = {usdFromCents(amounts.pages * albumPageDefinitionCost)}
-                </Typography>
+                </StaticText>
             </Grid>
             <Grid item xs={4}><Label>Achievements:</Label></Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                <StaticText>
                     {amounts.totalAchievements.toString()} x {usdFromCents(albumAchievementDefinitionCost)} = {usdFromCents(amounts.totalAchievements * albumAchievementDefinitionCost)}
-                </Typography>
+                </StaticText>
             </Grid>
             <Grid item xs={4}><Label>Stickers:</Label></Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                <StaticText>
                     {amounts.totalStickers.toString()} x {usdFromCents(albumStickerDefinitionCost)} = {usdFromCents(amounts.totalStickers * albumStickerDefinitionCost)}
-                </Typography>
+                </StaticText>
             </Grid>
             <Grid item xs={4}><Label>Total:</Label></Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                <StaticText>
                     {usdFromCents(amounts.totalFiatCost)}
-                </Typography>
+                </StaticText>
             </Grid>
             <Grid item xs={4}><Label>Total (MATIC):</Label></Grid>
             <Grid item xs={8}>
-                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                <StaticText>
                     {web3.utils.fromWei(amounts.totalNativeCost, "ether")}
-                </Typography>
+                </StaticText>
             </Grid>
             <Grid item xs={12}>
                 {(canBeReleased) ? (<>
