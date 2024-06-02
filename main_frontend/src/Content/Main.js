@@ -6,6 +6,9 @@ import StandaloneMessage from "./Windows/StandaloneMessage";
 import mainContractClients from "./Main/mainContractClients";
 import {MemoryRouter, Route, Routes, useNavigate} from "react-router-dom";
 import {Box, Button, Grid} from "@mui/material";
+import worldsEventsEffect from "./Main/worldsEventsEffect";
+import {useNonReactive} from "../Utils/nonReactive";
+import albumsEventsEffect from "./Main/albumsEventsEffect";
 
 
 function EntryPoint() {
@@ -37,7 +40,61 @@ function EntryPoint() {
 /**
  * Renders all the content to the end user(s).
  */
-function MainContent() {
+function MainContent({
+    contracts
+}) {
+    const {
+        main, economy, worldsManagement, worlds, params
+    } = contracts;
+
+    // 1. Listing the worlds.
+    let [worldsCache, setWorldsCache] = useState(
+        {lastBlock: null, lastState: {worldsIndices: {}, worldsRelevance: []}}
+    );
+    useEffect(() => {
+        return worldsEventsEffect(
+            worlds, {lastBlock: null, lastState: {worldsIndices: {}, worldsRelevance: []}},
+            setWorldsCache
+        );
+    }, [worlds]);
+
+    // 2. Tracking the cached data for the worlds.
+    const [worldsDataCache, setWorldsDataCache] = useState({});
+    const setWorldData = useNonReactive((worldId, worldData) => {
+        setWorldsDataCache({
+            ...worldsDataCache,
+            ...(Object.fromEntries([[worldId, worldData]]))
+        });
+    });
+
+    // 3. Picking a world.
+    let [selectedWorldId, setSelectedWorldId] = useState();
+
+    // 3. Listing the albums' types (for a world).
+    let [albumsCache, setAlbumsCache] = useState(
+        {lastBlock: null, lastState: {albumsIndices: {}, albumsRelevance: []}}
+    );
+    useEffect(() => {
+        setAlbumsCache({lastBlock: null, lastState: {albumsIndices: {}, albumsRelevance: []}});
+        if (typeof selectedWorldId === "bigint" && selectedWorldId >= 0n) {
+            // start fetching albums data.
+            return albumsEventsEffect(
+                worldsManagement, {lastBlock: null, lastState: {albumsIndices: {}, albumsRelevance: []}},
+                // eslint-disable-next-line no-undef
+                setAlbumsCache, BigInt(selectedWorldId)
+            );
+        }
+    }, [selectedWorldId, worldsManagement]);
+
+    // 6. Tracking the cached data for the albums.
+    const [albumsDataCache, setAlbumsDataCache] = useState({});
+    const setAlbumData = useNonReactive((albumId, albumData) => {
+        setAlbumsDataCache({
+            ...albumsDataCache,
+            ...(Object.fromEntries([[albumId, albumData]]))
+        });
+    });
+
     return <Box sx={{width: "100%", height: "100%", minHeight: "600px", position: "relative"}}>
         <MemoryRouter>
             <Routes>
