@@ -258,6 +258,12 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
             1n, 0n, {value: (await worldsManagement.getAlbumReleaseNativeCost(0n) * 110n / 100n)}
         );
 
+        console.log("Creating booster pack...");
+        await worldsManagement.defineBoosterPackRule(
+            // eslint-disable-next-line no-undef
+            1n, 0n, "Complete", `${baseImageUrl}/booster-pack.png`, 300, 10, 1, true, 1000
+        )
+
         const account = (await hre.ethers.getSigners())[0];
         console.log("Transferring ownership of the world to " + owner + "...");
         await worlds.transferFrom(account, owner, 1n);
