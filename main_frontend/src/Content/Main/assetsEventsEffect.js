@@ -67,7 +67,7 @@ function _updateState(state, event, account) {
             switch(type)
             {
                 case "album":
-                    state.albums[id] = true;
+                    state.albums.add(id);
                     break;
                 case "booster-pack":
                     state.boosterPacks[albumTypeId] ||= [];
