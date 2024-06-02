@@ -43,7 +43,8 @@ function AlbumData({ worldsManagement, setAlbumData }) {
                 worldId, name, edition, frontImage, backImage, rarityIcons,
                 totalStickers, completedPages, released
             }
-            // 2. Set the downloaded world's data into the worldsData for the worldId.
+
+            // 2. Set the downloaded album's data into the albumsData for the albumId.
             setAlbumData(albumId, retrievedAlbumData);
             setLocalAlbumData(retrievedAlbumData);
         });
@@ -100,7 +101,7 @@ function AlbumData({ worldsManagement, setAlbumData }) {
     </Section>;
 }
 
-function AlbumPages({ worldsManagement }) {
+function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag }) {
     // Global contexts.
     const {wrappedCall, albumId, worldId, account} = useGlobalContextData();
     const paramsContext = useContext(ParamsContext);
@@ -109,9 +110,6 @@ function AlbumPages({ worldsManagement }) {
 
     // Local data.
     const [albumPages, setAlbumPages] = useState([]);
-
-    // A refresh flag.
-    const [refreshFlag, setRefreshFlag] = useState(0);
 
     const [name, setName] = useState('');
     const [backgroundImage, setBackgroundImage] = useState('');
@@ -154,7 +152,7 @@ function AlbumPages({ worldsManagement }) {
                 });
             }
 
-            // 2. Set the downloaded world's data into the worldsData for the worldId.
+            // 2. Set the downloaded data properly.
             setAlbumPages(pages);
         });
         getAlbumPages();
@@ -265,19 +263,76 @@ function AlbumPages({ worldsManagement }) {
     </Section>;
 }
 
-function AlbumAchievements({worldsManagement}) {
+function AlbumAchievements({ worldsManagement, refreshFlag, setRefreshFlag }) {
     // Global contexts.
-    const {wrappedCall, albumId, worldId, account} = useGlobalContextData();
+    const {wrappedCall, albumId} = useGlobalContextData();
+    const paramsContext = useContext(ParamsContext);
 
     // Local data.
     const [albumAchievements, setAlbumAchievements] = useState([]);
 
-    return <Section title="Album data" color="primary.light" sx={{marginTop: 4}}>
+    // Collecting the available achievement types.
+    const achievementTypes = paramsContext.paramsData.achievementTypes;
+    let achievementTypesMap = {}
+    achievementTypes.filter(
+        (achievementType) => achievementType[2] === 1n
+    ).forEach((achievementType) => {
+        achievementTypesMap[achievementType[1]] = achievementType[0];
+    });
+    achievementTypesMap["0x0000000000000000000000000000000000000000000000000000000000000000"] = "(none)";
 
+    useEffect(() => {
+        const getAlbumAchievements = wrappedCall(async function getWorldData() {
+            // 1. Download the achievements' data.
+            // eslint-disable-next-line no-undef
+            const count = await worldsManagement.methods.albumAchievementDefinitionsCount(BigInt(albumId)).call();
+            let achievements = [];
+            for(let index = 0; index < count; index++) {
+                let {
+                    type_, displayName, image, data
+                    // eslint-disable-next-line no-undef
+                } = await worldsManagement.methods.albumAchievementDefinitions(BigInt(albumId), index).call();
+                achievements.push({
+                    type: type_, displayName, image, data
+                });
+            }
+
+            // 2. Set the downloaded data properly.
+            setAlbumAchievements(achievements);
+        });
+        getAlbumAchievements();
+    }, [albumId, wrappedCall, worldsManagement, setAlbumAchievements, refreshFlag]);
+
+    return <Section title="Achievements" color="primary.light" sx={{marginTop: 4}}>
+        <Grid container>
+            <Grid item xs={12}>
+                <Typography sx={{p: 2}}>These are all the currently defined album achievements</Typography>
+            </Grid>
+            {albumAchievements.map((achievement, idx) => <>
+                <Grid item xs={12}>
+                    <Heading>{achievement.displayName} ({achievementTypesMap[achievement.type] || "Unknown"})</Heading>
+                </Grid>
+                <Grid item xs={4}>
+                    <Label>Image:</Label>
+                </Grid>
+                <Grid item xs={8}>
+                    <ImagePreview aspectRatio="1 / 1" cover={false} url={achievement.image}
+                                  style={{maxWidth: "200px"}} />
+                </Grid>
+                <Grid item xs={4}>
+                    <Label>Data:</Label>
+                </Grid>
+                <Grid item xs={8}>
+                    <Typography sx={{textAlign: 'left', p: 2, paddingLeft: 0}}>
+                        {achievement.data}
+                    </Typography>
+                </Grid>
+            </>)}
+        </Grid>
     </Section>;
 }
 
-function AlbumBoosterPackRules({ worldsManagement }) {
+function AlbumBoosterPackRules({ worldsManagement, refreshFlag, setRefreshFlag }) {
     // Global contexts.
     const {wrappedCall, albumId, worldId, account} = useGlobalContextData();
 
@@ -289,7 +344,7 @@ function AlbumBoosterPackRules({ worldsManagement }) {
     </Section>;
 }
 
-function AlbumReleasePreview({ worldsManagement }) {
+function AlbumReleasePreview({ worldsManagement, refreshFlag, setRefreshFlag }) {
     // Global contexts.
     const {wrappedCall, albumId, worldId, account} = useGlobalContextData();
 
@@ -308,17 +363,25 @@ export default function EditAlbum({
     const {worldId, albumId} = useParams();
     const albumData = albumsDataCache[albumId];
 
+    // A refresh flag.
+    const [refreshFlag, setRefreshFlag] = useState(0);
+
+
     return <AlbumsListEnabledLayout worldsData={worldsData} albumsData={albumsDataCache}
                                     selectedWorldId={selectedWorldId} setSelectedWorldId={setSelectedWorldId}
                                     albumsList={albumsCache.lastState.albumsRelevance}>
         <AlbumData worldsManagement={worldsManagement} worldId={worldId} albumId={albumId}
                    setAlbumData={setAlbumData} />
-        <AlbumPages worldsManagement={worldsManagement} worldId={worldId} albumId={albumId} />
-        <AlbumAchievements worldsManagement={worldsManagement} worldId={worldId} albumId={albumId} />
+        <AlbumPages worldsManagement={worldsManagement} worldId={worldId} albumId={albumId}
+                    refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag} />
+        <AlbumAchievements worldsManagement={worldsManagement} worldId={worldId} albumId={albumId}
+                           refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag} />
         {albumData ? (
             albumData.released
-                ? <AlbumBoosterPackRules worldsManagement={worldsManagement} />
-                : <AlbumReleasePreview worldsManagement={worldsManagement} />
+                ? <AlbumBoosterPackRules worldsManagement={worldsManagement}
+                                         refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag} />
+                : <AlbumReleasePreview worldsManagement={worldsManagement}
+                                       refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag}/>
         ) : null}
     </AlbumsListEnabledLayout>;
 }
