@@ -101,7 +101,7 @@ function MainContent({
     // 7. Listing all the assets (for an account).
     let [assetsCache, setAssetsCache] = useState({
         lastBlock: null, lastState: {
-            albumsIndices: {}, albumsRelevance: []
+            assetsIndices: {}, assetsRelevance: [], boosterPacks: {}, stickers: {}, albums: {}
         }}
     );
 
