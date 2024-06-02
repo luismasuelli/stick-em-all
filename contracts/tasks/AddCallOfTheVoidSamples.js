@@ -104,7 +104,6 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
         const definePageCostParam = keccak256(hre.ethers, "Costs::Albums::DefinePage");
         const defineAchievementCostParam = keccak256(hre.ethers, "Costs::Albums::DefineAchievement");
         const defineStickerCostParam = keccak256(hre.ethers, "Costs::Albums::DefineSticker");
-        console.log(params);
         const defineWorldNativePrice = await params["getNativeCost(bytes32)"](defineWorldCostParam);
         const defineAlbumNativePrice = await params["getNativeCost(bytes32)"](defineAlbumCostParam);
         const definePageNativePrice = await params["getNativeCost(bytes32)"](definePageCostParam);
