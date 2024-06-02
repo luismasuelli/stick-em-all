@@ -23,13 +23,13 @@ function EntryPoint() {
     }}>
         <Box sx={{display: "inline-block", width: "300px"}}>
             <Grid container>
-                <Grid xs={12} sx={{p: 2}}>
+                <Grid item xs={12} sx={{p: 2}}>
                     <Button sx={{width: "100%"}} onClick={() => navigate("/create")}
                             variant="contained" color="primary" size="large">
                         Create album
                     </Button>
                 </Grid>
-                <Grid xs={12} sx={{p: 2}}>
+                <Grid item xs={12} sx={{p: 2}}>
                     <Button sx={{width: "100%"}} onClick={() => navigate("/albums")}
                             variant="contained" color="primary" size="large">
                         See my albums
@@ -71,7 +71,7 @@ function MainContent({
     });
 
     // 3. Picking a world.
-    let [selectedWorldId, setSelectedWorldId] = useState();
+    let [selectedWorldId, setSelectedWorldId] = useState("");
 
     // 3. Listing the albums' types (for a world).
     let [albumsCache, setAlbumsCache] = useState(
@@ -102,7 +102,12 @@ function MainContent({
         <MemoryRouter>
             <Routes>
                 <Route path="/" element={<EntryPoint />} />
-                <Route path="/create" element={<Create />} />
+                <Route path="/create" element={<Create
+                    main={main} economy={economy} worldsManagement={worldsManagement} worlds={worlds}
+                    worldsCache={worldsCache.lastState} worldsDataCache={worldsDataCache} setWorldsDataCache={setWorldsDataCache}
+                    albumsCache={albumsCache.lastState} albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
+                    selectedWorldId={selectedWorldId} setSelectedWorldId={setSelectedWorldId}
+                />} />
                 <Route path="/albums" element={<MyAlbums />} />
                 <Route path="/albums/:albumId" element={<Album />} />
             </Routes>
@@ -129,7 +134,7 @@ export default function Main() {
     if (contracts) {
         return <ParamsAwareContractWindow caption={"Stick 'Em All"} description={description}
                                           paramsContract={contracts.params} params={[]}
-                                          mainContract={contracts.worldsManagement}>
+                                          mainContract={contracts.main}>
             <MainContent account={account} contracts={contracts} />
         </ParamsAwareContractWindow>;
     } else {
