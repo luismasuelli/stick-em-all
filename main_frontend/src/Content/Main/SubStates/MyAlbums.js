@@ -1,3 +1,3 @@
-export function MyAlbums() {
+export default function MyAlbums() {
     return <></>;
 }

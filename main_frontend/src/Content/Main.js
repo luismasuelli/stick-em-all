@@ -9,8 +9,9 @@ import {Box, Button, Grid} from "@mui/material";
 import worldsEventsEffect from "./Main/worldsEventsEffect";
 import {useNonReactive} from "../Utils/nonReactive";
 import albumsEventsEffect from "./Main/albumsEventsEffect";
-import {Album, Create} from "@mui/icons-material";
-import {MyAlbums} from "./Main/SubStates/MyAlbums";
+import Create from "./Main/SubStates/Create";
+import MyAlbums from "./Main/SubStates/MyAlbums";
+import Album from "./Main/SubStates/Album";
 
 
 function EntryPoint() {
