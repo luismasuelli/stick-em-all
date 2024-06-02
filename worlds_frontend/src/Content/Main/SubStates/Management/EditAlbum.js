@@ -1,6 +1,6 @@
 import AlbumsListEnabledLayout from "../../Components/AlbumsListEnabledLayout";
 import {useNavigate, useParams} from "react-router-dom";
-import React, {useContext, useEffect, useState} from "react";
+import React, {Fragment, useContext, useEffect, useState} from "react";
 import Web3Context from "../../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../../Wrapping/Web3AccountContext";
 import ContractWindowContext from "../../../Contexts/ContractWindowContext";
@@ -324,7 +324,7 @@ function AlbumAchievements({ worldsManagement, refreshFlag, setRefreshFlag }) {
             <Grid item xs={12}>
                 <Typography sx={{p: 2}}>These are all the currently defined album achievements</Typography>
             </Grid>
-            {albumAchievements.map((achievement, idx) => <>
+            {albumAchievements.map((achievement, idx) => <Fragment key={idx}>
                 <Grid item xs={12}>
                     <Heading>{achievement.displayName} ({achievementTypesMap[achievement.type] || "Unknown"})</Heading>
                 </Grid>
@@ -343,7 +343,7 @@ function AlbumAchievements({ worldsManagement, refreshFlag, setRefreshFlag }) {
                         {achievement.data}
                     </Typography>
                 </Grid>
-            </>)}
+            </Fragment>)}
         </Grid>
     </Section>;
 }
