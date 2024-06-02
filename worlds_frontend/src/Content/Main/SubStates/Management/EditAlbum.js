@@ -178,7 +178,7 @@ function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag, isReleased 
                 <Button size="large" color="primary" variant="contained"
                         onClick={() => setRefreshFlag((refreshFlag + 1) % 2)}>Refresh</Button>
             </Grid>
-            {albumPages.map((page, idx) => <>
+            {albumPages.map((page, idx) => <Fragment key={idx}>
                 <Grid item xs={12}>
                     <Heading>
                         Page #{idx + 1} - {page.name}
@@ -207,7 +207,7 @@ function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag, isReleased 
                         {page.currentlyDefinedStickers.toString()} (complete: {page.complete ? "Yes" : "No"})
                     </Box>
                 </Grid>
-            </>)}
+            </Fragment>)}
             {isReleased ? <>
                 <Heading>Create new page</Heading>
                 <Alert severity="warning" sx={{margin: 1}}>

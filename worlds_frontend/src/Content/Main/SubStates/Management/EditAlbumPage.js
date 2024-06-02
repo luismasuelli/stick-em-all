@@ -78,7 +78,7 @@ export default function EditAlbumPage({
         </Box>
         <Section title="Page stickers" color="primary.light">
             <Grid container>
-                {stickers.map((sticker, index) => <>
+                {stickers.map((sticker, index) => <Fragment key={index}>
                     <Grid item xs={12}>
                         <Heading>Sticker #{index + 1} / {maxStickers.toString()}</Heading>
                     </Grid>
@@ -101,7 +101,7 @@ export default function EditAlbumPage({
                     <Grid item xs={9}>
                         <Typography sx={{marginTop: 2, marginBottom: 2}}>{rarities[sticker.rarity]}</Typography>
                     </Grid>
-                </>)}
+                </Fragment>)}
             </Grid>
             {(maxStickers.toString() === stickers.length.toString()) ? (
                 <Alert sx={{marginTop: 1, marginBottom: 1}} severity="success">
