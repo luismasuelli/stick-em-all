@@ -4,9 +4,11 @@ import {useContext, useEffect, useMemo, useState} from "react";
 import {useNonReactive} from "../../../Utils/nonReactive";
 import {ImagePreview} from "../../Controls/ImagePreview";
 import {getEventLogs} from "../../../Utils/eventLogs";
-import {Web3Context} from "web3";
 import Web3AccountContext from "../../../Wrapping/Web3AccountContext";
+import Web3Context from "../../../Wrapping/Web3Context";
 import {useNavigate} from "react-router-dom";
+import {ReverseChallenge} from "../../Controls/ReverseChallenge";
+import Heading from "../../Controls/Heading";
 
 export default function Create({
     main, worldsManagement, worlds, economy,
@@ -17,7 +19,7 @@ export default function Create({
     const {wrappedCall} = useContext(ContractWindowContext);
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
     const navigate = useNavigate();
-    const {web3} = context;
+    const {web3, account} = context;
 
     setWorldsDataCache = useNonReactive(setWorldsDataCache);
     setAlbumsDataCache = useNonReactive(setAlbumsDataCache);
@@ -96,16 +98,16 @@ export default function Create({
         refreshAlbumsData();
     }, [setAlbumsDataCache, albumsCache, albumsDataCache, worldsManagement, wrappedCall, selectedWorldId]);
 
-    const worldLogo = currentWorldData.background && `url("${currentWorldData.background}")`;
-    const worldImage = currentWorldData.logo;
+    const worldBackground = currentWorldData.background && `url("${currentWorldData.background}")`;
+    const worldLogo = currentWorldData.logo;
     const albumImage = currentAlbumData.frontImage;
 
     const createAlbum = wrappedCall(async function () {
-        if (!selectedAlbumId) return;
+        if (selectedAlbumId === "" || selectedWorldId === undefined) return;
 
         const tx = await economy.methods.mintAlbum(
             selectedAlbumId
-        ).send();
+        ).send({from: account});
         const logs = await getEventLogs(tx, economy);
         const mintLogs = logs.filter(log => log.name === "TransferSingle");
 
@@ -122,12 +124,15 @@ export default function Create({
     });
 
     return <Box sx={{
-        aspectRatio: "16 / 9", width: "100%", backgroundSize: "cover", backgroundImage: worldImage,
+        aspectRatio: "16 / 9", width: "100%", backgroundSize: "cover", backgroundImage: worldBackground,
         display: "flex", alignItems: "center", justifyContent: "center"
     }}>
-        <Grid container sx={{width: "500px"}}>
+        <Grid container sx={{width: "800px"}} spacing={2}>
+            <Grid item xs={12}>
+                <Heading>Please select a world and an album type to create your album</Heading>
+            </Grid>
             <Grid item xs={8}>
-                <Select autoWidth label="World" sx={{ minWidth: 100, bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
+                <Select autoWidth label="World" sx={{ minWidth: "200px", bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
                         value={selectedWorldId} onChange={(e) => setSelectedWorldId(e.target.value)}>
                     {worldsCache.worldsRelevance.map((world, index) => {
                         return <MenuItem value={world.worldId} key={index}>
@@ -135,6 +140,11 @@ export default function Create({
                         </MenuItem>;
                     })}
                 </Select>
+                {(selectedWorldId) ? (
+                    <ReverseChallenge worldId={selectedWorldId}
+                                      externalUrl={worldsDataCache[selectedWorldId]?.externalUrl}
+                                      validatorUrl={worldsDataCache[selectedWorldId]?.validatorUrl} />
+                ) : null}
             </Grid>
             <Grid item xs={4}>
                 <ImagePreview aspectRatio="1 / 1" cover={false} url={worldLogo} />
@@ -143,7 +153,7 @@ export default function Create({
                 <>
                     <Grid item xs={8}>
                         <Grid item xs={8}>
-                            <Select autoWidth label="Album" sx={{ minWidth: 100, bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
+                            <Select autoWidth label="Album" sx={{ minWidth: "200px", bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
                                     value={selectedAlbumId} onChange={(e) => setSelectedAlbumId(e.target.value)}>
                                 {albumsCache.albumsRelevance.map((album, index) => {
                                     return <MenuItem value={album.albumId} key={index}>
@@ -151,7 +161,7 @@ export default function Create({
                                     </MenuItem>;
                                 })}
                             </Select>
-                            {(selectedAlbumId) ? (
+                            {(selectedAlbumId !== "") ? (
                                 <Button sx={{width: "100%", marginTop: 2}} onClick={createAlbum}
                                         variant="contained" color="primary" size="large">
                                     Create album
@@ -160,7 +170,7 @@ export default function Create({
                         </Grid>
                     </Grid>
                     <Grid item xs={4}>
-                        <ImagePreview aspectRatio="1 / 1" cover={false} url={albumImage} />
+                        <ImagePreview aspectRatio="8 / 9" cover={false} url={albumImage} />
                     </Grid>
                 </>
             ) : null}
