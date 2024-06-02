@@ -128,13 +128,20 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
         await worlds.setExternalUrl(1n, baseUrl);
         await worlds.setValidatorUrl(1n, `${baseUrl}/validator.json`);
 
+        const NO_DATA = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        const NONE = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        const BRONZE = 0;
+        const SILVER = 1;
+        const GOLD = 2;
+        const PLATINUM = 3;
+
         // 2. Define the album (worldId=1, id=0).
         console.log("Defining the album: Eldritch Armies...");
         await worldsManagement.defineAlbum(
             1n, "Eldritch Armies", "2024", `${baseImageUrl}/album-cover.webp`,
             `${baseImageUrl}/album-back-cover.webp`, `${baseImageUrl}/rarities.png`,
             badgeAchievementType, "Eldritch Master", `${baseImageUrl}/achievement-album.webp`,
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            NO_DATA
         );
 
         // 2. Define the album pages (worldId=1, albumId=0, pageIdx=0..6).
@@ -143,37 +150,51 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Sun", `${baseImageUrl}/page-sun.webp`, 15,
             badgeAchievementType, "Withering Hydra", `${baseImageUrl}/achievement-sun.webp`,
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 0n, "Hunting Scorpion", `${baseImageUrl}/page-sun-1.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 0n, "Sun Stone", `${baseImageUrl}/page-sun-2.webp`, SILVER, NONE, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 0n, "Man-eating Eagle", `${baseImageUrl}/page-sun-3.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 0n, "Torch of the Eternal Flame", `${baseImageUrl}/page-sun-4.webp`, SILVER, NONE, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 0n, "Sizzling Pinnacle", `${baseImageUrl}/page-sun-5.webp`, GOLD, NONE, NO_DATA
         );
         console.log(">>> Page: Moon...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Moon", `${baseImageUrl}/page-moon.webp`, 16,
             badgeAchievementType, "Shadow Man", `${baseImageUrl}/achievement-moon.webp`,
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            NO_DATA
         );
         console.log(">>> Page: Space...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Space", `${baseImageUrl}/page-space.webp`, 12,
             badgeAchievementType, "Aeon of The Way", `${baseImageUrl}/achievement-space.webp`,
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            NO_DATA
         );
         console.log(">>> Page: Time...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Time", `${baseImageUrl}/page-time.webp`, 13,
             badgeAchievementType, "Entropic Manifestation", `${baseImageUrl}/achievement-time.webp`,
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            NO_DATA
         );
         console.log(">>> Page: Stars...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Stars", `${baseImageUrl}/page-stars.webp`, 14,
             badgeAchievementType, "Emissary of the Ancient Ones", `${baseImageUrl}/achievement-stars.webp`,
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            NO_DATA
         );
         console.log(">>> Page: Glitch...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Glitch", `${baseImageUrl}/page-glitch.webp`, 0,
-            "0x0000000000000000000000000000000000000000000000000000000000000000", "", "",
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            NONE, "", "", NO_DATA
         );
 
         const account = (await hre.ethers.getSigners())[0];
