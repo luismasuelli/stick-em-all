@@ -4,13 +4,50 @@ import Web3AccountContext from "../Wrapping/Web3AccountContext";
 import ParamsAwareContractWindow from "./Windows/ParamsAwareContractWindow";
 import StandaloneMessage from "./Windows/StandaloneMessage";
 import mainContractClients from "./Main/mainContractClients";
+import {MemoryRouter, Route, Routes, useNavigate} from "react-router-dom";
+import {Box, Button, Grid} from "@mui/material";
 
+
+function EntryPoint() {
+    const navigate = useNavigate();
+
+    return <Box sx={{
+        position: "absolute", left: 0, top: 0, right: 0, bottom: 0,
+        display: "flex", alignItems: "center", justifyContent: "center"
+    }}>
+        <Box sx={{display: "inline-block", width: "300px"}}>
+            <Grid container>
+                <Grid xs={12} sx={{p: 2}}>
+                    <Button sx={{width: "100%"}} onClick={() => navigate("/create")}
+                            variant="contained" color="primary" size="large">
+                        Create album
+                    </Button>
+                </Grid>
+                <Grid xs={12} sx={{p: 2}}>
+                    <Button sx={{width: "100%"}} onClick={() => navigate("/albums")}
+                            variant="contained" color="primary" size="large">
+                        See my albums
+                    </Button>
+                </Grid>
+            </Grid>
+        </Box>
+    </Box>;
+}
 
 /**
  * Renders all the content to the end user(s).
  */
 function MainContent() {
-
+    return <Box sx={{width: "100%", height: "100%", minHeight: "600px", position: "relative"}}>
+        <MemoryRouter>
+            <Routes>
+                <Route path="/" element={<EntryPoint />} />
+                <Route path="/create" element={<></>} />
+                <Route path="/albums" element={<></>} />
+                <Route path="/albums/:albumId" element={<></>} />
+            </Routes>
+        </MemoryRouter>
+    </Box>;
 }
 
 
