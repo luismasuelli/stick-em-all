@@ -6,11 +6,10 @@ import getEventsEffect from "../../Utils/getEventsEffect";
  * Updates a state by a given event.
  * @param state The state.
  * @param event The event to update by.
- * @param account The account to update by.
  * @returns {*} The new event.
  * @private
  */
-function _updateState(state, event, account) {
+function _updateState(state, event) {
     /**
      * Gets or adds a world entry.
      * @param worldId The world id.
@@ -37,28 +36,26 @@ function _updateState(state, event, account) {
 
 
 /**
- * Related to an account, processes an event in an immutable way.
+ * Processes an event in an immutable way.
  * @param state The current state.
  * @param event The event being processed.
- * @param account The account.
  * @returns {unknown} The NEW updated state.
  */
-function updateAccountDependentNextState(state, event, account) {
+function updateNextState(state, event) {
     return produce(state, draft => {
-        _updateState(draft, event, account);
+        _updateState(draft, event);
     });
 }
 
 
 /**
- * Related to an account, processes an event in a mutable way.
+ * Processes an event in a mutable way.
  * @param state The current state.
  * @param event The event being processed.
- * @param account The account.
  * @returns {*} The updated state.
  */
-function updateAccountDependentInitialState(state, event, account) {
-    return _updateState(state || {worldsIndices: {}, worldsRelevance: []}, event, account);
+function updateInitialState(state, event) {
+    return _updateState(state || {worldsIndices: {}, worldsRelevance: []}, event);
 }
 
 
@@ -81,12 +78,12 @@ function finishInitialState(state) {
  */
 export default function worldsEventsEffect(worlds, worldsCache, setWorldsCache) {
     let prepareInitialState = {
-        updateInitialState: updateAccountDependentInitialState, finishInitialState
+        updateInitialState, finishInitialState
     };
 
     return getEventsEffect(
         worlds, [
             {name: "Transfer", filter: {from: "0x0000000000000000000000000000000000000000"}},
-        ], prepareInitialState, updateAccountDependentNextState, setWorldsCache, worldsCache
+        ], prepareInitialState, updateNextState, setWorldsCache, worldsCache
     );
 }
