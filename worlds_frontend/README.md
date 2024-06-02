@@ -2,10 +2,9 @@
 
 This directory contains an application to:
 
-1. Transfer the ownership of this application and, by extension, the whole ecosystem.
-2. Define which account will be the one that receives the earnings in a _withdraw_ operation.
-3. Withdraw part of the earnings (done against the earnings-receiving address).
-4. Change the prices (expressed in USD) of each parameter.
+1. Mint a world and maintain its data.
+2. Create albums, maintain their data (adding pages, achievements, and stickers) and release them.
+3. Define and update booster pack rules.
 
 ## Install everything
 
