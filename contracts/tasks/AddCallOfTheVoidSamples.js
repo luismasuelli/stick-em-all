@@ -230,10 +230,28 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
             badgeAchievementType, "Emissary of the Ancient Ones", `${baseImageUrl}/achievement-stars.webp`,
             NO_DATA
         );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 4n, "Astrolabe", `${baseImageUrl}/page-stars-1.webp`, SILVER, NONE, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 4n, "Monstrous Orb", `${baseImageUrl}/page-stars-2.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 4n, "Abandoned Observatory\n", `${baseImageUrl}/page-stars-3.webp`, SILVER, NONE, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 4n, "Night-mantle Tarantula", `${baseImageUrl}/page-stars-4.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 4n, "Parallax Opal", `${baseImageUrl}/page-stars-5.webp`, GOLD, NONE, NO_DATA
+        );
         console.log(">>> Page: Glitch...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Glitch", `${baseImageUrl}/page-glitch.webp`, 0,
             NONE, "", "", NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 5n, "Glitch in the Reality", `${baseImageUrl}/page-glitch-1.webp`, PLATINUM, NONE, NO_DATA
         );
 
         const account = (await hre.ethers.getSigners())[0];
