@@ -359,7 +359,7 @@ function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setR
     // Local data.
     const [platinumProbs, setPlatinumProbs] = useState(0n);
     const [active, setActive] = useState(false);
-    const [fiatPrice, setFiatPrice] = useState(0);
+    const [fiatPrice, setFiatPrice] = useState(200n);
 
     useEffect(() => {
         // eslint-disable-next-line no-undef
@@ -378,6 +378,14 @@ function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setR
         `${rule.bronzeStickersCount.toString()}/${rule.silverStickersCount.toString()}/` +
         `${rule.hasGoldOrPlatinumSticker.toString()}`
     );
+
+    function setConstrainedFiatPrice(fiatPrice) {
+        if (fiatPrice < 200n) {
+            setFiatPrice(200n);
+        } else {
+            setFiatPrice(fiatPrice);
+        }
+    }
 
     function setConstrainedPlatinumProbs(platinumProbs) {
         if (platinumProbs < 0n) {
@@ -410,7 +418,7 @@ function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setR
                 <Grid xs={8}><StaticText>{rule.name}</StaticText></Grid>
                 <Grid xs={4}><Label>Price:</Label></Grid>
                 <Grid xs={8}>
-                    <TokenInput unit={2} value={fiatPrice} onChange={(v) => setFiatPrice(v)} />
+                    <TokenInput unit={2} value={fiatPrice} onChange={setConstrainedFiatPrice} />
                 </Grid>
                 <Grid xs={4}><Label>Platinum chance:</Label></Grid>
                 <Grid xs={8}>
@@ -427,9 +435,101 @@ function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setR
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
                     <Button size="large" color="primary" variant="contained"
-                            onClick={() => updateRule}>Release</Button>
+                            onClick={updateRule}>Update</Button>
                 </Grid>
             </Grid>
+        </Grid>
+    </>;
+}
+
+function NewAlbumBoosterPackRule({ worldsManagement, refreshFlag, setRefreshFlag }) {
+    // Global contexts.
+    const {wrappedCall, albumId, worldId, account} = useGlobalContextData();
+
+    // Local data.
+    const [name, setName] = useState('');
+    const [fiatPrice, setFiatPrice] = useState(200n);
+    const [image, setImage] = useState('');
+    const [bronzeStickers, setBronzeStickers] = useState(0);
+    const [silverStickers, setSilverStickers] = useState(0);
+    const [hasGoldOrPlatinum, setHasGoldOrPlatinum] = useState(false);
+    const [platinumProbs, setPlatinumProbs] = useState(0);
+
+    function setConstrainedFiatPrice(fiatPrice) {
+        if (fiatPrice < 200n) {
+            setFiatPrice(200n);
+        } else {
+            setFiatPrice(fiatPrice);
+        }
+    }
+
+    function setConstrainedPlatinumProbs(platinumProbs) {
+        if (platinumProbs < 0n) {
+            setPlatinumProbs(0n);
+        } else if (platinumProbs > 10000n) {
+            setPlatinumProbs(10000n);
+        } else {
+            setPlatinumProbs(platinumProbs);
+        }
+    }
+
+    const createRule = wrappedCall(async function() {
+        await worldsManagement.methods.updateBoosterPackRule(
+            worldId, albumId, name, image.trim(), fiatPrice, bronzeStickers,
+            silverStickers, hasGoldOrPlatinum, platinumProbs
+        );
+        setRefreshFlag((refreshFlag + 1) % 2);
+    });
+
+    return <>
+        <Grid item xs={12}>
+            <Heading>Create a new Booster Pack rule</Heading>
+        </Grid>
+        <Grid item xs={3}>
+            <Label>Name:</Label>
+        </Grid>
+        <Grid item xs={9}>
+            <TextField variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
+        </Grid>
+        <Grid item xs={3}>
+            <Label>Image (URL):</Label>
+        </Grid>
+        <Grid item xs={9}>
+            <TextField variant="outlined" value={image} onChange={(e) => setImage(e.target.value)} />
+            <ImagePreview url={image} cover={false} aspectRatio="2 / 3" />
+        </Grid>
+        <Grid item xs={3}>
+            <Label>fiatPrice:</Label>
+        </Grid>
+        <Grid item xs={9}>
+            <TokenInput unit={2} value={fiatPrice} onChange={setConstrainedFiatPrice} />
+        </Grid>
+        <Grid item xs={3}>
+            <Label>Bronze Stickers:</Label>
+        </Grid>
+        <Grid item xs={9}>
+            <TokenInput unit="wei" value={bronzeStickers} onChange={setBronzeStickers} />
+        </Grid>
+        <Grid item xs={3}>
+            <Label>Silver Stickers:</Label>
+        </Grid>
+        <Grid item xs={9}>
+            <TokenInput unit="wei" value={silverStickers} onChange={setSilverStickers} />
+        </Grid>
+        <Grid item xs={3}>
+            <Label>Has Gold/Platinum Sticker:</Label>
+        </Grid>
+        <Grid item xs={9}>
+            <Switch checked={hasGoldOrPlatinum} onChange={(e) => setHasGoldOrPlatinum(e.target.checked)} />
+        </Grid>
+        <Grid xs={3}><Label>Platinum chance:</Label></Grid>
+        <Grid xs={9}>
+            <TokenInput value={platinumProbs} onChange={setConstrainedPlatinumProbs} unit="wei"
+                        placeholder="0 to 10000" />
+        </Grid>
+        <Grid xs={12}>
+            <Button size="large" color="primary" variant="contained"
+                    onClick={createRule}>Create</Button>
         </Grid>
     </>;
 }
@@ -468,7 +568,8 @@ function AlbumBoosterPackRules({ worldsManagement, refreshFlag, setRefreshFlag }
     return <Section title="Booster Packs" color="primary.light" sx={{marginTop: 4}}>
         <Grid container>
             {albumBoosterPackRules.map((rule, idx) =>
-                <AlbumBoosterPackRule key={idx} index={idx} rule={rule} />)}
+                <AlbumBoosterPackRule key={idx} index={idx} rule={rule} worldsManagement={worldsManagement}
+                                      refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag} />)}
 
         </Grid>
     </Section>;
