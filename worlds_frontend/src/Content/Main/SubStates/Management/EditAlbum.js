@@ -36,7 +36,7 @@ function useGlobalContextData() {
     return {account, worldId, albumId, wrappedCall, web3};
 }
 
-function AlbumData({ worldsManagement, setAlbumData }) {
+function AlbumData({ worldsManagement, setAlbumData, refreshFlag }) {
     // Global contexts.
     const {wrappedCall, albumId} = useGlobalContextData();
 
@@ -63,7 +63,7 @@ function AlbumData({ worldsManagement, setAlbumData }) {
             setLocalAlbumData(retrievedAlbumData);
         });
         getAlbumData();
-    }, [albumId, wrappedCall, worldsManagement, setAlbumData]);
+    }, [albumId, wrappedCall, worldsManagement, setAlbumData, refreshFlag]);
 
     return <Section title="Album data" color="primary.light">
         <Grid container>
@@ -476,7 +476,7 @@ export default function EditAlbum({
                                     selectedWorldId={selectedWorldId} setSelectedWorldId={setSelectedWorldId}
                                     albumsList={albumsCache.lastState.albumsRelevance}>
         <AlbumData worldsManagement={worldsManagement} worldId={worldId} albumId={albumId}
-                   setAlbumData={setAlbumData} />
+                   setAlbumData={setAlbumData} refreshFlag={refreshFlag} />
         <AlbumPages worldsManagement={worldsManagement} worldId={worldId} albumId={albumId}
                     refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag}
                     isReleased={albumData && albumData.released} />
