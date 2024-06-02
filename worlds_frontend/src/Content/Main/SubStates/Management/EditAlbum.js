@@ -375,7 +375,6 @@ function AlbumReleasePreview({ worldsManagement, refreshFlag, setRefreshFlag }) 
     const [amounts, setAmounts] = useState({
         pages: 0n, totalStickers: 0n, totalAchievements: 0n, totalFiatCost: 0n, totalNativeCost: 0n
     });
-    console.log("Amounts:", amounts);
 
     const [canBeReleased, setCanBeReleased] = useState(false);
 
