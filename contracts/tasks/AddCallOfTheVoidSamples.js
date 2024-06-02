@@ -253,6 +253,11 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
             1n, 0n, 5n, "Glitch in the Reality", `${baseImageUrl}/page-glitch-1.webp`, PLATINUM, NONE, NO_DATA
         );
 
+        console.log("Releasing album...");
+        await worldsManagement.releaseAlbum(
+            1n, 0n, {value: (await worldsManagement.getAlbumReleaseNativeCost(0n) * 110n / 100n)}
+        );
+
         const account = (await hre.ethers.getSigners())[0];
         console.log("Transferring ownership of the world to " + owner + "...");
         await worlds.transferFrom(account, owner, 1n);
