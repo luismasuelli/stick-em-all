@@ -173,6 +173,21 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
             badgeAchievementType, "Shadow Man", `${baseImageUrl}/achievement-moon.webp`,
             NO_DATA
         );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 1n, "Werewolf", `${baseImageUrl}/page-moon-1.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 1n, "Moonstone Necklace", `${baseImageUrl}/page-moon-2.webp`, SILVER, NONE, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 1n, "Dream Eater", `${baseImageUrl}/page-moon-3.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 1n, "Darklight Lantern", `${baseImageUrl}/page-moon-4.webp`, SILVER, NONE, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 1n, "Altair of the Shadow Man", `${baseImageUrl}/page-moon-5.webp`, GOLD, NONE, NO_DATA
+        );
         console.log(">>> Page: Space...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Space", `${baseImageUrl}/page-space.webp`, 12,
