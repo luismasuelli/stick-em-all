@@ -19,17 +19,17 @@ function categorizeId(id) {
 
     // Test for album id.
     if ((id & albumIdMask) !== 0n) {
-        return {id, type: "album"};
+        return {type: "album"};
     }
 
     // Test for booster pack id.
     if ((id & boosterPackSubMask) !== 0n) {
-        return {id, type: "booster-pack", albumTypeId: id >> 31n, ruleId: id & boosterPackRuleIdSubMask};
+        return {type: "booster-pack", albumTypeId: id >> 31n, ruleId: id & boosterPackRuleIdSubMask};
     }
 
     // Assume for sticker id.
     return {
-        id, type: "sticker", albumTypeId: id >> 31n,
+        type: "sticker", albumTypeId: id >> 31n,
         pageId: (id >> 3n) & stickerPageIdSubMask, slotId: (id & 7n),
         combinedId: (id & stickerCombinedIdSubMask)
     }
@@ -40,22 +40,49 @@ function categorizeId(id) {
  * Updates a state by a given event.
  * @param state The state.
  * @param event The event to update by.
+ * @param account The related account.
  * @returns {*} The new event.
  * @private
  */
 function _updateState(state, event, account) {
     /**
      * Gets or adds an album entry.
-     * @param albumId The album id.
-     * @param worldId The world id.
-     * @returns {{albumId}|*} The object.
+     * @param id The asset id.
+     * @returns * The object.
      */
-    function getOrAdd(albumId, worldId) {
-        const index = state.assetsIndices[albumId];
+    function getOrAdd(id) {
+        const index = state.assetsIndices[id];
         if (index === undefined) {
-            state.assetsIndices[albumId] = state.assetsRelevance.length;
-            let obj = {albumId, worldId};
+            // 1. Store the global index reference, and the
+            //    proper object.
+            state.assetsIndices[id] = state.assetsRelevance.length;
+            let obj = {amount: 0};
             state.assetsRelevance.push(obj);
+
+            // 2. Also store the other indices.
+            const {
+                type, albumTypeId, ruleId, pageId, slotId
+            } = categorizeId(id);
+            // eslint-disable-next-line default-case
+            switch(type)
+            {
+                case "album":
+                    // Nothing to do here: Albums, by ids, are always stored by id.
+                    break;
+                case "booster-pack":
+                    state.boosterPacks[albumTypeId] ||= [];
+                    state.boosterPacks[albumTypeId].push({id, ruleId});
+                    break;
+                case "sticker":
+                    state.boosterPacks[albumTypeId] ||= {};
+                    state.boosterPacks[albumTypeId][pageId] ||= [];
+                    state.boosterPacks[albumTypeId][pageId].push({id, pageId, slotId});
+                    state.boosterPacks[albumTypeId]["__all__"] ||= [];
+                    state.boosterPacks[albumTypeId]["__all__"].push({id, pageId, slotId});
+                    break;
+            }
+
+            // Return the object.
             return obj;
         } else {
             return state.assetsRelevance[index];
@@ -72,7 +99,7 @@ function _updateState(state, event, account) {
         id = BigInt(id);
         // eslint-disable-next-line no-undef
         value = BigInt(value);
-        // TODO CONTINUE THIS IMPLEMENTATION (must use: categorizeId).
+        getOrAdd(id).amount += value;
     }
 
     if (event.event === "TransferSingle") {
@@ -125,11 +152,9 @@ function updateAccountDependentInitialState(state, event, account) {
     return _updateState(state || {
         assetsIndices: {},
         assetsRelevance: [], // Amounts actually go here (for ALL the tokens).
-        // TODO properly define/implement these.
-        albums: {}, // [albumId] = amount (1 or 0)
-        boosterPacks: {}, // [albumTypeId][ruleId] = amount
-        stickers: {}, // [albumTypeId][pageId][slotId] = amount
-        // Also: [albumTypeId]["__all__"][combinedId] = amount
+        boosterPacks: {}, // [albumTypeId] = [{id, ruleId}, ...]
+        stickers: {}, // [albumTypeId][pageId] = [{id, pageId, slotId}, ...]
+        // Also: [albumTypeId]["__all__"] = [{id, pageId, slotId}, ...]
     }, event, account);
 }
 
