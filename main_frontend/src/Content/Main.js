@@ -9,6 +9,8 @@ import {Box, Button, Grid} from "@mui/material";
 import worldsEventsEffect from "./Main/worldsEventsEffect";
 import {useNonReactive} from "../Utils/nonReactive";
 import albumsEventsEffect from "./Main/albumsEventsEffect";
+import {Album, Create} from "@mui/icons-material";
+import {MyAlbums} from "./Main/SubStates/MyAlbums";
 
 
 function EntryPoint() {
@@ -99,9 +101,9 @@ function MainContent({
         <MemoryRouter>
             <Routes>
                 <Route path="/" element={<EntryPoint />} />
-                <Route path="/create" element={<></>} />
-                <Route path="/albums" element={<></>} />
-                <Route path="/albums/:albumId" element={<></>} />
+                <Route path="/create" element={<Create />} />
+                <Route path="/albums" element={<MyAlbums />} />
+                <Route path="/albums/:albumId" element={<Album />} />
             </Routes>
         </MemoryRouter>
     </Box>;
