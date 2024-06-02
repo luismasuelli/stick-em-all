@@ -570,7 +570,8 @@ function AlbumBoosterPackRules({ worldsManagement, refreshFlag, setRefreshFlag }
             {albumBoosterPackRules.map((rule, idx) =>
                 <AlbumBoosterPackRule key={idx} index={idx} rule={rule} worldsManagement={worldsManagement}
                                       refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag} />)}
-
+            <NewAlbumBoosterPackRule worldsManagement={worldsManagement} refreshFlag={refreshFlag}
+                                     setRefreshFlag={setRefreshFlag} />
         </Grid>
     </Section>;
 }
