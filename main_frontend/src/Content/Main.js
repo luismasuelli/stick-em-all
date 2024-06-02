@@ -98,6 +98,16 @@ function MainContent({
         });
     });
 
+    // 7. Listing all the assets (for an account).
+    let [assetsCache, setAssetsCache] = useState({
+        lastBlock: null, lastState: {
+            albumsIndices: {}, albumsRelevance: []
+        }}
+    );
+
+    // 8. Tracking the cached data for the assets.
+    let [assetsDataCache, setAssetsDataCache] = useState({});
+
     return <Box sx={{width: "100%", height: "100%", minHeight: "600px", position: "relative"}}>
         <MemoryRouter>
             <Routes>
