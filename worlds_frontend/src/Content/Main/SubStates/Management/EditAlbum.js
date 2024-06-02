@@ -4,13 +4,13 @@ import React, {useContext, useEffect, useState} from "react";
 import Web3Context from "../../../../Wrapping/Web3Context";
 import Web3AccountContext from "../../../../Wrapping/Web3AccountContext";
 import ContractWindowContext from "../../../Contexts/ContractWindowContext";
+import ParamsContext from "../../../Contexts/ParamsContext";
 import Section from "../../../Controls/Section";
 import {Alert, Button, Grid, MenuItem, Select, Typography} from "@mui/material";
 import {ImagePreview} from "../../../Controls/ImagePreview";
 import Heading from "../../../Controls/Heading";
 import Label from "../../../Controls/Label";
 import TextField from "@mui/material/TextField";
-import ParamsContext from "../../../Contexts/ParamsContext";
 import Box from "@mui/material/Box";
 
 function usdFromCents(v) {
