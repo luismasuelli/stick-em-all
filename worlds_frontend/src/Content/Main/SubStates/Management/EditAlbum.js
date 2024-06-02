@@ -47,7 +47,7 @@ function AlbumData({ worldsManagement, setAlbumData }) {
     });
 
     useEffect(() => {
-        const getAlbumData = wrappedCall(async function getWorldData() {
+        const getAlbumData = wrappedCall(async function() {
             // 1. Download the album data for the given id.
             const {
                 worldId, name, edition, frontImage, backImage, rarityIcons,
@@ -149,7 +149,7 @@ function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag, isReleased 
     });
 
     useEffect(() => {
-        const getAlbumPages = wrappedCall(async function getWorldData() {
+        const getAlbumPages = wrappedCall(async function() {
             // 1. Download the pages' data.
             // eslint-disable-next-line no-undef
             const count = await worldsManagement.methods.albumPageDefinitionsCount(BigInt(albumId)).call();
@@ -298,7 +298,7 @@ function AlbumAchievements({ worldsManagement, refreshFlag, setRefreshFlag }) {
     achievementTypesMap["0x0000000000000000000000000000000000000000000000000000000000000000"] = "(none)";
 
     useEffect(() => {
-        const getAlbumAchievements = wrappedCall(async function getWorldData() {
+        const getAlbumAchievements = wrappedCall(async function() {
             // 1. Download the achievements' data.
             // eslint-disable-next-line no-undef
             const count = await worldsManagement.methods.albumAchievementDefinitionsCount(BigInt(albumId)).call();
@@ -386,7 +386,7 @@ function AlbumReleasePreview({ worldsManagement, refreshFlag, setRefreshFlag }) 
     });
 
     useEffect(() => {
-        const getAlbumAchievements = wrappedCall(async function getWorldData() {
+        const getAlbumAchievements = wrappedCall(async function() {
             // eslint-disable-next-line no-undef
             let canBeReleased = BigInt(await worldsManagement.methods.canBeReleased(worldId, albumId).call());
             // eslint-disable-next-line no-undef
