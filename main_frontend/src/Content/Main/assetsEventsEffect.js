@@ -67,7 +67,7 @@ function _updateState(state, event, account) {
             switch(type)
             {
                 case "album":
-                    // Nothing to do here: Albums, by ids, are always stored by id.
+                    state.albums[id] = true;
                     break;
                 case "booster-pack":
                     state.boosterPacks[albumTypeId] ||= [];
@@ -152,6 +152,7 @@ function updateAccountDependentInitialState(state, event, account) {
     return _updateState(state || {
         assetsIndices: {},
         assetsRelevance: [], // Amounts actually go here (for ALL the tokens).
+        albums: {}, // [id] = true;
         boosterPacks: {}, // [albumTypeId] = [{id, ruleId}, ...]
         stickers: {}, // [albumTypeId][pageId] = [{id, pageId, slotId}, ...]
         // Also: [albumTypeId]["__all__"] = [{id, pageId, slotId}, ...]
