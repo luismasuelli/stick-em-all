@@ -101,7 +101,7 @@ function AlbumData({ worldsManagement, setAlbumData }) {
     </Section>;
 }
 
-function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag }) {
+function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag, isReleased }) {
     // Global contexts.
     const {wrappedCall, albumId, worldId, account} = useGlobalContextData();
     const paramsContext = useContext(ParamsContext);
@@ -194,71 +194,73 @@ function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag }) {
                     </Box>
                 </Grid>
             </>)}
-            <Heading>Create new page</Heading>
-            <Alert severity="warning" sx={{margin: 1}}>
-                Please take special care while creating the bare album here. Changes cannot be done later.
-                Stickers (and THEIR achievements) will be added later.
-            </Alert>
-            <Grid container>
-                <Grid item xs={4}><Label>Name:</Label></Grid>
-                <Grid item xs={8}>
-                    <TextField variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
+            {isReleased ? <>
+                <Heading>Create new page</Heading>
+                <Alert severity="warning" sx={{margin: 1}}>
+                    Please take special care while creating the bare album here. Changes cannot be done later.
+                    Stickers (and THEIR achievements) will be added later.
+                </Alert>
+                <Grid container>
+                    <Grid item xs={4}><Label>Name:</Label></Grid>
+                    <Grid item xs={8}>
+                        <TextField variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={4}><Label>Background:</Label></Grid>
+                    <Grid item xs={8}>
+                        <TextField variant="outlined" value={backgroundImage} onChange={(e) => setBackgroundImage(e.target.value)} />
+                        <ImagePreview aspectRatio="8 / 9" cover={true} url={backgroundImage} style={{maxWidth: "400px"}} />
+                    </Grid>
+                    <Grid item xs={4}><Label>Layout:</Label></Grid>
+                    <Grid item xs={8}>
+                        <Select autoWidth label="Layout" sx={{ minWidth: 100, bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
+                                value={layout} onChange={(e) => setLayout(e.target.value)}>
+                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map(
+                                (layoutIndex, index) => (
+                                    <MenuItem value={layoutIndex} key={index}>
+                                        <div className={`layout layout-${layoutIndex}`} />
+                                    </MenuItem>
+                                )
+                            )}
+                        </Select>
+                    </Grid>
+                    <Grid item xs={4}><Label>Achievement Type:</Label></Grid>
+                    <Grid item xs={8}>
+                        <Select autoWidth label="Achievement Type" sx={{ minWidth: 100, bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
+                                value={achievementType} onChange={(e) => setAchievementType(e.target.value)}>
+                            <MenuItem value="0x0000000000000000000000000000000000000000000000000000000000000000">
+                                <i>None</i>
+                            </MenuItem>
+                            {achievementTypes.filter(
+                                (achievementType) => achievementType[2] === 1n
+                            ).map(
+                                (achievementType, index) => (
+                                    <MenuItem value={achievementType[1]} key={index}>{achievementType[0]}</MenuItem>
+                                )
+                            )}
+                        </Select>
+                    </Grid>
+                    <Grid item xs={4}><Label>Achievement Name:</Label></Grid>
+                    <Grid item xs={8}>
+                        <TextField variant="outlined" value={achievementName} onChange={(e) => setAchievementName(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={4}><Label>Achievement Image (URL):</Label></Grid>
+                    <Grid item xs={8}>
+                        <TextField variant="outlined" value={achievementImage} onChange={(e) => setAchievementImage(e.target.value)} />
+                        <ImagePreview aspectRatio="1 / 1" cover={true} url={achievementImage} style={{maxWidth: "400px"}} />
+                    </Grid>
+                    <Grid item xs={4}><Label>Achievement Data:</Label></Grid>
+                    <Grid item xs={8}>
+                        <TextField variant="outlined" placeholder="Optional, 0x + 64 hex. chars" value={achievementData}
+                                   onChange={(e) => setAchievementData(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button variant="contained" color="primary" size="large"
+                                onClick={() => defineAlbumPage()}>
+                            Create
+                        </Button>
+                    </Grid>
                 </Grid>
-                <Grid item xs={4}><Label>Background:</Label></Grid>
-                <Grid item xs={8}>
-                    <TextField variant="outlined" value={backgroundImage} onChange={(e) => setBackgroundImage(e.target.value)} />
-                    <ImagePreview aspectRatio="8 / 9" cover={true} url={backgroundImage} style={{maxWidth: "400px"}} />
-                </Grid>
-                <Grid item xs={4}><Label>Layout:</Label></Grid>
-                <Grid item xs={8}>
-                    <Select autoWidth label="Layout" sx={{ minWidth: 100, bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
-                            value={layout} onChange={(e) => setLayout(e.target.value)}>
-                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map(
-                            (layoutIndex, index) => (
-                                <MenuItem value={layoutIndex} key={index}>
-                                    <div className={`layout layout-${layoutIndex}`} />
-                                </MenuItem>
-                            )
-                        )}
-                    </Select>
-                </Grid>
-                <Grid item xs={4}><Label>Achievement Type:</Label></Grid>
-                <Grid item xs={8}>
-                    <Select autoWidth label="Achievement Type" sx={{ minWidth: 100, bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
-                            value={achievementType} onChange={(e) => setAchievementType(e.target.value)}>
-                        <MenuItem value="0x0000000000000000000000000000000000000000000000000000000000000000">
-                            <i>None</i>
-                        </MenuItem>
-                        {achievementTypes.filter(
-                            (achievementType) => achievementType[2] === 1n
-                        ).map(
-                            (achievementType, index) => (
-                                <MenuItem value={achievementType[1]} key={index}>{achievementType[0]}</MenuItem>
-                            )
-                        )}
-                    </Select>
-                </Grid>
-                <Grid item xs={4}><Label>Achievement Name:</Label></Grid>
-                <Grid item xs={8}>
-                    <TextField variant="outlined" value={achievementName} onChange={(e) => setAchievementName(e.target.value)} />
-                </Grid>
-                <Grid item xs={4}><Label>Achievement Image (URL):</Label></Grid>
-                <Grid item xs={8}>
-                    <TextField variant="outlined" value={achievementImage} onChange={(e) => setAchievementImage(e.target.value)} />
-                    <ImagePreview aspectRatio="1 / 1" cover={true} url={achievementImage} style={{maxWidth: "400px"}} />
-                </Grid>
-                <Grid item xs={4}><Label>Achievement Data:</Label></Grid>
-                <Grid item xs={8}>
-                    <TextField variant="outlined" placeholder="Optional, 0x + 64 hex. chars" value={achievementData}
-                               onChange={(e) => setAchievementData(e.target.value)} />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button variant="contained" color="primary" size="large"
-                            onClick={() => defineAlbumPage()}>
-                        Create
-                    </Button>
-                </Grid>
-            </Grid>
+            </> : null}
         </Grid>
     </Section>;
 }
@@ -373,7 +375,8 @@ export default function EditAlbum({
         <AlbumData worldsManagement={worldsManagement} worldId={worldId} albumId={albumId}
                    setAlbumData={setAlbumData} />
         <AlbumPages worldsManagement={worldsManagement} worldId={worldId} albumId={albumId}
-                    refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag} />
+                    refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag}
+                    isReleased={albumData && albumData.released} />
         <AlbumAchievements worldsManagement={worldsManagement} worldId={worldId} albumId={albumId}
                            refreshFlag={refreshFlag} setRefreshFlag={setRefreshFlag} />
         {albumData ? (
