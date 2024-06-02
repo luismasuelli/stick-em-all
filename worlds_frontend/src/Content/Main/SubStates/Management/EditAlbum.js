@@ -376,7 +376,7 @@ function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setR
 
     const content = (
         `${rule.bronzeStickersCount.toString()}/${rule.silverStickersCount.toString()}/` +
-        `${rule.hasGoldOrPlatinumSticker.toString()}`
+        `${rule.hasGoldOrPlatinumSticker ? "(One gold or platinum)" : "(No gold nor platinum)"}`
     );
 
     function setConstrainedFiatPrice(fiatPrice) {
@@ -404,7 +404,7 @@ function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setR
     const updateRule = wrappedCall(async function() {
         await worldsManagement.methods.updateBoosterPackRule(
             worldId, albumId, index, active, fiatPrice, platinumProbs
-        );
+        ).send();
         setRefreshFlag((refreshFlag + 1) % 2);
     });
 
@@ -430,7 +430,7 @@ function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setR
                 <Grid xs={4}><Label>Active:</Label></Grid>
                 <Grid xs={8} sx={{alignItems: 'center'}}>
                     <Switch
-                        checked={rule.active}
+                        checked={active}
                         onChange={handleChange}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
@@ -477,10 +477,11 @@ function NewAlbumBoosterPackRule({ worldsManagement, refreshFlag, setRefreshFlag
     }
 
     const createRule = wrappedCall(async function() {
-        await worldsManagement.methods.updateBoosterPackRule(
-            worldId, albumId, name, image.trim(), fiatPrice, bronzeStickers,
-            silverStickers, hasGoldOrPlatinum, platinumProbs
-        );
+        await worldsManagement.methods.defineBoosterPackRule(
+            // eslint-disable-next-line no-undef
+            BigInt(worldId), BigInt(albumId), name, image.trim(), BigInt(fiatPrice), parseInt(bronzeStickers),
+            parseInt(silverStickers), !!(hasGoldOrPlatinum), parseInt(platinumProbs)
+        ).send();
         setRefreshFlag((refreshFlag + 1) % 2);
     });
 
