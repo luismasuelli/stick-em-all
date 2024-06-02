@@ -194,6 +194,18 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
             badgeAchievementType, "Aeon of The Way", `${baseImageUrl}/achievement-space.webp`,
             NO_DATA
         );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 2n, "Monk of the Maze", `${baseImageUrl}/page-space-1.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 2n, "Tulpa", `${baseImageUrl}/page-space-2.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 2n, "Taoist Temple", `${baseImageUrl}/page-space-3.webp`, GOLD, NONE, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 2n, "Obsidian Belt", `${baseImageUrl}/page-space-4.webp`, SILVER, NONE, NO_DATA
+        );
         console.log(">>> Page: Time...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Time", `${baseImageUrl}/page-time.webp`, 13,
