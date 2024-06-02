@@ -5,8 +5,8 @@ import getEventsEffect from "../../Utils/getEventsEffect";
 const albumIdMask = 1n << 255n;
 const boosterPackSubMask = 1n << 30n;
 const boosterPackRuleIdSubMask = (1n << 16n) - 1n;
-const stickerPageIdSubMask = (1n << 13n) - 1;
-const stickerCombinedIdSubMask = (1n << 16n) - 1;
+const stickerPageIdSubMask = (1n << 13n) - 1n;
+const stickerCombinedIdSubMask = (1n << 16n) - 1n;
 
 
 /**
@@ -56,7 +56,8 @@ function _updateState(state, event, account) {
             // 1. Store the global index reference, and the
             //    proper object.
             state.assetsIndices[id] = state.assetsRelevance.length;
-            let obj = {amount: 0};
+            // eslint-disable-next-line no-undef
+            let obj = {amount: BigInt(0)};
             state.assetsRelevance.push(obj);
 
             // 2. Also store the other indices.
@@ -99,7 +100,8 @@ function _updateState(state, event, account) {
         id = BigInt(id);
         // eslint-disable-next-line no-undef
         value = BigInt(value);
-        getOrAdd(id).amount += value;
+        // eslint-disable-next-line no-undef
+        getOrAdd(id).amount += BigInt(value);
     }
 
     if (event.event === "TransferSingle") {
