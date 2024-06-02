@@ -91,7 +91,7 @@ contract StickEmAllEconomy is ERC1155 {
         require(lastAlbumId != ~uint256(0), "StickEmAllEconomy: No more albums");
         lastAlbumId += 1;
         albums[lastAlbumId] = AlbumInstance({owner: msg.sender, albumTypeId: _albumTypeId});
-        _mint(msg.sender, _albumTypeId, 1, "");
+        _mint(msg.sender, lastAlbumId, 1, "");
     }
 
     /**
