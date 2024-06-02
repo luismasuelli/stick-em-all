@@ -39,7 +39,7 @@ function _updateState(state, event) {
 
 
 /**
- * Related to an account, processes an event in an immutable way.
+ * Processes an event in an immutable way.
  * @param state The current state.
  * @param event The event being processed.
  * @returns {unknown} The NEW updated state.
@@ -52,7 +52,7 @@ function updateNextState(state, event) {
 
 
 /**
- * Related to an account, processes an event in a mutable way.
+ * Processes an event in a mutable way.
  * @param state The current state.
  * @param event The event being processed.
  * @returns {*} The updated state.
