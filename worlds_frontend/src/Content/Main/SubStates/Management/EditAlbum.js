@@ -13,13 +13,27 @@ import TextField from "@mui/material/TextField";
 import ParamsContext from "../../../Contexts/ParamsContext";
 import Box from "@mui/material/Box";
 
+function usdFromCents(v) {
+    v = v.toString();
+    switch(v.length) {
+        case 0:
+            return "$0.00";
+        case 1:
+            return "$0.0" + v;
+        case 2:
+            return "$0." + v;
+        default:
+            return `$${v.substring(0, v.length - 2)}.${v.substring(v.length - 2)}`;
+    }
+}
+
 function useGlobalContextData() {
     const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
-    const {account} = context;
+    const {account, web3} = context;
     const {worldId, albumId} = useParams();
     const {wrappedCall} = useContext(ContractWindowContext);
 
-    return {account, worldId, albumId, wrappedCall};
+    return {account, worldId, albumId, wrappedCall, web3};
 }
 
 function AlbumData({ worldsManagement, setAlbumData }) {
@@ -348,13 +362,103 @@ function AlbumBoosterPackRules({ worldsManagement, refreshFlag, setRefreshFlag }
 
 function AlbumReleasePreview({ worldsManagement, refreshFlag, setRefreshFlag }) {
     // Global contexts.
-    const {wrappedCall, albumId, worldId, account} = useGlobalContextData();
+    const {wrappedCall, albumId, worldId, account, web3} = useGlobalContextData();
+    const paramsContext = useContext(ParamsContext);
+    const fiatPrices = paramsContext.paramsData.fiatCosts;
+    const params = paramsContext.params;
+    const albumDefinitionCost = fiatPrices[params[1].hash] || 0n;
+    const albumPageDefinitionCost = fiatPrices[params[2].hash] || 0n;
+    const albumAchievementDefinitionCost = fiatPrices[params[3].hash] || 0n;
+    const albumStickerDefinitionCost = fiatPrices[params[4].hash] || 0n;
 
     // Local data.
-    const [albumBoosterPackRules, setAlbumBoosterPackRules] = useState([]);
+    const [amounts, setAmounts] = useState({
+        pages: 0n, totalStickers: 0n, totalAchievements: 0n, totalFiatCost: 0n, totalNativeCost: 0n
+    });
+    console.log("Amounts:", amounts);
 
-    return <Section title="Album data" color="primary.light" sx={{marginTop: 4}}>
+    const [canBeReleased, setCanBeReleased] = useState(false);
 
+    const release = wrappedCall(async function() {
+        await worldsManagement.methods.releaseAlbum(worldId, albumId).send({
+            value: (amounts.totalNativeCost * 110n / 100n).toString()
+        });
+        setRefreshFlag((refreshFlag + 1) % 2);
+    });
+
+    useEffect(() => {
+        const getAlbumAchievements = wrappedCall(async function getWorldData() {
+            // eslint-disable-next-line no-undef
+            let canBeReleased = BigInt(await worldsManagement.methods.canBeReleased(worldId, albumId).call());
+            // eslint-disable-next-line no-undef
+            let albumId_ = BigInt(albumId);
+            // eslint-disable-next-line no-undef
+            const pages = BigInt(await worldsManagement.methods.albumPageDefinitionsCount(albumId_).call());
+            // eslint-disable-next-line no-undef
+            const totalStickers = BigInt((await worldsManagement.methods.albumDefinitions(albumId_).call()).totalStickers);
+            // eslint-disable-next-line no-undef
+            const totalAchievements = BigInt(await worldsManagement.methods.albumAchievementDefinitionsCount(albumId_).call()) - 1n;
+            // eslint-disable-next-line no-undef
+            const totalFiatCost = BigInt(await worldsManagement.methods.getAlbumReleaseFiatCost(albumId_).call());
+            // eslint-disable-next-line no-undef
+            const totalNativeCost = BigInt(await worldsManagement.methods.getAlbumReleaseNativeCost(albumId_).call());
+            setAmounts({ pages, totalStickers, totalAchievements, totalFiatCost, totalNativeCost });
+            setCanBeReleased(canBeReleased);
+        });
+        getAlbumAchievements();
+    }, [worldsManagement, albumId, refreshFlag, wrappedCall, worldId]);
+
+    return <Section title="Release costs" color="primary.light" sx={{marginTop: 4}}>
+        <Grid container>
+            <Grid item xs={4}><Label>Album:</Label></Grid>
+            <Grid item xs={8}>
+                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                    {usdFromCents(albumDefinitionCost)}
+                </Typography>
+            </Grid>
+            <Grid item xs={4}><Label>Pages:</Label></Grid>
+            <Grid item xs={8}>
+                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                    {amounts.pages.toString()} x {usdFromCents(albumPageDefinitionCost)} = {usdFromCents(amounts.pages * albumPageDefinitionCost)}
+                </Typography>
+            </Grid>
+            <Grid item xs={4}><Label>Achievements:</Label></Grid>
+            <Grid item xs={8}>
+                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                    {amounts.totalAchievements.toString()} x {usdFromCents(albumAchievementDefinitionCost)} = {usdFromCents(amounts.totalAchievements * albumAchievementDefinitionCost)}
+                </Typography>
+            </Grid>
+            <Grid item xs={4}><Label>Stickers:</Label></Grid>
+            <Grid item xs={8}>
+                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                    {amounts.totalStickers.toString()} x {usdFromCents(albumStickerDefinitionCost)} = {usdFromCents(amounts.totalStickers * albumStickerDefinitionCost)}
+                </Typography>
+            </Grid>
+            <Grid item xs={4}><Label>Total:</Label></Grid>
+            <Grid item xs={8}>
+                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                    {usdFromCents(amounts.totalFiatCost)}
+                </Typography>
+            </Grid>
+            <Grid item xs={4}><Label>Total (MATIC):</Label></Grid>
+            <Grid item xs={8}>
+                <Typography sx={{textAlign: 'right', p: 2, paddingLeft: 0}}>
+                    {web3.utils.fromWei(amounts.totalNativeCost, "ether")}
+                </Typography>
+            </Grid>
+            <Grid item xs={12}>
+                {(canBeReleased) ? (<>
+                    <Alert severity="warning" sx={{marginTop: 1, marginBottom: 1}}>
+                        Please take special care while creating the bare album here. Releasing cannot be undone.
+                    </Alert>
+                    <Button size="large" color="primary" variant="contained"
+                            onClick={() => release()}>Release</Button>
+                </>) : <Alert severity="error">
+                    This album cannot be released yet. Ensure the album has an even number of
+                    pages and that each page is completely defined.
+                </Alert>}
+            </Grid>
+        </Grid>
     </Section>;
 }
 
