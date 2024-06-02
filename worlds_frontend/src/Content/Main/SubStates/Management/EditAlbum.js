@@ -357,7 +357,7 @@ function AlbumBoosterPackRules({ worldsManagement, refreshFlag, setRefreshFlag }
     // Local data.
     const [albumBoosterPackRules, setAlbumBoosterPackRules] = useState([]);
 
-    return <Section title="Album data" color="primary.light" sx={{marginTop: 4}}>
+    return <Section title="Booster Packs" color="primary.light" sx={{marginTop: 4}}>
 
     </Section>;
 }
