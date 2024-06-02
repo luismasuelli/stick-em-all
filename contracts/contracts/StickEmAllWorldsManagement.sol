@@ -606,6 +606,7 @@ contract StickEmAllWorldsManagement {
     ) private {
         AlbumPageDefinition storage page = albumPageDefinitions[_albumId][_pageIdx];
         AlbumDefinition storage album = albumDefinitions[_albumId];
+        page.currentlyDefinedStickers += 1;
         if (_definitions.length == page.maxStickers) {
             page.complete = true;
             album.completedPages += 1;
