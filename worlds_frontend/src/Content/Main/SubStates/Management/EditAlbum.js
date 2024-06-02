@@ -210,7 +210,7 @@ function AlbumPages({ worldsManagement, refreshFlag, setRefreshFlag, isReleased 
                     </Box>
                 </Grid>
             </Fragment>)}
-            {isReleased ? <>
+            {!isReleased ? <>
                 <Heading>Create new page</Heading>
                 <Alert severity="warning" sx={{margin: 1}}>
                     Please take special care while creating a page for the album here. Changes cannot be done later.
@@ -473,7 +473,6 @@ export default function EditAlbum({
     // A refresh flag.
     const [refreshFlag, setRefreshFlag] = useState(0);
 
-    console.log("Album data:", albumData);
     return <AlbumsListEnabledLayout worldsData={worldsData} albumsData={albumsDataCache}
                                     selectedWorldId={selectedWorldId} setSelectedWorldId={setSelectedWorldId}
                                     albumsList={albumsCache.lastState.albumsRelevance}>
