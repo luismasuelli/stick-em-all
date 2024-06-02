@@ -455,6 +455,27 @@ function NewAlbumBoosterPackRule({ worldsManagement, refreshFlag, setRefreshFlag
     const [hasGoldOrPlatinum, setHasGoldOrPlatinum] = useState(false);
     const [platinumProbs, setPlatinumProbs] = useState(0);
     const [localRefresh, setLocalRefresh] = useState(false);
+    const [rarityCounts, setRarityCounts] = useState({
+        bronze: 0n, silver: 0n, goldOrPlatinum: 0n
+    });
+
+    useEffect(() => {
+        const getRarityCounts = wrappedCall(async function() {
+            // 1. Download the achievements' data.
+            // eslint-disable-next-line no-undef
+            const bronze = await worldsManagement.methods.albumBronzeStickerIndicesCount(BigInt(albumId)).call();
+            // eslint-disable-next-line no-undef
+            const silver = await worldsManagement.methods.albumSilverStickerIndicesCount(BigInt(albumId)).call();
+            // eslint-disable-next-line no-undef
+            const gold = await worldsManagement.methods.albumGoldStickerIndicesCount(BigInt(albumId)).call();
+            // eslint-disable-next-line no-undef
+            const platinum = await worldsManagement.methods.albumPlatinumStickerIndicesCount(BigInt(albumId)).call();
+
+            // 2. Set the downloaded data properly.
+            setRarityCounts({ bronze, silver, goldOrPlatinum: gold + platinum});
+        });
+        getRarityCounts();
+    }, [albumId, wrappedCall, worldsManagement, setRarityCounts, refreshFlag]);
 
     function setConstrainedFiatPrice(fiatPrice) {
         if (fiatPrice < 200n) {
@@ -531,9 +552,17 @@ function NewAlbumBoosterPackRule({ worldsManagement, refreshFlag, setRefreshFlag
             <TokenInput value={platinumProbs} onChange={setConstrainedPlatinumProbs} unit="wei"
                         placeholder="0 to 10000" />
         </Grid>
-        <Grid xs={12}>
-            <Button size="large" color="primary" variant="contained"
-                    onClick={createRule}>Create</Button>
+        <Grid xs={12} sx={{paddingTop: 1, paddingBottom: 1}}>
+            {(rarityCounts.bronze < bronzeStickers || rarityCounts.silver < silverStickers ||
+                (hasGoldOrPlatinum && (rarityCounts.goldOrPlatinum < 1))) ? (
+                <Alert severity="error">
+                    The amount of stickers is not accepted. There are {rarityCounts.bronze.toString()} bronze
+                    stickers, {rarityCounts.silver.toString()} silver stickers, and {rarityCounts.goldOrPlatinum}
+                    gold/platinum stickers.
+                </Alert>
+            ) : (
+                <Button size="large" color="primary" variant="contained" onClick={createRule}>Create</Button>
+            )}
         </Grid>
     </>;
 }
