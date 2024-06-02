@@ -1,70 +1,72 @@
-# Getting Started with Create React App
+# Stick 'em All - Main Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This directory contains an application to:
 
-## Available Scripts
+1. Mint a new album, from a given released album type defined by certain world.
+2. Transfer an entire album to another party.
+3. Purchase booster pack rules from active rule sets.
+4. Use/open any booster pack and get their stickers.
+5. Use (glue) the stickers in certain album.
+6. Transfer stickers to another party.
 
-In the project directory, you can run:
+## Install everything
 
-### `npm start`
+This is a node project. All the `npm` / `npx` projects must be run in _this_ directory.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Run this command in a shell:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```shell
+npm install
+```
 
-### `npm test`
+## Launch the application
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Launching against your Local network
 
-### `npm run build`
+First, you need to read the local deployment instructions [for the contracts](../contracts/README.md).
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Once the contracts are deployed, take the "Main address" from the output of the deploy-everything task.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Then, in the `worlds_frontend/` directory create a `.env.development.custom.local` with:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+REACT_APP_MAIN_CONTRACT=0xTheAddressYouCopiedFromParams
+```
 
-### `npm run eject`
+And then, run this command in shell:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```shell
+npm run start
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Then, visit the local site (e.g. localhost:3000) ensuring the current network in your wallet is the local one.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Launching against Polygon Amoy
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+First, you need to read the testnet deployment instructions [for the contracts](../contracts/README.md).
 
-## Learn More
+The later instructions are similar but with `.env.test.custom.local`, but after deploying the contracts
+to the "testnet" network.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+And then, run this command in shell:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```shell
+npm run start:testnet
+```
 
-### Code Splitting
+Then, visit the local site (e.g. localhost:3000) ensuring the current network in your wallet is the testnet pme.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Launching against Polygon Mainnet
 
-### Analyzing the Bundle Size
+First, you need to read the testnet deployment instructions [for the contracts](../contracts/README.md).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The later instructions are similar but with `.env.production.custom.local`, but after deploying the contracts
+to the "mainnet" network.
 
-### Making a Progressive Web App
+And then, run this command in shell:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```shell
+npm run start:mainnet
+```
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Then, visit the local site (e.g. localhost:3000) ensuring the current network in your wallet is the mainnet one.
