@@ -420,7 +420,7 @@ function AlbumBoosterPackRule({ worldsManagement, index, rule, refreshFlag, setR
                 <Grid xs={8}>
                     <TokenInput unit={2} value={fiatPrice} onChange={setConstrainedFiatPrice} />
                 </Grid>
-                <Grid xs={4}><Label>Platinum chance:</Label></Grid>
+                <Grid xs={4}><Label>Platinum chance per 10000:</Label></Grid>
                 <Grid xs={8}>
                     <TokenInput value={platinumProbs} onChange={setConstrainedPlatinumProbs} unit="wei"
                                 placeholder="0 to 10000" />
@@ -454,6 +454,7 @@ function NewAlbumBoosterPackRule({ worldsManagement, refreshFlag, setRefreshFlag
     const [silverStickers, setSilverStickers] = useState(0);
     const [hasGoldOrPlatinum, setHasGoldOrPlatinum] = useState(false);
     const [platinumProbs, setPlatinumProbs] = useState(0);
+    const [localRefresh, setLocalRefresh] = useState(false);
 
     function setConstrainedFiatPrice(fiatPrice) {
         if (fiatPrice < 200n) {
@@ -461,6 +462,7 @@ function NewAlbumBoosterPackRule({ worldsManagement, refreshFlag, setRefreshFlag
         } else {
             setFiatPrice(fiatPrice);
         }
+        setLocalRefresh(!localRefresh);
     }
 
     function setConstrainedPlatinumProbs(platinumProbs) {
@@ -471,6 +473,7 @@ function NewAlbumBoosterPackRule({ worldsManagement, refreshFlag, setRefreshFlag
         } else {
             setPlatinumProbs(platinumProbs);
         }
+        setLocalRefresh(!localRefresh);
     }
 
     const createRule = wrappedCall(async function() {
@@ -522,7 +525,7 @@ function NewAlbumBoosterPackRule({ worldsManagement, refreshFlag, setRefreshFlag
         <Grid item xs={9}>
             <Switch checked={hasGoldOrPlatinum} onChange={(e) => setHasGoldOrPlatinum(e.target.checked)} />
         </Grid>
-        <Grid xs={3}><Label>Platinum chance:</Label></Grid>
+        <Grid xs={3}><Label>Platinum chance per 10000:</Label></Grid>
         <Grid xs={9}>
             <TokenInput value={platinumProbs} onChange={setConstrainedPlatinumProbs} unit="wei"
                         placeholder="0 to 10000" />

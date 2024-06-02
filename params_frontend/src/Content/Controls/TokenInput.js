@@ -8,8 +8,9 @@ function sanitizeInput(input) {
 
     // Step 2: Remove all dots beyond the first
     let parts = sanitized.split('.');
-    if (parts.length > 1) {
-        sanitized = parts.shift() + '.' + parts.join('');
+    sanitized = parts.shift();
+    if (parts.length >= 1) {
+        sanitized += ('.' + parts.join(''));
     }
 
     // Step 3: Replace empty string with "0"
@@ -62,6 +63,9 @@ function dumpUnit(value, decimals) {
     result = result.replace(/^0+/, ''); // Remove leading zeros
     if (decimals > 0) { // Only process trailing zeros if decimals were intended
         result = result.replace(/\.0+$|(\.\d*?[1-9])0+$/, '$1'); // Remove trailing zeros
+    }
+    if (result.endsWith(".")) {
+        result = result.substring(0, result.length - 1);
     }
 
     // Handle special case where result is empty or just a dot left after trimming
