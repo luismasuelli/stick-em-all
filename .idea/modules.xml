@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/contracts/contracts.iml" filepath="$PROJECT_DIR$/contracts/contracts.iml" />
       <module fileurl="file://$PROJECT_DIR$/frontend_boilerplate/frontend_boilerplate.iml" filepath="$PROJECT_DIR$/frontend_boilerplate/frontend_boilerplate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/main_frontend/main_frontend.iml" filepath="$PROJECT_DIR$/main_frontend/main_frontend.iml" />
       <module fileurl="file://$PROJECT_DIR$/params_frontend/params_frontend.iml" filepath="$PROJECT_DIR$/params_frontend/params_frontend.iml" />
       <module fileurl="file://$PROJECT_DIR$/static_server/static_server.iml" filepath="$PROJECT_DIR$/static_server/static_server.iml" />
       <module fileurl="file://$PROJECT_DIR$/worlds_frontend/worlds_frontend.iml" filepath="$PROJECT_DIR$/worlds_frontend/worlds_frontend.iml" />
