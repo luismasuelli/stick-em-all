@@ -174,6 +174,8 @@ function finishInitialState(state) {
  * Creates an events effect for the assets' events.
  * @param economy The economy contract.
  * @param account The account to watch.
+ * @param setAssetsCache The setter of the cache.
+ * @param assetsCache The cache.
  * @returns {function(): void} The close function for the effect.
  */
 export default function assetsEventsEffect(economy, account, setAssetsCache, assetsCache) {
