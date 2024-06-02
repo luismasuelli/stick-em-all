@@ -212,6 +212,18 @@ task("add-callofthevoid-samples", "Adds all of the Call of the Void samples")
             badgeAchievementType, "Entropic Manifestation", `${baseImageUrl}/achievement-time.webp`,
             NO_DATA
         );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 3n, "Skeleton Warrior", `${baseImageUrl}/page-time-1.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 3n, "Banshee", `${baseImageUrl}/page-time-2.webp`, BRONZE, cardAchievementType, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 3n, "Bracelet of Memories", `${baseImageUrl}/page-time-3.webp`, SILVER, NONE, NO_DATA
+        );
+        await worldsManagement.defineAlbumPageSticker(
+            1n, 0n, 3n, "Ruined Belltower", `${baseImageUrl}/page-time-4.webp`, GOLD, NONE, NO_DATA
+        );
         console.log(">>> Page: Stars...");
         await worldsManagement.defineAlbumPage(
             1n, 0n, "Stars", `${baseImageUrl}/page-stars.webp`, 14,
