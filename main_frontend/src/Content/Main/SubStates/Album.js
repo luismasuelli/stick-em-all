@@ -1,10 +1,11 @@
 import ThemedPaper from "../../Controls/ThemedPaper";
-import {Box, Button, Chip} from "@mui/material";
+import {Box, Button, Chip, Grid} from "@mui/material";
 import {useNavigate, useParams} from "react-router-dom";
 import Label from "../../Controls/Label";
 import {useContext, useEffect, useMemo, useState} from "react";
 import ContractWindowContext from "../../Contexts/ContractWindowContext";
 import {useNonReactive} from "../../../Utils/nonReactive";
+import Section from "../../Controls/Section";
 
 
 function AlbumPastedSticker({
@@ -63,266 +64,277 @@ function AlbumPastedSticker({
 
 
 function AlbumPage({
-    worldsManagement, wrappedCall, albumId, albumTypeId, pageIdx, pageDefinition, albumDataCache
+    worldsManagement, main, wrappedCall, albumId, albumTypeId, pageIdx, pageDefinition, albumDataCache
 }) {
     const { layout, maxStickers } = pageDefinition;
     const background = pageDefinition.backgroundImage ? `url("${pageDefinition.backgroundImage}")` : "none";
+    const [pastedStickers, setPastedStickers] = useState([]);
 
     let content;
 
-    console.log("Layout:", layout);
+    useEffect(() => {
+        const updatePastedStickers = wrappedCall(async function() {
+            let newPastedStickers = [];
+            for(let idx = 0; idx < maxStickers; idx++) {
+                // eslint-disable-next-line no-undef
+                newPastedStickers.push(await main.methods.pastedStickers(albumId, (BigInt(pageIdx) << 3n) | BigInt(idx)).call());
+            }
+            setPastedStickers(newPastedStickers);
+        });
+        updatePastedStickers();
+    }, [main, albumId, maxStickers, pageIdx, wrappedCall]);
 
     switch(layout) {
         case 0n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="50%" top="50%" />
             </>;
             break;
         case 1n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="50%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="50%" top="75%" />
             </>;
             break;
         case 2n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="50%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="75%" top="50%" />
             </>;
             break;
         case 3n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="75%" top="25%" />
             </>;
             break;
         case 4n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="75%" top="75%" />
             </>;
             break;
         case 5n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="50%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="50%" top="50%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="50%" top="75%" />
             </>;
             break;
         case 6n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="50%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="50%" top="50%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="75%" top="50%" />
             </>;
             break;
         case 7n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="50%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="25%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="75%" top="75%" />
             </>;
             break;
         case 8n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="75%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="50%" top="75%" />
             </>;
             break;
         case 9n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="50%" top="50%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="75%" top="25%" />
             </>;
             break;
         case 10n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="50%" top="50%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="75%" top="75%" />
             </>;
             break;
         case 11n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="75%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="25%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={3}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[3]} left="75%" top="75%" />
             </>;
             break;
         case 12n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="50%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="65%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="25%" top="65%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="50%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={3}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="65%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[3]} left="75%" top="65%" />
             </>;
             break;
         case 13n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="35%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="35%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="50%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="35%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="75%" top="35%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={3}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[3]} left="50%" top="75%" />
             </>;
             break;
         case 14n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="75%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="50%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="50%" top="50%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={3}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[3]} left="25%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={4}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[4]} left="75%" top="75%" />
             </>;
             break;
         case 15n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="50%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="75%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={3}
-                                    albumDataCache={albumDataCache} pasted={false} left="33%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[3]} left="33%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={4}
-                                    albumDataCache={albumDataCache} pasted={false} left="66%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[4]} left="66%" top="75%" />
             </>;
             break;
         case 16n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="33%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="33%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="66%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="66%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="25%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={3}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[3]} left="50%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={4}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[4]} left="75%" top="75%" />
             </>;
             break;
         case 17n:
             content = <>
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="35%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[0]} left="25%" top="35%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={1}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="25%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[1]} left="50%" top="25%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={2}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="35%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[2]} left="75%" top="35%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={3}
-                                    albumDataCache={albumDataCache} pasted={false} left="25%" top="65%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[3]} left="25%" top="65%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={4}
-                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="75%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[4]} left="50%" top="75%" />
                 <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                     albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={5}
-                                    albumDataCache={albumDataCache} pasted={false} left="75%" top="65%" />
+                                    albumDataCache={albumDataCache} pasted={pastedStickers[5]} left="75%" top="65%" />
             </>;
             break;
         default:
@@ -339,11 +351,20 @@ function AlbumPage({
 function AlbumAchievements({
     worldsManagement, wrappedCall, albumId, albumTypeId, albumDataCache
 }) {
+    useEffect(() => {
+
+    }, [albumTypeId]);
+
+    return <Section title="Album achievements & completion" color="primary.light" sx={{marginTop: 4}}>
+        <Grid container>
+
+        </Grid>
+    </Section>
 }
 
 
 function AlbumLayout({
-    worldsManagement, wrappedCall, albumId, albumTypeId, albumDataCache
+    main, worldsManagement, wrappedCall, albumId, albumTypeId, albumDataCache
 }) {
     const {
         completedPages, frontImage, backImage
@@ -386,7 +407,7 @@ function AlbumLayout({
                 ? <></>
                 : (currentPage === maxPages - 1)
                     ? <img src={backImage} style={{width: "100%", height: "100%"}} alt="" />
-                    : <AlbumPage worldsManagement={worldsManagement} wrappedCall={wrappedCall}
+                    : <AlbumPage main={main} worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                  albumId={albumId}
                                  albumTypeId={albumTypeId} albumDataCache={albumDataCache}
                                  pageIdx={(currentPage - 1) * 2} pageDefinition={pages[(currentPage - 1) * 2]} />
@@ -400,7 +421,7 @@ function AlbumLayout({
                 ? <img src={frontImage} style={{width: "100%", height: "100%"}} alt="" />
                 : (currentPage === maxPages - 1)
                     ? <></>
-                    : <AlbumPage worldsManagement={worldsManagement} wrappedCall={wrappedCall}
+                    : <AlbumPage main={main} worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                                  albumId={albumId}
                                  albumTypeId={albumTypeId} albumDataCache={albumDataCache}
                                  pageIdx={currentPage * 2 - 1} pageDefinition={pages[currentPage * 2 - 1]} />
@@ -413,7 +434,7 @@ function AlbumLayout({
 }
 
 export default function Album({
-    worldsManagement, worlds, economy,
+    worldsManagement, worlds, economy, main,
     albumsDataCache, assetsDataCache, albumTypesDataCache
 }) {
     const {wrappedCall} = useContext(ContractWindowContext);
@@ -435,7 +456,7 @@ export default function Album({
         </Box>
         <Box>
             {(albumDataCache) ? (
-                <AlbumLayout worldsManagement={worldsManagement} wrappedCall={wrappedCall}
+                <AlbumLayout main={main} worldsManagement={worldsManagement} wrappedCall={wrappedCall}
                              albumId={albumId} albumTypeId={albumTypeId}
                              albumDataCache={albumDataCache} />
             ) : null}

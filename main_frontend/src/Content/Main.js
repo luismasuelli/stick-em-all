@@ -142,7 +142,7 @@ function MainContent({
                     albumTypesDataCache={albumTypesDataCache} setAlbumTypesDataCache={setAlbumTypesDataCache}
                 />} />
                 <Route path="/albums/:albumId" element={<Album
-                    economy={economy} worldsManagement={worldsManagement} worlds={worlds}
+                    main={main} economy={economy} worldsManagement={worldsManagement} worlds={worlds}
                     albumsDataCache={albumsDataCache} assetsDataCache={assetsDataCache}
                     albumTypesDataCache={albumTypesDataCache}
                 />} />
