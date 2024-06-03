@@ -9,7 +9,9 @@ export default function Album({
 }) {
     const navigate = useNavigate();
     const {albumId} = useParams();
+    const albumDataCache = albumsDataCache[albumTypesDataCache[albumId]];
 
+    console.log("cached data:", albumDataCache);
     return <ThemedPaper sx={{minHeight: "600px", marginTop: 2}}>
         <Box sx={{
             display: 'flex', justifyContent: 'space-between', marginBottom: 1, marginTop: 1
@@ -17,8 +19,8 @@ export default function Album({
             <Button variant="contained" color="primary"
                     onClick={() => navigate("/")}>&#9664; Back</Button>
             <Label sx={{paddingRight: 0}}>
-                You're in an album: {albumsDataCache[albumTypesDataCache[albumId]]?.name || "(Unknown)"}&nbsp;
-                (Edition: {albumsDataCache[albumTypesDataCache[albumId]]?.edition || "(Unknown)"})
+                You're in an album: {albumDataCache?.name || "(Unknown)"}&nbsp;
+                (Edition: {albumDataCache?.edition || "(Unknown)"})
             </Label>
         </Box>
     </ThemedPaper>;
