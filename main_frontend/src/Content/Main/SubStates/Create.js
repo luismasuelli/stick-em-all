@@ -125,58 +125,67 @@ export default function Create({
     });
 
     return <Box sx={{
-        aspectRatio: "16 / 9", width: "100%", backgroundSize: "cover", backgroundImage: worldBackground,
-        display: "flex", alignItems: "center", justifyContent: "center"
+        aspectRatio: "16 / 9", width: "100%", backgroundSize: "cover",
+        display: "flex", flexDirection: "column"
     }}>
-        <ThemedPaper color="primary.light">
-            <Grid container sx={{width: "800px"}} spacing={2}>
-                <Grid item xs={12}>
-                    <Heading>Please select a world and an album type to create your album</Heading>
-                </Grid>
-                <Grid item xs={8}>
-                    <Select autoWidth label="World" sx={{ minWidth: "200px", bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
-                            value={selectedWorldId} onChange={(e) => setSelectedWorldId(e.target.value)}>
-                        {worldsCache.worldsRelevance.map((world, index) => {
-                            return <MenuItem value={world.worldId} key={index}>
-                                {worldsDataCache[world.worldId] ? worldsDataCache[world.worldId].name : "(Unknown)"}
-                            </MenuItem>;
-                        })}
-                    </Select>
+        <Box sx={{display: 'flex', justifyContent: 'space-between', marginBottom: 1, marginTop: 1}}>
+            <Button variant="contained" color="primary"
+                    onClick={() => navigate("/")}>&#9664; Back</Button>
+        </Box>
+        <Box sx={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexGrow: 1, backgroundImage: worldBackground
+        }}>
+            <ThemedPaper color="primary.light">
+                <Grid container sx={{width: "800px"}} spacing={2}>
+                    <Grid item xs={12}>
+                        <Heading>Please select a world and an album type to create your album</Heading>
+                    </Grid>
+                    <Grid item xs={8}>
+                        <Select autoWidth label="World" sx={{ minWidth: "200px", bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
+                                value={selectedWorldId} onChange={(e) => setSelectedWorldId(e.target.value)}>
+                            {worldsCache.worldsRelevance.map((world, index) => {
+                                return <MenuItem value={world.worldId} key={index}>
+                                    {worldsDataCache[world.worldId] ? worldsDataCache[world.worldId].name : "(Unknown)"}
+                                </MenuItem>;
+                            })}
+                        </Select>
+                        {(selectedWorldId) ? (
+                            <ReverseChallenge worldId={selectedWorldId}
+                                              externalUrl={worldsDataCache[selectedWorldId]?.externalUrl}
+                                              validatorUrl={worldsDataCache[selectedWorldId]?.validatorUrl} />
+                        ) : null}
+                    </Grid>
+                    <Grid item xs={4}>
+                        <ImagePreview aspectRatio="1 / 1" cover={false} url={worldLogo} />
+                    </Grid>
                     {(selectedWorldId) ? (
-                        <ReverseChallenge worldId={selectedWorldId}
-                                          externalUrl={worldsDataCache[selectedWorldId]?.externalUrl}
-                                          validatorUrl={worldsDataCache[selectedWorldId]?.validatorUrl} />
+                        <>
+                            <Grid item xs={8}>
+                                <Grid item xs={8}>
+                                    <Select autoWidth label="Album" sx={{ minWidth: "200px", bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
+                                            value={selectedAlbumId} onChange={(e) => setSelectedAlbumId(e.target.value)}>
+                                        {albumsCache.albumsRelevance.map((album, index) => {
+                                            return <MenuItem value={album.albumId} key={index}>
+                                                {albumsDataCache[album.albumId] ? albumsDataCache[album.albumId].name : "(Unknown)"}
+                                            </MenuItem>;
+                                        })}
+                                    </Select>
+                                    {(selectedAlbumId !== "") ? (
+                                        <Button sx={{width: "100%", marginTop: 2}} onClick={createAlbum}
+                                                variant="contained" color="primary" size="large">
+                                            Create album
+                                        </Button>
+                                    ) : null}
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <ImagePreview aspectRatio="8 / 9" cover={false} url={albumImage} />
+                            </Grid>
+                        </>
                     ) : null}
                 </Grid>
-                <Grid item xs={4}>
-                    <ImagePreview aspectRatio="1 / 1" cover={false} url={worldLogo} />
-                </Grid>
-                {(selectedWorldId) ? (
-                    <>
-                        <Grid item xs={8}>
-                            <Grid item xs={8}>
-                                <Select autoWidth label="Album" sx={{ minWidth: "200px", bgcolor: 'background.paper', marginRight: '10px', padding: '5px' }}
-                                        value={selectedAlbumId} onChange={(e) => setSelectedAlbumId(e.target.value)}>
-                                    {albumsCache.albumsRelevance.map((album, index) => {
-                                        return <MenuItem value={album.albumId} key={index}>
-                                            {albumsDataCache[album.albumId] ? albumsDataCache[album.albumId].name : "(Unknown)"}
-                                        </MenuItem>;
-                                    })}
-                                </Select>
-                                {(selectedAlbumId !== "") ? (
-                                    <Button sx={{width: "100%", marginTop: 2}} onClick={createAlbum}
-                                            variant="contained" color="primary" size="large">
-                                        Create album
-                                    </Button>
-                                ) : null}
-                            </Grid>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <ImagePreview aspectRatio="8 / 9" cover={false} url={albumImage} />
-                        </Grid>
-                    </>
-                ) : null}
-            </Grid>
-        </ThemedPaper>
+            </ThemedPaper>
+        </Box>
     </Box>;
 }
