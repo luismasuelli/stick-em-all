@@ -149,9 +149,48 @@ contract StickEmAllEconomy is ERC1155 {
      * The URI for the token (depends on it being album, sticker, or booster pack).
      */
     function uri(uint256 _tokenId) public view virtual override returns (string memory) {
-        // TODO implement properly.
+        string memory name;
+        string memory description;
+        string memory image;
+        string memory type_;
+
+        if (_tokenId & (1<<255) != 0) {
+            if (_tokenId > lastAlbumId) return "";
+
+            uint256 typeId = albums[_tokenId].albumTypeId;
+            string memory edition;
+            (,name,edition,image,,,,,) = worldsManagement.albumDefinitions(typeId);
+            description = string(abi.encodePacked("Edition: ", edition));
+            type_ = "album";
+        } else if (_tokenId & (1<<30) != 0) {
+            bool created;
+            uint256 albumTypeId = _tokenId >> 31;
+            uint256 ruleId = _tokenId & ((1 << 16) - 1);
+            string memory albumName;
+            string memory albumEdition;
+            (,albumName,albumEdition,,,,,,) = worldsManagement.albumDefinitions(albumTypeId);
+            (created,,,,name,image,,,,) = worldsManagement.albumBoosterPackRules(albumTypeId, ruleId);
+            if (!created) return "";
+            description = string(abi.encodePacked("Booster Pack for Album: ", albumName, ", Edition: ", albumEdition));
+            type_ = "booster-pack";
+        } else {
+            uint256 slot = _tokenId & 7;
+            _tokenId = _tokenId >> 3;
+            uint16 page = uint16(_tokenId & ((1 << 13) - 1));
+            uint256 albumTypeId = _tokenId >> 28;
+            string memory albumName;
+            string memory albumEdition;
+            (,albumName,albumEdition,,,,,,) = worldsManagement.albumDefinitions(albumTypeId);
+            uint256 maxStickers = worldsManagement.albumPageStickersDefinitionsCount(albumTypeId, page);
+            if (slot >= maxStickers) return "";
+            (name,image,,) = worldsManagement.albumPageStickersDefinitions(albumTypeId, page, slot);
+            description = string(abi.encodePacked("Sticker for Album: ", albumName, ", Edition: ", albumEdition));
+            type_ = "sticker";
+        }
+
         return string(abi.encodePacked("data:application/json;base64,", Base64.encode(abi.encodePacked(
-            '{}'
+            '{"name":"', name, '","description":"', description, '","image":"', image,
+            '","properties":{"type":"', type_, '"}}'
         ))));
     }
 }
