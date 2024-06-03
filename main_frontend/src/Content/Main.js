@@ -12,6 +12,7 @@ import albumsEventsEffect from "./Main/albumsEventsEffect";
 import Create from "./Main/SubStates/Create";
 import MyAlbums from "./Main/SubStates/MyAlbums";
 import Album from "./Main/SubStates/Album";
+import assetsEventsEffect from "./Main/assetsEventsEffect";
 
 
 function EntryPoint() {
@@ -46,6 +47,8 @@ function EntryPoint() {
 function MainContent({
     contracts
 }) {
+    const context = {...useContext(Web3Context), ...useContext(Web3AccountContext)};
+    const {account} = context;
     const {
         main, economy, worldsManagement, worlds, params
     } = contracts;
@@ -73,7 +76,7 @@ function MainContent({
     // 3. Picking a world.
     let [selectedWorldId, setSelectedWorldId] = useState("");
 
-    // 3. Listing the albums' types (for a world).
+    // 4. Listing the albums' types (for a world).
     let [albumsCache, setAlbumsCache] = useState(
         {lastBlock: null, lastState: {albumsIndices: {}, albumsRelevance: []}}
     );
@@ -89,7 +92,7 @@ function MainContent({
         }
     }, [selectedWorldId, worldsManagement]);
 
-    // 6. Tracking the cached data for the albums.
+    // 5. Tracking the cached data for the albums.
     const [albumsDataCache, setAlbumsDataCache] = useState({});
     const setAlbumData = useNonReactive((albumId, albumData) => {
         setAlbumsDataCache({
@@ -98,14 +101,25 @@ function MainContent({
         });
     });
 
-    // 7. Listing all the assets (for an account).
+    // 6. Listing all the assets (for an account).
     let [assetsCache, setAssetsCache] = useState({
         lastBlock: null, lastState: {
-            assetsIndices: {}, assetsRelevance: [], boosterPacks: {}, stickers: {}, albums: {}
+            assetsIndices: {}, assetsRelevance: [], boosterPacks: {}, stickers: {}, albums: []
         }}
     );
+    useEffect(() => {
+        setAssetsCache({lastBlock: null, lastState: {
+            assetsIndices: {}, assetsRelevance: [], boosterPacks: {}, stickers: {}, albums: []
+        }});
+        // start fetching albums data.
+        return assetsEventsEffect(
+            economy, account, setAssetsCache, {lastBlock: null, lastState: {
+                assetsIndices: {}, assetsRelevance: [], boosterPacks: {}, stickers: {}, albums: []
+            }}
+        );
+    }, [account, economy]);
 
-    // 8. Tracking the cached data for the assets.
+    // 7. Tracking the cached data for the assets.
     let [assetsDataCache, setAssetsDataCache] = useState({});
 
     return <Box sx={{width: "100%", height: "100%", minHeight: "600px", position: "relative"}}>
@@ -118,7 +132,10 @@ function MainContent({
                     albumsCache={albumsCache.lastState} albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
                     selectedWorldId={selectedWorldId} setSelectedWorldId={setSelectedWorldId}
                 />} />
-                <Route path="/albums" element={<MyAlbums />} />
+                <Route path="/albums" element={<MyAlbums
+                    worldsManagement={worldsManagement} albums={assetsCache.lastState.albums}
+                    albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
+                />} />
                 <Route path="/albums/:albumId" element={<Album />} />
             </Routes>
         </MemoryRouter>
