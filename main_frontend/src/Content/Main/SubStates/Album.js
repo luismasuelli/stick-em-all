@@ -1,5 +1,5 @@
 import ThemedPaper from "../../Controls/ThemedPaper";
-import {Box, Button} from "@mui/material";
+import {Box, Button, Chip} from "@mui/material";
 import {useNavigate, useParams} from "react-router-dom";
 import Label from "../../Controls/Label";
 import {useContext, useEffect, useMemo, useState} from "react";
@@ -53,6 +53,10 @@ function AlbumPastedSticker({
         <Box style={{
             position: "absolute", bottom: -4, right: -4, top: -4, left: -4,
             width: "100%", height: "100%", zIndex: 2000, border: "4px solid white",
+        }} />
+        <Chip label={stickerData.displayName} variant="outlined" style={{
+            position: "absolute", bottom: "-35%", left: "50%", transform: "translate(-50%, -50%)",
+            zIndex: 3000, backgroundColor: "white"
         }} />
     </Box>;
 }
@@ -329,6 +333,12 @@ function AlbumPage({
     return <Box style={{width: "100%", height: "100%", backgroundImage: background}}>
         {content}
     </Box>;
+}
+
+
+function AlbumAchievements({
+    worldsManagement, wrappedCall, albumId, albumTypeId, albumDataCache
+}) {
 }
 
 
