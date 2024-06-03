@@ -11,6 +11,8 @@ function AlbumPastedSticker({
     worldsManagement, albumTypeId, pageIdx, slotIdx, pasted, albumDataCache,
     wrappedCall, left, top
 }) {
+    console.log("Printing sticker...");
+
     const {
         rarityIcons
     } = albumDataCache;
@@ -33,30 +35,102 @@ function AlbumPastedSticker({
         getStickerDefinition();
     }, [albumTypeId, pageIdx, slotIdx, wrappedCall, worldsManagement]);
 
-    const rarityIndex = stickerData.rarity;
-    const rarityIconsUrl = rarityIcons ? (`url("${rarityIcons}")`) : "none"
+    // eslint-disable-next-line no-undef
+    const rarityIndex = parseFloat(stickerData.rarity.toString());
+    const rarityIconsUrl = rarityIcons ? `url("${rarityIcons}")` : "none";
+    const imageUrl = stickerData.image ? `url("${stickerData.image}")` : "none";
 
     return <Box style={{
-        width: "20%", height: "20%", position: "absolute", left: left || 0, top: top || 0,
-        transform: "translate(-50%, -50%)", border: "4px solid white", opacity: pasted ? 1 : 0.5}}
-    >
-        <img src={stickerData.image} style={{width: "100%", height: "100%"}} alt={stickerData.displayName} />
-        <div style={{
+        width: "20%", aspectRatio: "1 / 1", position: "absolute", left: left || 0, top: top || 0,
+        transform: "translate(-50%, -50%)", opacity: pasted ? 1 : 0.5,
+        backgroundImage: imageUrl, backgroundSize: "contain"
+    }}>
+        <Box style={{
             width: "20%", height: "20%", position: "absolute", bottom: "10%", right: "10%",
             backgroundImage: rarityIconsUrl, backgroundRepeat: "no-repeat", backgroundSize: "400% 100%",
-            backgroundPosition: `${rarityIndex * -100}% 0`
+            backgroundPosition: `${(rarityIndex * 33.3333333333).toString()}% 0`, zIndex: 1000
+        }} />
+        <Box style={{
+            position: "absolute", bottom: -4, right: -4, top: -4, left: -4,
+            width: "100%", height: "100%", zIndex: 2000, border: "4px solid white",
         }} />
     </Box>;
 }
 
 
 function AlbumPage({
-    albumId, albumTypeId, pageDefinition, albumDataCache, wrappedCall
+    worldsManagement, wrappedCall, albumId, albumTypeId, pageIdx, pageDefinition, albumDataCache
 }) {
-    const { layout, maxStickers } = pageDefinition.layout;
+    const { layout, maxStickers } = pageDefinition;
     const background = pageDefinition.backgroundImage ? `url("${pageDefinition.backgroundImage}")` : "none";
 
-    let content = <></>;
+    let content;
+
+    console.log("Layout:", layout);
+
+    switch(layout) {
+        case 0n:
+            content = <>
+                <AlbumPastedSticker worldsManagement={worldsManagement} wrappedCall={wrappedCall}
+                                    albumTypeId={albumTypeId} pageIdx={pageIdx} slotIdx={0}
+                                    albumDataCache={albumDataCache} pasted={false} left="50%" top="50%" />
+            </>;
+            break;
+        case 1n:
+            content = <></>;
+            break;
+        case 2n:
+            content = <></>;
+            break;
+        case 3n:
+            content = <></>;
+            break;
+        case 4n:
+            content = <></>;
+            break;
+        case 5n:
+            content = <></>;
+            break;
+        case 6n:
+            content = <></>;
+            break;
+        case 7n:
+            content = <></>;
+            break;
+        case 8n:
+            content = <></>;
+            break;
+        case 9n:
+            content = <></>;
+            break;
+        case 10n:
+            content = <></>;
+            break;
+        case 11n:
+            content = <></>;
+            break;
+        case 12n:
+            content = <></>;
+            break;
+        case 13n:
+            content = <></>;
+            break;
+        case 14n:
+            content = <></>;
+            break;
+        case 15n:
+            content = <></>;
+            break;
+        case 16n:
+            content = <></>;
+            break;
+        case 17n:
+            content = <></>;
+            break;
+        default:
+            content = <></>;
+            break;
+    }
 
     return <Box style={{width: "100%", height: "100%", backgroundImage: background}}>
         {content}
@@ -108,7 +182,10 @@ function AlbumLayout({
                 ? <></>
                 : (currentPage === maxPages - 1)
                     ? <img src={backImage} style={{width: "100%", height: "100%"}} alt="" />
-                    : <AlbumPage albumId={albumId} pageDefinition={pages[(currentPage - 1) * 2]} />
+                    : <AlbumPage worldsManagement={worldsManagement} wrappedCall={wrappedCall}
+                                 albumId={albumId}
+                                 albumTypeId={albumTypeId} albumDataCache={albumDataCache}
+                                 pageIdx={(currentPage - 1) * 2} pageDefinition={pages[(currentPage - 1) * 2]} />
             }
             <Button style={{position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)"}}
                     onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
@@ -119,7 +196,10 @@ function AlbumLayout({
                 ? <img src={frontImage} style={{width: "100%", height: "100%"}} alt="" />
                 : (currentPage === maxPages - 1)
                     ? <></>
-                    : <AlbumPage albumId={albumId} pageDefinition={pages[currentPage * 2 - 1]} />
+                    : <AlbumPage worldsManagement={worldsManagement} wrappedCall={wrappedCall}
+                                 albumId={albumId}
+                                 albumTypeId={albumTypeId} albumDataCache={albumDataCache}
+                                 pageIdx={currentPage * 2 - 1} pageDefinition={pages[currentPage * 2 - 1]} />
             }
             <Button style={{position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)"}}
                     onClick={() => setCurrentPage(Math.min(maxPages - 1, currentPage + 1))}
