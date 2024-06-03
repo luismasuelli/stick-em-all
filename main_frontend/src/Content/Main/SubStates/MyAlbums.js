@@ -8,7 +8,8 @@ import {useNonReactive} from "../../../Utils/nonReactive";
 import ThemedPaper from "../../Controls/ThemedPaper";
 
 export default function MyAlbums({
-    economy, worldsManagement, worlds, albums, albumsDataCache, setAlbumsDataCache
+    economy, worldsManagement, worlds, albums, albumsDataCache, setAlbumsDataCache,
+    albumTypesDataCache, setAlbumTypesDataCache
 }) {
     const [selectedAlbumId, setSelectedAlbumId] = useState("");
     const {wrappedCall} = useContext(ContractWindowContext);
@@ -21,12 +22,19 @@ export default function MyAlbums({
         const fetchAlbumsData = wrappedCall(async function(){
             let newAlbumsDataCache = albumsDataCache;
             let newLocalAlbumsData = {};
+            let newAlbumTypesDataCache = albumTypesDataCache;
 
             for(let idx = 0; idx < albums.length; idx++) {
                 const id = albums[idx].toString();
+                const { albumTypeId } = await economy.methods.albums(id).call();
+                if (albumTypesDataCache[id] === undefined) {
+                    newAlbumTypesDataCache = {
+                        ...newAlbumTypesDataCache,
+                        ...(Object.fromEntries([[id, albumTypeId]]))
+                    }
+                }
 
-                if (!albumsDataCache[id]) {
-                    const { albumTypeId } = await economy.methods.albums(id).call();
+                if (!albumsDataCache[albumTypeId]) {
                     const {
                         worldId, name, edition, frontImage, backImage, rarityIcons,
                         totalStickers, completedPages, released
@@ -38,22 +46,24 @@ export default function MyAlbums({
                     }
                     newAlbumsDataCache = {
                         ...newAlbumsDataCache,
-                        ...(Object.fromEntries([[id, retrievedAlbumData]]))
+                        ...(Object.fromEntries([[albumTypeId, retrievedAlbumData]]))
                     }
                 }
 
-                newLocalAlbumsData[id.toString()] = newAlbumsDataCache[id];
+                newLocalAlbumsData[id.toString()] = newAlbumsDataCache[newAlbumTypesDataCache[id]];
             }
 
             setAlbumsDataCache(newAlbumsDataCache);
             setLocalAlbumsData(newLocalAlbumsData);
+            setAlbumTypesDataCache(newAlbumTypesDataCache);
         })
         fetchAlbumsData();
-    }, [worlds, economy, worldsManagement, albums, albumsDataCache, setAlbumsDataCache, wrappedCall]);
+    }, [
+        worlds, economy, worldsManagement, albums, wrappedCall,
+        albumsDataCache, setAlbumsDataCache, albumTypesDataCache, setAlbumTypesDataCache
+    ]);
 
     let worldBackground = localAlbumsData[selectedAlbumId]?.worldBackground;
-    console.log("Local albums data:", localAlbumsData);
-    console.log("World background:", worldBackground);
     if (worldBackground) worldBackground = `url("${worldBackground}")`;
 
     return <Box sx={{

@@ -122,6 +122,9 @@ function MainContent({
     // 7. Tracking the cached data for the assets.
     let [assetsDataCache, setAssetsDataCache] = useState({});
 
+    // 8. Also tracking the types of the albums.
+    let [albumTypesDataCache, setAlbumTypesDataCache] = useState({});
+
     return <Box sx={{width: "100%", height: "100%", minHeight: "600px", position: "relative"}}>
         <MemoryRouter>
             <Routes>
@@ -136,8 +139,12 @@ function MainContent({
                     economy={economy} worldsManagement={worldsManagement} worlds={worlds}
                     albums={assetsCache.lastState.albums}
                     albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
+                    albumTypesDataCache={albumTypesDataCache} setAlbumTypesDataCache={setAlbumTypesDataCache}
                 />} />
-                <Route path="/albums/:albumId" element={<Album />} />
+                <Route path="/albums/:albumId" element={<Album
+                    economy={economy} worldsManagement={worldsManagement} worlds={worlds}
+                    albumsDataCache={albumsDataCache} assetsDataCache={assetsDataCache}
+                />} />
             </Routes>
         </MemoryRouter>
     </Box>;
