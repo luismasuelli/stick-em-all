@@ -7,15 +7,60 @@ import ContractWindowContext from "../../Contexts/ContractWindowContext";
 import {useNonReactive} from "../../../Utils/nonReactive";
 
 
+function AlbumPastedSticker({
+    worldsManagement, albumTypeId, pageIdx, slotIdx, pasted, albumDataCache,
+    wrappedCall
+}) {
+    const {
+        rarityIcons
+    } = albumDataCache;
+
+    const [stickerData, setStickerData] = useState({
+        displayName: "", image: "", rarity: 0
+    });
+
+    useEffect(() => {
+        const getStickerDefinition = wrappedCall(async function() {
+            const {
+                displayName, image, rarity
+            } = await worldsManagement.methods.albumPageStickersDefinitions(
+                albumTypeId, pageIdx, slotIdx
+            ).call();
+            setStickerData({
+                displayName, image, rarity
+            });
+        });
+        getStickerDefinition();
+    }, [albumTypeId, pageIdx, slotIdx, wrappedCall, worldsManagement]);
+
+    const rarityIndex = stickerData.rarity;
+    const rarityIconsUrl = rarityIcons ? (`url("${rarityIcons}")`) : "none"
+
+    return <Box style={{
+        width: "20%", height: "20%", position: "relative",
+        border: "4px solid white", opacity: pasted ? 1 : 0.5}}
+    >
+        <img src={stickerData.image} style={{width: "100%", height: "100%"}} alt={stickerData.displayName} />
+        <div style={{
+            width: "20%", height: "20%", position: "absolute", bottom: "10%", right: "10%",
+            backgroundImage: rarityIconsUrl, backgroundRepeat: "no-repeat", backgroundSize: "400% 100%",
+            backgroundPosition: `${rarityIndex * -100}% 0`
+        }} />
+    </Box>;
+}
+
+
 function AlbumPage({
-    albumId, albumTypeId, pageDefinition
+    albumId, albumTypeId, pageDefinition, albumDataCache, wrappedCall
 }) {
     const layout = pageDefinition.layout;
     const background = pageDefinition.backgroundImage ? `url("${pageDefinition.backgroundImage}")` : "none";
 
-    return <Box style={{width: "100%", height: "100%", backgroundImage: background}}>
+    let content = <></>;
 
-    </Box>
+    return <Box style={{width: "100%", height: "100%", backgroundImage: background}}>
+        {content}
+    </Box>;
 }
 
 
