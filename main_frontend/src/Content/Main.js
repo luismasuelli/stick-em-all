@@ -133,7 +133,8 @@ function MainContent({
                     selectedWorldId={selectedWorldId} setSelectedWorldId={setSelectedWorldId}
                 />} />
                 <Route path="/albums" element={<MyAlbums
-                    economy={economy} worldsManagement={worldsManagement} albums={assetsCache.lastState.albums}
+                    economy={economy} worldsManagement={worldsManagement} worlds={worlds}
+                    albums={assetsCache.lastState.albums}
                     albumsDataCache={albumsDataCache} setAlbumsDataCache={setAlbumsDataCache}
                 />} />
                 <Route path="/albums/:albumId" element={<Album />} />
