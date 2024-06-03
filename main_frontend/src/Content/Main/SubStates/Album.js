@@ -9,7 +9,7 @@ import {useNonReactive} from "../../../Utils/nonReactive";
 
 function AlbumPastedSticker({
     worldsManagement, albumTypeId, pageIdx, slotIdx, pasted, albumDataCache,
-    wrappedCall
+    wrappedCall, left, top
 }) {
     const {
         rarityIcons
@@ -37,8 +37,8 @@ function AlbumPastedSticker({
     const rarityIconsUrl = rarityIcons ? (`url("${rarityIcons}")`) : "none"
 
     return <Box style={{
-        width: "20%", height: "20%", position: "relative",
-        border: "4px solid white", opacity: pasted ? 1 : 0.5}}
+        width: "20%", height: "20%", position: "absolute", left: left || 0, top: top || 0,
+        transform: "translate(-50%, -50%)", border: "4px solid white", opacity: pasted ? 1 : 0.5}}
     >
         <img src={stickerData.image} style={{width: "100%", height: "100%"}} alt={stickerData.displayName} />
         <div style={{
@@ -53,7 +53,7 @@ function AlbumPastedSticker({
 function AlbumPage({
     albumId, albumTypeId, pageDefinition, albumDataCache, wrappedCall
 }) {
-    const layout = pageDefinition.layout;
+    const { layout, maxStickers } = pageDefinition.layout;
     const background = pageDefinition.backgroundImage ? `url("${pageDefinition.backgroundImage}")` : "none";
 
     let content = <></>;
