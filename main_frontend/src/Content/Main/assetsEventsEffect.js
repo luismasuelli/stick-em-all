@@ -16,22 +16,18 @@ const stickerCombinedIdSubMask = (1n << 16n) - 1n;
  */
 function categorizeId(id) {
     // id is already a BigInt here.
-    console.log(`##### Categorizing id: ${id}`);
 
     // Test for album id.
     if ((id & albumIdMask) !== 0n) {
-        console.log(`##### It is an ID`);
         return {type: "album"};
     }
 
     // Test for booster pack id.
     if ((id & boosterPackSubMask) !== 0n) {
-        console.log(`##### It is a Booster Pack`);
         return {type: "booster-pack", albumTypeId: id >> 31n, ruleId: id & boosterPackRuleIdSubMask};
     }
 
     // Assume for sticker id.
-    console.log(`##### It is a Sticker`);
     return {
         type: "sticker", albumTypeId: id >> 31n,
         pageId: (id >> 3n) & stickerPageIdSubMask, slotId: (id & 7n),
