@@ -144,6 +144,7 @@ function MainContent({
                 <Route path="/albums/:albumId" element={<Album
                     economy={economy} worldsManagement={worldsManagement} worlds={worlds}
                     albumsDataCache={albumsDataCache} assetsDataCache={assetsDataCache}
+                    albumTypesDataCache={albumTypesDataCache}
                 />} />
             </Routes>
         </MemoryRouter>
